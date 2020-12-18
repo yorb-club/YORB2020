@@ -156,6 +156,7 @@ export class WinterShow2020 {
         const arrowImageObjects = [
             {file:ArrowImages['MainProjArea_Forward'], w:4, h:2.5, x:-9, y:0.01, z:-12, rotateX:-Math.PI / 2, rotateY:Math.PI / 2},
             {file:ArrowImages['MainProjArea_Forward'], w:4, h:2.5, x:-1, y:0.01, z:-12, rotateX:-Math.PI / 2, rotateY:Math.PI / 2},
+            {file:ArrowImages['MainProjArea_Forward'], w:4, h:2.5, x:12, y:0.01, z:-1, rotateX:-Math.PI / 2, rotateY:Math.PI / 2},
             {file:ArrowImages['Yorblet1-6_Left'], w:4, h:2, x:-18, y:0.01, z:-5, rotateX:-Math.PI / 2, rotateY:Math.PI / 2},
             {file:ArrowImages['Yorblet6-12_Right'], w:4.5, h:2, x:-18, y:0.01, z:-23, rotateX:-Math.PI / 2, rotateY:Math.PI / 2},
             {file:ArrowImages['ZoomProjects'], w:4, h:2, x:-18, y:0.01, z:-14, rotateX:-Math.PI / 2, rotateY:Math.PI / 2}
