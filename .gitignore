@@ -8,3 +8,5 @@ images/project_thumbnails
 .cache
 dist/
 utilities/getProjectThumbnails/projectThumbnails
+*/100DaysScripts/package-lock.json
+100Days/
