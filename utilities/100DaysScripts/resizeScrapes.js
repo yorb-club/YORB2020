@@ -12,13 +12,15 @@ const path = require('path');
 const sharp = require('sharp');
 
 const rootPath = '/home/dangalf/Desktop/YORB/YORB2020/'; //not sure if i need this, but was throwing errors when tried relative path with path.join (normalizing?)
+// const rootDir = path.dirname(require.main.filename);
+// console.log(rootDir);
 const scrapesFolder = path.join(rootPath, 'src/assets/images/100Days/scrapes');
 const resizedFolder = path.join(rootPath, 'src/assets/images/100Days/resized');
 
 let accountFolders = [];
 
 //for each account folder, make an object that has that account and all the post files saved in that dir
-fs.readdirSync(scrapesFolder).map(dirName => {
+fs.readdirSync(scrapesFolder).forEach(dirName => {
     let accountDir = path.join(scrapesFolder, dirName);
     let posts = fs.readdirSync(accountDir);
     accountFolders.push({path: accountDir, account: dirName, posts: posts}); 
@@ -32,7 +34,7 @@ fs.readdirSync(scrapesFolder).map(dirName => {
 console.log(accountFolders);
 
 for (let folder of accountFolders) {
-    fs.readdirSync(folder.path).map(fileName => {
+    fs.readdirSync(folder.path).forEach(fileName => {
         console.log(path.join(folder.path, fileName));
         //check for old posts
         if(!fileName.includes('old')){

@@ -17,6 +17,8 @@ import { ProjectionScreens } from './projectionScreens';
 import { YorbControls2 } from './yorbControls2.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
+import { DaysGallery } from './daysGallery';
+
 
 import * as THREE from 'three';
 
@@ -137,8 +139,11 @@ export class Yorb {
             this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
             this.itpModel = new ITPModel(this.scene);
-
             this.photoGallery = new PhotoGallery(this.scene);
+            this.daysGallery = new DaysGallery(this.scene, "classrooms");
+            // let posts = this.daysGallery.check();
+            // log('post check: ' + posts);
+            this.daysGallery.setupTest();
         }
 
         // this.sketches = new Sketches(this.scene)

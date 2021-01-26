@@ -10,12 +10,18 @@
 - [ ] create YORBOT account and follow class
 - [ ] send email to classes about permissions vis a vis bot follow
 - [ ] .env for insta account + password
+- [ ] sort by class in YORB not resize?
+- [ ] which parts need to be in .gitignore? issue if trying to run before anything in scrapes?
 
 ### To-Do: Develop
 - [X] resize script (images)
 - [ ] resize script (videos)
 - [ ] 100Days module
 - [ ] YORB test
+- [ ] nameplate above canvas
+- [ ] click/interact to change day or go through multiple posts
+- [ ] need to separate students by class?
+- [ ] *optional* would be cool to have some sort of structure outside that gets bigger with each post
 
 ## Order of Operations
 
