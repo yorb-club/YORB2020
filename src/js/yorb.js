@@ -143,7 +143,7 @@ export class Yorb {
             this.daysGallery = new DaysGallery(this.scene, "classrooms");
             // let posts = this.daysGallery.check();
             // log('post check: ' + posts);
-            this.daysGallery.setupTest();
+            // this.daysGallery.setupTest();
         }
 
         // this.sketches = new Sketches(this.scene)

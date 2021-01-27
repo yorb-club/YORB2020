@@ -8,5 +8,6 @@ images/project_thumbnails
 .cache
 dist/
 utilities/getProjectThumbnails/projectThumbnails
-*/100DaysScripts/package-lock.json
-100Days/
+100DaysScripts/package-lock.json
+/src/assets/images/100Days/
+utilities/100DaysScripts/instagram-scraper.log
