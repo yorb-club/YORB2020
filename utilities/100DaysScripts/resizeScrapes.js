@@ -51,7 +51,8 @@ for (let folder of accountFolders) {
             if(fileName.includes('.jpg')) { //its an image
                 //resize the image and save to the resized folder
                 sharp(path.join(folder.path, fileName))
-                .resize(256, 256)
+                // .resize(256, 256)
+                .resize(1024, 1024, {fit: 'contain'})
                 .toFile(path.join(dayFolder, existingNum + '.png'), (err, info) => {
                     if (err) {
                         console.log('ERROR at ' + folder.path + '/' + fileName + " : " + err);
