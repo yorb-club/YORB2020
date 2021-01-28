@@ -141,9 +141,6 @@ export class Yorb {
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, "classrooms");
-            // let posts = this.daysGallery.check();
-            // log('post check: ' + posts);
-            // this.daysGallery.setupTest();
         }
 
         // this.sketches = new Sketches(this.scene)

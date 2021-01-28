@@ -44,7 +44,11 @@
 ### Cron Job: scrape & resize
 
 ```
-0 8 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && instagram-scraper -f accounts.txt -u <YORBO> -p <password> -d ../../src/assets/images/100Days/scrapes -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
+0 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && sudo instagram-scraper -f accounts_kd.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/kd -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
 
-30 8 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && <resize-script>
+10 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && sudo instagram-scraper -f accounts_kc.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/kc -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
+
+20 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && sudo instagram-scraper -f accounts_paula.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/paula -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
+
+30 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && <resize-script>
 ``` 

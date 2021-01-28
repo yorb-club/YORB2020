@@ -19,16 +19,18 @@ const resizedFolder = path.join(rootPath, 'src/assets/images/100Days/resized');
 
 let accountFolders = [];
 
-//for each account folder, make an object that has that account and all the post files saved in that dir
-fs.readdirSync(scrapesFolder).forEach(dirName => {
-    let accountDir = path.join(scrapesFolder, dirName);
-    let posts = fs.readdirSync(accountDir);
-    accountFolders.push({path: accountDir, account: dirName, posts: posts}); 
+//for each class and account folder, make an object that has that account and all the post files saved in that dir
+fs.readdirSync(scrapesFolder).forEach(classDir => {
+    fs.readdirSync(path.join(scrapesFolder, classDir)).forEach(dirName => {
+        let accountDir = path.join(scrapesFolder, classDir, dirName);
+        let posts = fs.readdirSync(accountDir);
+        accountFolders.push({path: accountDir, class: classDir, account: dirName, posts: posts}); 
 
-    //also need to make account dir in resized if it doesn't already exist
-    if (!fs.existsSync(path.join(resizedFolder, dirName))){
-        fs.mkdirSync(path.join(resizedFolder, dirName));
-    }
+        //also need to make account dir in resized if it doesn't already exist
+        if (!fs.existsSync(path.join(resizedFolder, classDir, dirName))){
+            fs.mkdirSync(path.join(resizedFolder, classDir, dirName));
+        }
+    });
 });
 
 console.log(accountFolders);
@@ -40,7 +42,7 @@ for (let folder of accountFolders) {
         if(!fileName.includes('old')){
             //make a folder per day so we can sort by date
             let day = fileName.substr(0, 8);
-            let dayFolder = path.join(resizedFolder, folder.account, day);
+            let dayFolder = path.join(resizedFolder, folder.class, folder.account, day);
             if(!fs.existsSync(dayFolder)) {
                 fs.mkdirSync(dayFolder);
             }

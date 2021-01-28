@@ -12,65 +12,6 @@ const log = debugModule('YORB:DaysGallery');
 // why folders in dist is better than one big folder:
 // https://medium.com/hceverything/parcel-js-moving-static-resources-to-a-separate-folder-aef63a038cbd
 
-//can't do the following because parcel doesn't do readdirSync, only readfileSync
-// let assetPath = '../assets/images/100Days/resized';
-// let posts = []
-// fs.readdirSync(assetPath).forEach(folder => {
-//     fs.readdirSync(path.join(assetPath, folder)).forEach(file => {
-//         posts.push(require(path.join(assetPath, folder, file))); //testing to see if this does what i think it will...
-//     });
-// });
-
-//instead using the npm module require-directory -- nope, that uses readdirSync
-//now trying auto-load module -- nope that uses readdirSync too
-// const autoload = require('auto-load');
-// const posts = autoload(assetPath);
-
-
-//https://www.npmjs.com/package/parcel-plugin-static-files-copy
-// let posts = require('../../dist/100Days/resized/kcconch/20101005/0.png');
-// let assetPath = '../../dist/100Days/resized';
-// let posts = [];
-// fs.readdirSync(assetPath).forEach(folder => {
-//     fs.readdirSync(path.join(assetPath, folder)).forEach(file => {
-//         posts.push(require(path.join(assetPath, folder, file))); //testing to see if this does what i think it will...
-//     });
-// });
-//basically useless because still relies on readdirSync...
-
-/*
-//okay, now going to try and just run a script that will create a new module that exports a reference to the folders.
-//will have to either run createDaysDir.js after resizeScrapes.js or just append the short functions to the end of the latter
-const daysDir = require('./daysDir.js')
-let assetPath = '../../assets/images/100Days/resized';
-let distPath = '../../../dist/100Days/resized'
-//should this go in createDaysDir so that the require has it all already? keeping it here because that module gets rewritten
-//there's gotta be a better way to do this, this is super redundant:
-// const posts = require(path.join(distPath, '100daysof_emp/20101005/0.png'));
-const posts = require('../../../dist/100Days/resized/100daysof_emp/20101005/0.png');
-// const posts = require('../../../dist/100Days/resized/kcconch/20101005/0.png')
-//ugh stupid dist hash thing
-let postsDir = {};
-Object.keys(daysDir).forEach(account => {
-    postsDir[account] = {};
-    Object.keys(daysDir[account]).forEach(date => {
-        // let thosePosts = require(path.join(assetPath, account, date, "*.png"));
-        // postsDir[account][date] = thosePosts;
-
-        postsDir[account][date] = [];
-        daysDir[account][date].forEach(post => {
-            console.log("post" + post)
-            // console.log(path.join(distPath, account, date, post))
-            // postsDir[account][date].push(require(path.join(distPath, account, date, post)));
-            postsDir[account][date].push(fs.readFileSync(path.join(distPath, account, date, post)));
-        });
-    });
-});
-*/
-
-// let posts = daysDir['kcconch'];
-// let posts = postsDir;
-
 
 const postsDir = require('../assets/images/100Days/resized/**/*.png');
 
@@ -82,7 +23,10 @@ export class DaysGallery {
         this.location = {}
         if (location == 'classrooms'){
             //starting point is front left corner of back classroom
-            this.location.startPoint = new Vector3(42, 2, 7);
+            this.location.startPoint = {};
+            this.location.startPoint.left = new Vector3(42, 2.5, 7);
+            this.location.startPoint.right = new Vector3(47, 2.5, 19.4);
+            // this.location.startPoint.third  //TODO location and name
             this.setup(this.location.startPoint);
         } else { //just for testing the now defunct setupGrid()
             this.location.center = new Vector3(40.5, 0, 0);
@@ -95,9 +39,8 @@ export class DaysGallery {
     //get posts and generate canvases along the walls of the back classroom (just left for now)
     //TODO generate box geometry based on image size? dont want to squish rects
     setup (startPoint){
+        this.galleryTitle();
         let todaysPosts = this.getTodaysPosts();
-        log("tp: ");
-        log(todaysPosts);
         this.generateGallery(todaysPosts, startPoint);
     }
 
@@ -105,27 +48,52 @@ export class DaysGallery {
     getTodaysPosts () {
         let allPosts = [];
         //sort the account dates so we know the most recent folder
-        Object.keys(postsDir).forEach(account => {
+        Object.keys(postsDir).forEach(classroom => {
             let unsorted = {};
-                unsorted[account] = [];
-            Object.keys(postsDir[account]).forEach(date => {
-                unsorted[account].push(date);
+            unsorted[classroom] = {};
+            Object.keys(postsDir[classroom]).forEach(account => {
+                    unsorted[classroom][account] = [];
+                Object.keys(postsDir[classroom][account]).forEach(date => {
+                    unsorted[classroom][account].push(date);
+                });
             });
             allPosts.push(unsorted);
         });
-        allPosts.forEach(account => {
-            //prob a better way of doing this
-            Object.keys(account).forEach(dateArray => {
-                account[dateArray] = account[dateArray].sort((a, b) => {
-                    return b-a
+        console.log(JSON.stringify(allPosts) + '\n\n\n\n\n');
+        allPosts.forEach(classroom => {
+            //this is def weird
+            console.log(classroom)
+            Object.keys(classroom).forEach(classObj => {
+                // console.log(JSON.stringify(classObj) + 'asdfd');
+                console.log(classObj);
+                Object.keys(classroom[classObj]).forEach(account => {
+                    console.log(JSON.stringify(account) + account)
+                    //prob a better way of doing this
+                    // classroom[classObj][account].forEach(dateArray => {
+                    //     console.log(dateArray)
+                    //     console.log(JSON.stringify(account))
+                    console.log(classroom[classObj][account])
+                    // account[dateArray] = account[dateArray].sort((a, b) => {
+                    classroom[classObj][account] = classroom[classObj][account].sort((a, b) => {
+                    
+                        return b-a
+                    });
+                    // });
                 });
             });
         });
         //for now, just getting the first image from the most recent post folder
         let todaysPosts = [];
-        allPosts.forEach(account => {
-            let accountName = Object.keys(account)[0];
-            todaysPosts.push(postsDir[accountName][account[accountName][0]]['0']);
+        allPosts.forEach(classroom => {
+            Object.keys(classroom).forEach(classObj => {
+                console.log(classObj)
+                console.log(postsDir);
+                Object.keys(classroom[classObj]).forEach(account => {
+                    console.log(account);
+                    // let accountName = Object.keys(account)[0];
+                    todaysPosts.push({classroom: classObj, account: account, post: postsDir[classObj][account][classroom[classObj][account][0]]['0']});
+                });
+            });
         });
 
         return todaysPosts;
@@ -133,16 +101,34 @@ export class DaysGallery {
 
     //goes along the classroom wall with a .5 gap between 
     generateGallery (posts, startPoint) {
-        let currentSpot = startPoint;
+        let currentSpot = startPoint.left;
         let room = 'left';
         let direction = 'west'
         //go through all posts (TODO -- might want to not just start at corner)
-        for (let post of posts) {
-            //add next canvas
-            this.generateCanvas(post, currentSpot);
 
-            //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
-            [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
+
+        //hacky because rushing -- TODO fix
+        for (let post of posts) {
+            if(post.classroom = "kd") {
+                //add next canvas
+                this.generateCanvas(post.post, currentSpot);
+                //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
+                [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
+            }
+        }
+
+        currentSpot = startPoint.right;
+        room = 'right';
+        direction = 'north';
+
+        //this isn't working because of the wonky getTodaysPosts code -- should start over.
+        for (let post of posts) {
+            if(post.classroom == "kc") {
+                //add next canvas
+                this.generateCanvas(post.post, currentSpot);
+                //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
+                [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
+            }
         }
     }
 
@@ -172,7 +158,7 @@ export class DaysGallery {
 
         if (direction == 'west') {
             if (spot.x + gap > boundaries[room]['x'][1]) {
-                spot.x += gap;
+                spot.x += canvasSize;
                 return this.placeClockwise(spot, room, 'north');
             } else {
                 spot.x += gap;
@@ -196,13 +182,45 @@ export class DaysGallery {
             }
         } else if (direction == 'south') {
             if (spot.z - gap < boundaries[room]['z'][0] + 2) { //have to account for door
-                spot = new Vector3(47, 2, 19); //starting in SW corner of right room
-                return this.placeClockwise(spot, 'right', 'north'); // move to right room
+                console.log('out of room in : ' + room);
+                // spot = new Vector3(47, 2, 19); //starting in SW corner of right room
+                // return this.placeClockwise(spot, 'right', 'north'); // move to right room
             } else {
                 spot.z -= gap;
                 return [spot, room, direction];
             }
         }
+    }
+
+    galleryTitle () {
+        // title code from YG's yorblet.js labels, thanks!
+        const fontJson = require('../assets/fonts/helvetiker_regular_copy.typeface.json')
+        const font = new THREE.Font(fontJson)
+        const text = '100 Days of Making'
+
+        const fontGeometry = new THREE.TextBufferGeometry(text, {
+            font: font,
+            size: .8,
+            height: 0.01,
+            curveSegments: 11,
+            bevelEnabled: true,
+            bevelThickness: 0.1,
+            bevelSize: 0.1,
+            bevelSegments: 6,
+        })
+
+        const fontMaterial1 = new THREE.MeshBasicMaterial({ color: 0x18DD6C, flatShading: true })
+        const fontMaterial2 = new THREE.MeshBasicMaterial({ color: 0x1250CC, flatShading: true })
+        const fontMesh = new THREE.Mesh(fontGeometry, [fontMaterial1, fontMaterial2])
+        //alternate color0x787878
+
+        // let labelOffsetX = 2
+        // let labelOffsetY = 13
+        // let labelOffsetZ = 6
+
+        fontMesh.position.set(39, 2.7, 8.5)
+        fontMesh.lookAt(0, 2.6, 8.5)
+        this.scene.add(fontMesh)
     }
 
     check () {
