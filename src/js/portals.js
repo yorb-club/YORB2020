@@ -24,8 +24,6 @@ const yorbletReference = [
     {url: 'https://yorblet10.itp.io', model: PortalModels['cubBlue'], label: {text:"   Go to\nYorblet 10", color:0x4b4ff4, size:0.25, rotateY:Math.PI/2, xOff:0, yOff:3, zOff:0.6}},
     {url: 'https://yorblet11.itp.io', model: PortalModels['pyrBlue'], label: {text:"   Go to\nYorblet 11", color:0x4b4ff4, size:0.25, rotateY:Math.PI/2, xOff:0, yOff:3, zOff:0.6}},
     {url: 'https://yorblet12.itp.io', model: PortalModels['sphGreen'], label: {text:"   Go to\nYorblet 12", color:0x9be210, size:0.25, rotateY:Math.PI/2, xOff:0, yOff:3, zOff:0.6}}
-    {url: "null", model: PortalModels['book_case_flat_shading'], label: {text:"Return to Lobby", color:0xf4d010, size:0.4, rotateY:Math.PI / 2, xOff:0, yOff:3, zOff:2}}, //lobby
-
 ]
 
 //yorblet.js uses yorblet_index, which gets passed here to

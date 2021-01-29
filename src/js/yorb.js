@@ -17,6 +17,7 @@ import { ProjectionScreens } from './projectionScreens'
 import { YorbControls2 } from './yorbControls2.js'
 import { Yorblet } from './yorblet.js'
 import { PhotoGallery } from './photoGallery'
+import { MovieRoom } from './movieRoom.js'
 
 import * as THREE from 'three'
 
@@ -24,7 +25,8 @@ const Stats = require('./libs/stats.min.js')
 
 // set whether we are a YORBLET or YORB based on hostname:
 const hostname = window.location.hostname
-let MODE = 'YORBLET'
+// let MODE = 'YORBLET'
+let MODE = 'MOVIEROOM'
 if (hostname === "yorb.itp.io"){
     MODE = "YORB";
 }
@@ -155,12 +157,15 @@ export class Yorb {
             this.photoGallery = new PhotoGallery(this.scene);
         }
 
+        if (MODE === 'MOVIEROOM') {
+            this.yorblet = new MovieRoom(this.scene, this.projectionScreens, this.mouse, this.camera, this.controls)
+        }
+
         // this.sketches = new Sketches(this.scene)
         // setTimeout(() => {
         //     this.sketches.addSketches()
         // }, 5000) // try to let the sketches finish loading
-    }
-
+      }
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     // Lighting 💡
@@ -332,7 +337,7 @@ export class Yorb {
               return compareStrings(a.projectName, b.projectName)
       })
       // console.table(sorted_projects)
-      
+
       // Now we create our links fromm the sorted data
       for (let p of sorted_projects) {
         // Taking array numbers from the_project above
