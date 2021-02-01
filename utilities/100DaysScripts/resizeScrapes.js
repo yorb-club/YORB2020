@@ -5,21 +5,75 @@
  * 
  *  for each account folder, get file, resize, save to new file based on timestamp from original scrape
  *  also renaming old scrapes so don't have redundant resizes on subsequent runs
+ * 
  */
 
 const fs = require('fs');
 const path = require('path');
 const sharp = require('sharp');
 
-const rootPath = '/home/dangalf/Desktop/YORB/YORB2020/'; //not sure if i need this, but was throwing errors when tried relative path with path.join (normalizing?)
-// const rootDir = path.dirname(require.main.filename);
-// console.log(rootDir);
+const rootPath = process.cwd(); //working directory
 const scrapesFolder = path.join(rootPath, 'src/assets/images/100Days/scrapes');
 const resizedFolder = path.join(rootPath, 'src/assets/images/100Days/resized');
 
-let accountFolders = [];
+// let accountFolders = [];
+
+//go through each class/account/date, resize the posts based on img or vid, and add them to new resized folder
+fs.readdirSync(scrapesFolder).forEach(classroom => {
+    fs.readdirSync(path.join(scrapesFolder, classroom)).forEach(account => {
+        //also need to make account dir in resized if it doesn't already exist
+        if (!fs.existsSync(path.join(resizedFolder, classroom, account))){
+            fs.mkdirSync(path.join(resizedFolder, classroom, account));
+        }
+        
+        //check each file in the account for resizes
+        fs.readdirSync(path.join(scrapesFolder, classroom, account)).forEach(fileName => {
+            //for each account, ignore the posts that have already been resized and labeled with "old"
+            if(!fileName.includes('old')){
+                //location of original
+                let originalPath = path.join(scrapesFolder, classroom, account);
+
+                //make a folder per day so we can sort by date
+                let day = fileName.substr(0, 8); //the beginning of each file is the date of post
+                let dayFolder = path.join(resizedFolder, classroom, account, day);
+                
+                //if it's a new date, make the folder
+                if(!fs.existsSync(dayFolder)) {
+                    fs.mkdirSync(dayFolder);
+                }
+                
+                //name the file sequentially based on existing posts from that day
+                let existingNum = fs.readdirSync(dayFolder).length;
+    
+                if(fileName.includes('.jpg')) { //its an image
+                    //resize the image and save to the resized folder (png for now)
+                    sharp(path.join(originalPath, fileName))
+                    .resize(1024, 1024, {fit: 'contain'})
+                    .toFile(path.join(dayFolder, existingNum + '.png'), (err, info) => {
+                        if (err) {
+                            console.log('ERROR at ' + folder.path + '/' + fileName + " : " + err);
+                        } else {
+                            // won't skip files that haven't actually been resized
+                            // rename old file so won't trigger on subsequent runs
+                            fs.renameSync(path.join(originalPath, fileName), path.join(originalPath, 'old' + fileName));
+                        }
+                        if (info) {
+                            console.log("INFO at " + dayFolder + " : " + info);
+                        }
+                    })
+                } else { //its a video -- resize not needed?
+                    fs.copyFileSync(path.join(originalPath, fileName), path.join(originalPath, 'old' + fileName));     
+                    fs.renameSync(path.join(originalPath, fileName), path.join(dayFolder, existingNum + '.mp4'));
+                }
+            }
+        });
+    });
+});
+
+/* OLD DUMB WAY
 
 //for each class and account folder, make an object that has that account and all the post files saved in that dir
+
 fs.readdirSync(scrapesFolder).forEach(classDir => {
     fs.readdirSync(path.join(scrapesFolder, classDir)).forEach(dirName => {
         let accountDir = path.join(scrapesFolder, classDir, dirName);
@@ -75,3 +129,4 @@ for (let folder of accountFolders) {
         }
     });
 }
+*/

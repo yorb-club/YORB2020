@@ -3,193 +3,127 @@
 
 import { Vector3 } from 'three'
 import * as THREE from 'three'
-// const fs = require('fs');
-// const path = require('path');
-
 import debugModule from 'debug';
 const log = debugModule('YORB:DaysGallery');
 
+const Place = require('../../utilities/tools/place.js'); //for generating the canvases along wall
+
 // why folders in dist is better than one big folder:
 // https://medium.com/hceverything/parcel-js-moving-static-resources-to-a-separate-folder-aef63a038cbd
-
-
 const postsDir = require('../assets/images/100Days/resized/**/*.png');
 
-//only require recent posts for now, later can adjust if want to scroll back in time
+/* postsDir STRUCTURE:
+
+    postsDir = { 
+        classroom: {
+            account : {
+                date: {
+                    '0': "file.png"
+                }
+            }
+        }
+    }
+*/
 
 export class DaysGallery {
     constructor(scene, location) {
-        this.scene = scene
-        this.location = {}
+        this.scene = scene;
+        // this.location = {}
+        this.gallery = undefined; //not needed now, but might be useful later to change/update specific posts
+
         if (location == 'classrooms'){
             //starting point is front left corner of back classroom
-            this.location.startPoint = {};
-            this.location.startPoint.left = new Vector3(42, 2.5, 7);
-            this.location.startPoint.right = new Vector3(47, 2.5, 19.4);
-            // this.location.startPoint.third  //TODO location and name
-            this.setup(this.location.startPoint);
+            // this.startPoint = {};
+            // this.startPoint.left = new Vector3(42, 2.5, 7);
+            // this.startPoint.right = new Vector3(47, 2.5, 19.4);
+            // this.startPoint.third  //TODO location and name
+
+            // this.setup(this.startPoint);
+            this.testPlace();
         } else { //just for testing the now defunct setupGrid()
-            this.location.center = new Vector3(40.5, 0, 0);
-            this.location.width = 2; //x
-            this.location.depth = 2; //z
-            this.location.height = 10; //y
+            // this.location.center = new Vector3(40.5, 0, 0);
+            // this.location.width = 2; //x
+            // this.location.depth = 2; //z
+            // this.location.height = 10; //y
         }
     }
 
-    //get posts and generate canvases along the walls of the back classroom (just left for now)
-    //TODO generate box geometry based on image size? dont want to squish rects
-    setup (startPoint){
-        this.galleryTitle();
-        let todaysPosts = this.getTodaysPosts();
-        this.generateGallery(todaysPosts, startPoint);
+    testPlace () {
+        let startPoint = new Vector3(42, 2, 7.4);
+        let endPoint = new Vector3(47, 2, 7.4);
+        let assets = [
+            postsDir['kd']['100dayscoffee']['20101005']['0'],
+            postsDir['kd']['100dayscoffee']['20210110']['0'],
+            postsDir['kd']['100dayscoffee']['20101005']['0']
+        ]
+        let geometry = new THREE.BoxGeometry(1.5, 1.5, .2);
+        let group = Place.onWall(startPoint, endPoint, assets, geometry);
+        this.scene.add(group);
     }
 
-    //go to resized folder and grab the most recent post for each student
-    getTodaysPosts () {
-        let allPosts = [];
-        //sort the account dates so we know the most recent folder
-        Object.keys(postsDir).forEach(classroom => {
-            let unsorted = {};
-            unsorted[classroom] = {};
-            Object.keys(postsDir[classroom]).forEach(account => {
-                    unsorted[classroom][account] = [];
-                Object.keys(postsDir[classroom][account]).forEach(date => {
-                    unsorted[classroom][account].push(date);
+    //get posts and generate canvases along the walls of the back classrooms
+    // setup (startPoint){
+    setup () {
+        this.galleryTitle(); //place the gallery title on the wall outside the classrooms
+        let sortedDates = this.sortPosts();
+        let todaysPosts = this.getTodaysPosts(sortedDates);
+        this.generateGallery(todaysPosts); //keeping classroom location info in relevant methods instead of whole class
+
+        // let todaysPosts = this.getTodaysPosts();
+        // this.generateGallery(todaysPosts, startPoint);
+    }
+
+    //sort all the posts by date so we can grab today's post and later show by date
+    sortPosts () {
+        let sortedDates = {}; //want this to be same structure as postsDir, but account object holds an array of dates
+        
+        //using for/of instead of foreach because ¯\_(ツ)_/¯ https://thecodebarbarian.com/for-vs-for-each-vs-for-in-vs-for-of-in-javascript.html
+        for (let classroom of Object.keys(postsDir)){
+            sortedDates[classroom] = {};
+            for (let account of Object.keys(postsDir[classroom])) {
+                sortedDates[classroom][account] = [];
+                for (let date of Object.keys(postsDir[classroom][account])) {
+                    sortedDates[classroom][account].push(date);
+                }
+                sortedDates[classroom][account] = sortedDates[classroom][account].sort((a, b) => {
+                    return b-a
                 });
-            });
-            allPosts.push(unsorted);
-        });
-        console.log(JSON.stringify(allPosts) + '\n\n\n\n\n');
-        allPosts.forEach(classroom => {
-            //this is def weird
-            console.log(classroom)
-            Object.keys(classroom).forEach(classObj => {
-                // console.log(JSON.stringify(classObj) + 'asdfd');
-                console.log(classObj);
-                Object.keys(classroom[classObj]).forEach(account => {
-                    console.log(JSON.stringify(account) + account)
-                    //prob a better way of doing this
-                    // classroom[classObj][account].forEach(dateArray => {
-                    //     console.log(dateArray)
-                    //     console.log(JSON.stringify(account))
-                    console.log(classroom[classObj][account])
-                    // account[dateArray] = account[dateArray].sort((a, b) => {
-                    classroom[classObj][account] = classroom[classObj][account].sort((a, b) => {
-                    
-                        return b-a
-                    });
-                    // });
-                });
-            });
-        });
+            }
+        }
+        return sortedDates;
+    }
+
+    getTodaysPosts (sortedDates) {
         //for now, just getting the first image from the most recent post folder
         let todaysPosts = [];
-        allPosts.forEach(classroom => {
-            Object.keys(classroom).forEach(classObj => {
-                console.log(classObj)
-                console.log(postsDir);
-                Object.keys(classroom[classObj]).forEach(account => {
-                    console.log(account);
-                    // let accountName = Object.keys(account)[0];
-                    todaysPosts.push({classroom: classObj, account: account, post: postsDir[classObj][account][classroom[classObj][account][0]]['0']});
-                });
-            });
-        });
-
+        for (let classroom of Object.keys(sortedDates)) {
+            let posts = []; //array for place function
+            for (let account of Object.keys(sortedDates[classroom])) {
+                posts.push({account: postsDir[classroom][account][sortedDates[classroom][account][0]]['0']}) //get the file from posts dir that matches the first file in the most recent date in sorted X_X
+            }
+            todaysPosts.push({classroom: posts});
+        }
         return todaysPosts;
     }
 
-    //goes along the classroom wall with a .5 gap between 
-    generateGallery (posts, startPoint) {
-        let currentSpot = startPoint.left;
-        let room = 'left';
-        let direction = 'west'
-        //go through all posts (TODO -- might want to not just start at corner)
+    //place the meshes in the back classrooms 
+    generateGallery (posts) {
+        let galleryGroup = new THREE.Group();
+        //left classroom -- kd
+        let kdGroup = new THREE.Group();
+        
+        let southWall = Place.OnWall()
+        kdGroup.add(southWall);
+        galleryGroup.add(kdGroup);
+        //right classroom -- kc
+
+        //third classroom -- paula
 
 
-        //hacky because rushing -- TODO fix
-        for (let post of posts) {
-            if(post.classroom = "kd") {
-                //add next canvas
-                this.generateCanvas(post.post, currentSpot);
-                //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
-                [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
-            }
-        }
-
-        currentSpot = startPoint.right;
-        room = 'right';
-        direction = 'north';
-
-        //this isn't working because of the wonky getTodaysPosts code -- should start over.
-        for (let post of posts) {
-            if(post.classroom == "kc") {
-                //add next canvas
-                this.generateCanvas(post.post, currentSpot);
-                //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
-                [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
-            }
-        }
-    }
-
-    //for making each individual gallery "canvas"
-    generateCanvas (post, spot) {
-        const postTexture = new THREE.TextureLoader().load(post);
-        const postGeometry = new THREE.BoxGeometry(1,1,1);
-        const postMaterial = new THREE.MeshBasicMaterial({map: postTexture});
-        var postCanvas = new THREE.Mesh(postGeometry, postMaterial);
-        postCanvas.position.set(spot.x, spot.y, spot.z);
-        this.scene.add(postCanvas);
-    }
-
-    placeClockwise (spot, room, direction) {
-        let boundaries = { //per classroom
-            left: { x: [42, 47],
-                    z: [7.4, 18]
-                },
-            right: {x: [42, 47],
-                    z: [19.4, 30]
-                }
-        }
-
-        let spacing = .5;
-        let canvasSize = 1;
-        let gap = spacing + canvasSize; //putting here for now since will change eventually
-
-        if (direction == 'west') {
-            if (spot.x + gap > boundaries[room]['x'][1]) {
-                spot.x += canvasSize;
-                return this.placeClockwise(spot, room, 'north');
-            } else {
-                spot.x += gap;
-                return [spot, room, direction];
-            }
-        } else if (direction == 'north') {
-            if (spot.z + gap > boundaries[room]['z'][1]) {
-                spot.z += gap;
-                return this.placeClockwise(spot, room, 'east');
-            } else {
-                spot.z += gap;
-                return [spot, room, direction];
-            }
-        } else if (direction == 'east') {
-            if (spot.x - gap < boundaries[room]['x'][0]) {
-                spot.x -= gap;
-                return this.placeClockwise(spot, room, 'south');
-            } else {
-                spot.x -= gap;
-                return [spot, room, direction];
-            }
-        } else if (direction == 'south') {
-            if (spot.z - gap < boundaries[room]['z'][0] + 2) { //have to account for door
-                console.log('out of room in : ' + room);
-                // spot = new Vector3(47, 2, 19); //starting in SW corner of right room
-                // return this.placeClockwise(spot, 'right', 'north'); // move to right room
-            } else {
-                spot.z -= gap;
-                return [spot, room, direction];
-            }
-        }
+        //add all groups to scene
+        this.scene.add(galleryGroup);
+        //add to object to maybe reference later if need to update specific canvas?
+        this.gallery = galleryGroup;
     }
 
     galleryTitle () {
@@ -212,11 +146,6 @@ export class DaysGallery {
         const fontMaterial1 = new THREE.MeshBasicMaterial({ color: 0x18DD6C, flatShading: true })
         const fontMaterial2 = new THREE.MeshBasicMaterial({ color: 0x1250CC, flatShading: true })
         const fontMesh = new THREE.Mesh(fontGeometry, [fontMaterial1, fontMaterial2])
-        //alternate color0x787878
-
-        // let labelOffsetX = 2
-        // let labelOffsetY = 13
-        // let labelOffsetZ = 6
 
         fontMesh.position.set(39, 2.7, 8.5)
         fontMesh.lookAt(0, 2.6, 8.5)
@@ -268,7 +197,155 @@ export class DaysGallery {
 }
 
 /*
-OLD
+OLD FUNCTIONS -- I know I could probably just delete these, but I'm a hoarder
+
+//goes along the classroom wall with a .5 gap between 
+    generateGallery (posts, startPoint) {
+        let currentSpot = startPoint.left;
+        let room = 'left';
+        let direction = 'west'
+        //go through all posts (TODO -- might want to not just start at corner)
+
+
+        //hacky because rushing -- TODO fix
+        for (let post of posts) {
+            if(post.classroom = "kd") {
+                //add next canvas
+                this.generateCanvas(post.post, currentSpot);
+                //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
+                [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
+            }
+        }
+
+        currentSpot = startPoint.right;
+        room = 'right';
+        direction = 'north';
+
+        //this isn't working because of the wonky getTodaysPosts code -- should start over.
+        for (let post of posts) {
+            if(post.classroom == "kc") {
+                //add next canvas
+                this.generateCanvas(post.post, currentSpot);
+                //update spot by moving clockwise along boundaries towards cardinal directions (doors to room are on east side)
+                [currentSpot, room, direction] = this.placeClockwise(currentSpot, room, direction);
+            }
+        }
+    }
+
+    //for making each individual gallery "canvas"
+    generateCanvas (post, spot) {
+        const postTexture = new THREE.TextureLoader().load(post);
+        const postGeometry = new THREE.BoxGeometry(1,1,1);
+        const postMaterial = new THREE.MeshBasicMaterial({map: postTexture});
+        var postCanvas = new THREE.Mesh(postGeometry, postMaterial);
+        postCanvas.position.set(spot.x, spot.y, spot.z);
+        this.scene.add(postCanvas);
+    }
+
+    placeClockwise (spot, room, direction) { //TODO -- make utility/tool?
+        let boundaries = { //per classroom
+            left: { x: [42, 47],
+                    z: [7.4, 18]
+                },
+            right: {x: [42, 47],
+                    z: [19.4, 30]
+                }
+        }
+
+        let spacing = .5;
+        let canvasSize = 1;
+        let gap = spacing + canvasSize; //putting here for now since will change eventually
+
+        if (direction == 'west') {
+            if (spot.x + gap > boundaries[room]['x'][1]) {
+                spot.x += canvasSize;
+                return this.placeClockwise(spot, room, 'north');
+            } else {
+                spot.x += gap;
+                return [spot, room, direction];
+            }
+        } else if (direction == 'north') {
+            if (spot.z + gap > boundaries[room]['z'][1]) {
+                spot.z += gap;
+                return this.placeClockwise(spot, room, 'east');
+            } else {
+                spot.z += gap;
+                return [spot, room, direction];
+            }
+        } else if (direction == 'east') {
+            if (spot.x - gap < boundaries[room]['x'][0]) {
+                spot.x -= gap;
+                return this.placeClockwise(spot, room, 'south');
+            } else {
+                spot.x -= gap;
+                return [spot, room, direction];
+            }
+        } else if (direction == 'south') {
+            if (spot.z - gap < boundaries[room]['z'][0] + 2) { //have to account for door
+                console.log('out of room in : ' + room);
+                // spot = new Vector3(47, 2, 19); //starting in SW corner of right room
+                // return this.placeClockwise(spot, 'right', 'north'); // move to right room
+            } else {
+                spot.z -= gap;
+                return [spot, room, direction];
+            }
+        }
+    }
+
+//go to resized folder and grab the most recent post for each student
+    getTodaysPosts () {
+        let allPosts = [];
+        //sort the account dates so we know the most recent folder
+        Object.keys(postsDir).forEach(classroom => {
+            let unsorted = {};
+            unsorted[classroom] = {};
+            Object.keys(postsDir[classroom]).forEach(account => {
+                    unsorted[classroom][account] = [];
+                Object.keys(postsDir[classroom][account]).forEach(date => {
+                    unsorted[classroom][account].push(date);
+                });
+            });
+            allPosts.push(unsorted);
+        });
+        // console.log(JSON.stringify(allPosts) + '\n\n\n\n\n');
+        allPosts.forEach(classroom => {
+            //this is def weird
+            console.log(classroom)
+            Object.keys(classroom).forEach(classObj => {
+                // console.log(JSON.stringify(classObj) + 'asdfd');
+                console.log(classObj);
+                Object.keys(classroom[classObj]).forEach(account => {
+                    console.log(JSON.stringify(account) + account)
+                    //prob a better way of doing this
+                    // classroom[classObj][account].forEach(dateArray => {
+                    //     console.log(dateArray)
+                    //     console.log(JSON.stringify(account))
+                    console.log(classroom[classObj][account])
+                    // account[dateArray] = account[dateArray].sort((a, b) => {
+                    classroom[classObj][account] = classroom[classObj][account].sort((a, b) => {
+                    
+                        return b-a
+                    });
+                    // });
+                });
+            });
+        });
+        //for now, just getting the first image from the most recent post folder
+        let todaysPosts = [];
+        allPosts.forEach(classroom => {
+            Object.keys(classroom).forEach(classObj => {
+                console.log(classObj)
+                console.log(postsDir);
+                Object.keys(classroom[classObj]).forEach(account => {
+                    console.log(account);
+                    // let accountName = Object.keys(account)[0];
+                    todaysPosts.push({classroom: classObj, account: account, post: postsDir[classObj][account][classroom[classObj][account][0]]['0']});
+                });
+            });
+        });
+
+        return todaysPosts;
+    }
 
     // async setupGrid(){
     setupGrid(){

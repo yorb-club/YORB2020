@@ -9,6 +9,8 @@ images/project_thumbnails
 dist/
 utilities/getProjectThumbnails/projectThumbnails
 100DaysScripts/package-lock.json
-src/assets/images/100Days/scrapes/*
-src/assets/images/100Days/resized/*
+**/kd/*
+**/kc/*
+**/paula/*
+**/james/*
 utilities/100DaysScripts/instagram-scraper.log
