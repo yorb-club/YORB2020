@@ -29,7 +29,7 @@ fs.readdirSync(scrapesFolder).forEach(classroom => {
         //check each file in the account for resizes
         fs.readdirSync(path.join(scrapesFolder, classroom, account)).forEach(fileName => {
             //for each account, ignore the posts that have already been resized and labeled with "old"
-            if(!fileName.includes('old')){
+            if(!fileName.includes('old')){ //no longer using, but keeping for now
                 //location of original
                 let originalPath = path.join(scrapesFolder, classroom, account);
 
@@ -55,15 +55,19 @@ fs.readdirSync(scrapesFolder).forEach(classroom => {
                         } else {
                             // won't skip files that haven't actually been resized
                             // rename old file so won't trigger on subsequent runs
-                            fs.renameSync(path.join(originalPath, fileName), path.join(originalPath, 'old' + fileName));
+                            // fs.renameSync(path.join(originalPath, fileName), path.join(originalPath, 'old' + fileName));
+                            // now using --latest-stamps so safe to delete
+                            fs.unlinkSync(path.join(originalPath, fileName)); //rmSync didn't work
                         }
                         if (info) {
                             console.log("INFO at " + dayFolder + " : " + info);
                         }
                     })
-                } else { //its a video -- resize not needed?
-                    fs.copyFileSync(path.join(originalPath, fileName), path.join(originalPath, 'old' + fileName));     
+                } else { //its a video -- resize not needed? not removing, just moving to resized folder
+                    // fs.copyFileSync(path.join(originalPath, fileName), path.join(originalPath, 'old' + fileName));     
                     fs.renameSync(path.join(originalPath, fileName), path.join(dayFolder, existingNum + '.mp4'));
+                    // fs.rmSync(path.join(originalPath, fileName));
+                    
                 }
             }
         });

@@ -58,8 +58,8 @@ export class DaysGallery {
         this.galleryTitle(); //place the gallery title on the wall outside the classrooms
         let sortedDates = this.sortPosts();
         let todaysPosts = this.getTodaysPosts(sortedDates);
-        log('postssss');
-        log(todaysPosts);
+        // log('postssss');
+        // log(todaysPosts);
         this.generateGallery(todaysPosts); //keeping classroom location info in relevant methods instead of whole class
     }
 
@@ -109,7 +109,7 @@ export class DaysGallery {
         let kcPosts, kdPosts, paulaPosts;
         for (let section of Object.keys(posts)) {
             let sec = Object.keys(posts[section])[0];
-            log(sec);
+            // log(sec);
 
             if(sec == 'kc'){
                 kcPosts = posts[section][sec];
@@ -128,10 +128,12 @@ export class DaysGallery {
         let westGroupKD = kdPosts.slice(3, 9);
         let northGroupKD = kdPosts.slice(9, 12);
         let eastGroupKD = kdPosts.slice(12, kdPosts.length);
+
         let southWallKD = Place.onWall(new Vector3(41.5, 2, 7.4), new Vector3(47, 2, 7.4), southGroupKD, galleryGeometry, {labelLocation: 'alternating'});
         let westWallKD = Place.onWall(new Vector3(47, 2, 7.4), new Vector3(47, 2, 18.4), westGroupKD, galleryGeometry, {labelLocation: 'alternating'});
         let northWallKD = Place.onWall(new Vector3(47, 2, 18.4), new Vector3(41.5, 2, 18.4), northGroupKD, galleryGeometry, {labelLocation: 'alternating'});
         let eastWallKD = Place.onWall(new Vector3(41.5, 2, 18.4), new Vector3(41.5, 2, 10), eastGroupKD, galleryGeometry, {labelLocation: 'alternating'});
+        
         kdGroup.add(southWallKD, eastWallKD, northWallKD, westWallKD);
 
         //right classroom -- kc 15 incl. kc
@@ -140,23 +142,27 @@ export class DaysGallery {
         let westGroupKC = kcPosts.slice(3, 7);
         let northGroupKC = kcPosts.slice(7, 10);
         let eastGroupKC = kcPosts.slice(10, kcPosts.length);
+
         let southWallKC = Place.onWall(new Vector3(41.5, 2, 19.5), new Vector3(47, 2, 19.5), southGroupKC, galleryGeometry, {labelLocation: 'alternating'});
         let westWallKC = Place.onWall(new Vector3(47, 2, 19.5), new Vector3(47, 2, 29.8), westGroupKC, galleryGeometry, {labelLocation: 'alternating'});
         let northWallKC = Place.onWall(new Vector3(47, 2, 29.8), new Vector3(41.5, 2, 29.8), northGroupKC, galleryGeometry, {labelLocation: 'alternating'});
         let eastWallKC = Place.onWall(new Vector3(41.5, 2, 29.8), new Vector3(41.5, 2, 20.9), eastGroupKC, galleryGeometry, {labelLocation: 'alternating'});
+        
         kcGroup.add(southWallKC, eastWallKC, northWallKC, westWallKC);
 
-        //third classroom -- paula
+        //third classroom -- paula -- starts from west so last wall(see through) has least num of canvases
         let paulaGroup = new THREE.Group();
-        // let southGroupPaula = paulaPosts.slice(0, 3);
-        // let westGroupPaula = paulaPosts.slice(3, 9);
-        // let northGroupPaula = paulaPosts.slice(9, 12);
-        // let eastGroupPaula = paulaPosts.slice(12, paulaPosts.length);
-        // let southWallPaula = Place.onWall(new Vector3(41.5, 2, 7.4), new Vector3(47, 2, 7.4), southGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
-        // let westWallPaula = Place.onWall(new Vector3(47, 2, 7.4), new Vector3(47, 2, 18.4), westGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
-        // let northWallPaula = Place.onWall(new Vector3(47, 2, 18.4), new Vector3(41.5, 2, 18.4), northGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
-        // let eastWallPaula = Place.onWall(new Vector3(41.5, 2, 18.4), new Vector3(41.5, 2, 10.4), eastGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
-        // paulaGroup.add(southWallPaula, eastWallPaula, northWallPaula, westWallPaula);
+        let westGroupPaula = paulaPosts.slice(0, 5); //tight squeeze...
+        let northGroupPaula = paulaPosts.slice(5, 8);
+        let eastGroupPaula = paulaPosts.slice(8, 13);
+        let southGroupPaula = paulaPosts.slice(13, paulaPosts.length);
+
+        let westWallPaula = Place.onWall(new Vector3(39.5, 2, 21.9), new Vector3(39.5, 2, 29.8), westGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        let northWallPaula = Place.onWall(new Vector3(39.5, 2, 29.8), new Vector3(33.7, 2, 29.8), northGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        let eastWallPaula = Place.onWall(new Vector3(33.7, 2, 29.8), new Vector3(33.7, 2, 21.9), eastGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        let southWallPaula = Place.onWall(new Vector3(34.8, 2, 21.9), new Vector3(39.5, 2, 21.9), southGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        
+        paulaGroup.add(southWallPaula, eastWallPaula, northWallPaula, westWallPaula);
 
 
         //add all groups to scene

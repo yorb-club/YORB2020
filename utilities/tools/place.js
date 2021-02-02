@@ -5,6 +5,8 @@
 // const Place = require('./place')
 // Place.onWall();
 
+// eventually could also pass in a series of corners and it could auto make walls and auto assign projects to walls to fit?
+
 import * as THREE from 'three'
 import { Vector3 } from 'three'
 
@@ -166,11 +168,11 @@ function createLabel(label, canvasWidth) {
     const fontGeometry = new THREE.TextBufferGeometry(text, {
         font: font,
         size: textSize, //need to test
-        height: textSize / 2,
+        height: textSize / 4,
         curveSegments: 11,
         bevelEnabled: true,
-        bevelThickness: textSize / 4,
-        bevelSize: textSize / 4,
+        bevelThickness: textSize / 8,
+        bevelSize: textSize / 8,
         bevelSegments: 6,
     })
 
