@@ -3,7 +3,7 @@
 *not sure where best to put this readme and the corresponding files, so for now keeping most of it in utilities while the module is in /js and the scrapes/resizes are in assets/images/100Days*
 
 ### To-Do: Deploy
-- [ ] Update path in cron tab line
+- [ ] Update path in cron tab line (sudo crontab -e)
 - [X] install instagram-scraper (python)
 - [ ] add cron tab line to YORB machine (check time of classes)
 - [ ] add accounts to accounts.txt
@@ -24,13 +24,13 @@
 - [X] filter by hashtag
 - [X] 100Days module
 - [X] YORB test
-- [ ] nameplate above canvas
-- [ ] fix class sorting in files
+- [X] nameplate above canvas
+- [X] fix class sorting in files
 - [ ] click/interact to change day or go through multiple posts
-- [ ] need to separate students by class?
+- [X] need to separate students by class?
 - [ ] have HD images/videos served on command from other server like the projectDatabase
 - [ ] *optional* would be cool to have some sort of structure outside that gets bigger with each post
-- [ ] maybe develop a placement tool for the overall project based on placeClockwise
+- [X] maybe develop a placement tool for the overall project based on placeClockwise
 
 ## Order of Operations
 
@@ -42,11 +42,11 @@
 ### Cron Job: scrape & resize
 
 ```
-0 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && sudo instagram-scraper -f accounts_kd.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/kd -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
+0 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && instagram-scraper -f accounts_kd.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/kd -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
 
-10 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && sudo instagram-scraper -f accounts_kc.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/kc -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
+10 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && instagram-scraper -f accounts_kc.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/kc -n  -m 32 --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
 
-20 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && sudo instagram-scraper -f accounts_paula.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/paula -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
+20 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && instagram-scraper -f accounts_paula.txt -u <yorb> -p <pass> -d ../../src/assets/images/100Days/scrapes/paula -n --filter nyudaily -t image video --latest -T {date}-{shortcode}-{urlname}
 
-30 2 * * * cd /INSERT PATH HERE/YORB2020/utilities/100DaysScripts/ && <resize-script>
+30 2 * * * node utilities/100DaysScripts/resizeScrapes.js
 ``` 

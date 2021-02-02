@@ -190,7 +190,7 @@ export class Yorb {
     // update projects:
     updateProjects(projects) {
         if (this.show) {
-            log('yorb received', projects.length, 'show projects');
+            // log('yorb received', projects.length, 'show projects');
             this.show.updateProjects(projects);
         }
         if (this.yorblet) {
@@ -221,8 +221,8 @@ export class Yorb {
                 }
             }
         }
-        log('Number of total projects: ', projects.length);
-        log('Number of unique projects: ', numUniqueProjects);
+        // log('Number of total projects: ', projects.length);
+        // log('Number of unique projects: ', numUniqueProjects);
 
         // Make an HTML link to add to our overlay
         let project_box = document.getElementById('html-project-list');

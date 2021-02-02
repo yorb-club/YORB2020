@@ -10,7 +10,8 @@ const Place = require('../../utilities/tools/place.js'); //for generating the ca
 
 // why folders in dist is better than one big folder:
 // https://medium.com/hceverything/parcel-js-moving-static-resources-to-a-separate-folder-aef63a038cbd
-const postsDir = require('../assets/images/100Days/resized/**/*.png');
+// const postsDir = require('../assets/images/100Days/resized/**/*.png');
+const postsDir = require('../assets/images/100Days/resized/**/*.*');
 
 /* postsDir STRUCTURE:
 
@@ -18,7 +19,9 @@ const postsDir = require('../assets/images/100Days/resized/**/*.png');
         classroom: {
             account : {
                 date: {
-                    '0': "file.png"
+                    'file':  { //this is annoying, but it's done by require, not resizeScrapes...
+                        .png:"file.png" 
+                    }
                 }
             }
         }
@@ -39,7 +42,8 @@ export class DaysGallery {
             // this.startPoint.third  //TODO location and name
 
             // this.setup(this.startPoint);
-            this.testPlace();
+            // this.testPlace();
+            this.setup();
         } else { //just for testing the now defunct setupGrid()
             // this.location.center = new Vector3(40.5, 0, 0);
             // this.location.width = 2; //x
@@ -48,29 +52,15 @@ export class DaysGallery {
         }
     }
 
-    testPlace () {
-        let startPoint = new Vector3(42, 2, 7.4);
-        let endPoint = new Vector3(47, 2, 7.4);
-        let assets = [
-            postsDir['kd']['100dayscoffee']['20101005']['0'],
-            postsDir['kd']['100dayscoffee']['20210110']['0'],
-            postsDir['kd']['100dayscoffee']['20101005']['0']
-        ]
-        let geometry = new THREE.BoxGeometry(1.5, 1.5, .2);
-        let group = Place.onWall(startPoint, endPoint, assets, geometry);
-        this.scene.add(group);
-    }
-
     //get posts and generate canvases along the walls of the back classrooms
     // setup (startPoint){
     setup () {
         this.galleryTitle(); //place the gallery title on the wall outside the classrooms
         let sortedDates = this.sortPosts();
         let todaysPosts = this.getTodaysPosts(sortedDates);
+        log('postssss');
+        log(todaysPosts);
         this.generateGallery(todaysPosts); //keeping classroom location info in relevant methods instead of whole class
-
-        // let todaysPosts = this.getTodaysPosts();
-        // this.generateGallery(todaysPosts, startPoint);
     }
 
     //sort all the posts by date so we can grab today's post and later show by date
@@ -99,9 +89,13 @@ export class DaysGallery {
         for (let classroom of Object.keys(sortedDates)) {
             let posts = []; //array for place function
             for (let account of Object.keys(sortedDates[classroom])) {
-                posts.push({account: postsDir[classroom][account][sortedDates[classroom][account][0]]['0']}) //get the file from posts dir that matches the first file in the most recent date in sorted X_X
+                let post = {};
+                post[account] = Object.values(postsDir[classroom][account][sortedDates[classroom][account][0]]['0'])[0]; //get the file from posts dir that matches the first file in the most recent date in sorted, wow that triple 0 at the end is fucked uppp X_X
+                posts.push(post);
             }
-            todaysPosts.push({classroom: posts});
+            let room = {}
+            room[classroom] = posts;
+            todaysPosts.push(room);
         }
         return todaysPosts;
     }
@@ -109,18 +103,64 @@ export class DaysGallery {
     //place the meshes in the back classrooms 
     generateGallery (posts) {
         let galleryGroup = new THREE.Group();
-        //left classroom -- kd
-        let kdGroup = new THREE.Group();
+        let galleryGeometry = new THREE.BoxGeometry(1.5, 1.5, .2);
+        //might want to eventually make this more programatic, but fine for now...
+        //have to find by key since position in posts can change
+        let kcPosts, kdPosts, paulaPosts;
+        for (let section of Object.keys(posts)) {
+            let sec = Object.keys(posts[section])[0];
+            log(sec);
+
+            if(sec == 'kc'){
+                kcPosts = posts[section][sec];
+            }
+            if(sec == 'kd'){
+                kdPosts = posts[section][sec];
+            }
+            if(sec == 'paula'){
+                paulaPosts = posts[section][sec];
+            }
+        }
         
-        let southWall = Place.OnWall()
-        kdGroup.add(southWall);
-        galleryGroup.add(kdGroup);
-        //right classroom -- kc
+        //left classroom -- kd 17 incl kd
+        let kdGroup = new THREE.Group();
+        let southGroupKD = kdPosts.slice(0, 3);
+        let westGroupKD = kdPosts.slice(3, 9);
+        let northGroupKD = kdPosts.slice(9, 12);
+        let eastGroupKD = kdPosts.slice(12, kdPosts.length);
+        let southWallKD = Place.onWall(new Vector3(41.5, 2, 7.4), new Vector3(47, 2, 7.4), southGroupKD, galleryGeometry, {labelLocation: 'alternating'});
+        let westWallKD = Place.onWall(new Vector3(47, 2, 7.4), new Vector3(47, 2, 18.4), westGroupKD, galleryGeometry, {labelLocation: 'alternating'});
+        let northWallKD = Place.onWall(new Vector3(47, 2, 18.4), new Vector3(41.5, 2, 18.4), northGroupKD, galleryGeometry, {labelLocation: 'alternating'});
+        let eastWallKD = Place.onWall(new Vector3(41.5, 2, 18.4), new Vector3(41.5, 2, 10), eastGroupKD, galleryGeometry, {labelLocation: 'alternating'});
+        kdGroup.add(southWallKD, eastWallKD, northWallKD, westWallKD);
+
+        //right classroom -- kc 15 incl. kc
+        let kcGroup = new THREE.Group();
+        let southGroupKC = kcPosts.slice(0, 3);
+        let westGroupKC = kcPosts.slice(3, 7);
+        let northGroupKC = kcPosts.slice(7, 10);
+        let eastGroupKC = kcPosts.slice(10, kcPosts.length);
+        let southWallKC = Place.onWall(new Vector3(41.5, 2, 19.5), new Vector3(47, 2, 19.5), southGroupKC, galleryGeometry, {labelLocation: 'alternating'});
+        let westWallKC = Place.onWall(new Vector3(47, 2, 19.5), new Vector3(47, 2, 29.8), westGroupKC, galleryGeometry, {labelLocation: 'alternating'});
+        let northWallKC = Place.onWall(new Vector3(47, 2, 29.8), new Vector3(41.5, 2, 29.8), northGroupKC, galleryGeometry, {labelLocation: 'alternating'});
+        let eastWallKC = Place.onWall(new Vector3(41.5, 2, 29.8), new Vector3(41.5, 2, 20.9), eastGroupKC, galleryGeometry, {labelLocation: 'alternating'});
+        kcGroup.add(southWallKC, eastWallKC, northWallKC, westWallKC);
 
         //third classroom -- paula
+        let paulaGroup = new THREE.Group();
+        // let southGroupPaula = paulaPosts.slice(0, 3);
+        // let westGroupPaula = paulaPosts.slice(3, 9);
+        // let northGroupPaula = paulaPosts.slice(9, 12);
+        // let eastGroupPaula = paulaPosts.slice(12, paulaPosts.length);
+        // let southWallPaula = Place.onWall(new Vector3(41.5, 2, 7.4), new Vector3(47, 2, 7.4), southGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        // let westWallPaula = Place.onWall(new Vector3(47, 2, 7.4), new Vector3(47, 2, 18.4), westGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        // let northWallPaula = Place.onWall(new Vector3(47, 2, 18.4), new Vector3(41.5, 2, 18.4), northGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        // let eastWallPaula = Place.onWall(new Vector3(41.5, 2, 18.4), new Vector3(41.5, 2, 10.4), eastGroupPaula, galleryGeometry, {labelLocation: 'alternating'});
+        // paulaGroup.add(southWallPaula, eastWallPaula, northWallPaula, westWallPaula);
 
 
         //add all groups to scene
+        galleryGroup.add(kdGroup, kcGroup, paulaGroup) //prob not necessary but w/e
         this.scene.add(galleryGroup);
         //add to object to maybe reference later if need to update specific canvas?
         this.gallery = galleryGroup;
@@ -152,10 +192,31 @@ export class DaysGallery {
         this.scene.add(fontMesh)
     }
 
-    check () {
-        log('checking postsDir');
+    testPlace () {
         log(postsDir);
-        return postsDir;
+        // log(postsDir['kd']['100dayscoffee']['20101005']['0']);
+        let startPoint = new Vector3(42, 2, 7.4);
+        let endPoint = new Vector3(47, 2, 7.4);
+        let assets = [
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20210110']['0'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0]
+        ]
+        let geometry = new THREE.BoxGeometry(1.5, 1.5, .2);
+        let group = Place.onWall(startPoint, endPoint, assets, geometry);
+        this.scene.add(group);
+
+        let startPoint2 = new Vector3(47, 2, 7.4);
+        let endPoint2 = new Vector3(47, 2, 18.4);
+        let assets2 = [
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20210110']['0'])[0],
+            Object.values(postsDir['kd']['moving.drawing']['20210118']['0needsResize'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0]
+        ]
+        let geometry2 = new THREE.BoxGeometry(1.5, 1.5, .2);
+        let group2 = Place.onWall(startPoint2, endPoint2, assets2, geometry2);
+        this.scene.add(group2);
     }
 
     setupTest(){ //just for testing flow, test cube in elevators
@@ -345,6 +406,12 @@ OLD FUNCTIONS -- I know I could probably just delete these, but I'm a hoarder
         });
 
         return todaysPosts;
+    }
+
+    check () {
+        log('checking postsDir');
+        log(postsDir);
+        return postsDir;
     }
 
     // async setupGrid(){
