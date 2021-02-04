@@ -20,7 +20,7 @@ const yorbletPortalReference = [
     // { position: new Vector3(-23, 0, 4.5) },
     // { position: new Vector3(-23, 0, 2) },
     // { position: new Vector3(-23, 0, -0.5) },
-    // { position: new Vector3(-23, 0, -3) }, 
+    // { position: new Vector3(-23, 0, -3) },
     // { position: new Vector3(-23, 0, -35) }, //these six are in south side
     // { position: new Vector3(-23, 0, -37.5) },
     // { position: new Vector3(-23, 0, -40) },
@@ -70,7 +70,7 @@ export class WinterShow2020 {
         let fontJSON = require('../assets/fonts/helvetiker_bold.json')
         this.font = loader.parse(fontJSON)
         this._updateProjects()
-        this.addPortals()
+        // this.addPortals()
         this.addDecals();
         var signage = new Signage(this.scene);
         this.addArrowSigns();
@@ -160,7 +160,7 @@ export class WinterShow2020 {
             {file:ArrowImages['Yorblet6-12_Right'], w:4.5, h:2, x:-18, y:0.01, z:-23, rotateX:-Math.PI / 2, rotateY:Math.PI / 2},
             {file:ArrowImages['ZoomProjects'], w:4, h:2, x:-18, y:0.01, z:-14, rotateX:-Math.PI / 2, rotateY:Math.PI / 2}
         ]
-       
+
         arrowImageObjects.forEach((img) =>{
 
             const imgTxture = new THREE.TextureLoader().load(img.file);
@@ -168,17 +168,17 @@ export class WinterShow2020 {
             imgTxture.wrapS = THREE.RepeatWrapping
             imgTxture.wrapT = THREE.RepeatWrapping
             imgTxture.repeat.set(1, 1)
-    
+
             const imgGeometry = new THREE.PlaneBufferGeometry(img.w, img.h, 1, 1)
             const imgMaterial = new THREE.MeshBasicMaterial({ map: imgTxture, transparent: true, side: THREE.DoubleSide })
             const imgPlane = new THREE.Mesh(imgGeometry, imgMaterial)
 
             imgPlane.position.set(img.x, img.y, img.z)
-    
+
             imgPlane.rotateY(img.rotateY)
             imgPlane.rotateX(img.rotateX)
             // if (rotateZ) {imgPlane.rotateZ(rotateZ)}
-    
+
             this.scene.add(imgPlane)
         })
     }
@@ -265,7 +265,7 @@ export class WinterShow2020 {
                     if (!proj) return;
                     let offset = i - startIndex * 1
                     let locX = -22.55 + offset * 1.5
-                    let locZ = 32 
+                    let locZ = 32
                     let hyperlink = this.createHyperlinkedMesh(locX, 1.75, locZ, proj)
                     hyperlink.rotateY(Math.PI/2)
 
