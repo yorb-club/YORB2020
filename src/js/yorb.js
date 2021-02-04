@@ -140,7 +140,7 @@ export class Yorb {
             this.show.setup();
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
-            this.daysGallery = new DaysGallery(this.scene, "classrooms");
+            this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
         }
 
         // this.sketches = new Sketches(this.scene)

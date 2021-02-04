@@ -1,16 +1,14 @@
 // 100 days gallery module
-// August Luhrs Jan 2020
+// August Luhrs Jan/Feb 2020
 
 import { Vector3 } from 'three'
 import * as THREE from 'three'
 import debugModule from 'debug';
 const log = debugModule('YORB:DaysGallery');
-
 const Place = require('../../utilities/tools/place.js'); //for generating the canvases along wall
 
 // why folders in dist is better than one big folder:
 // https://medium.com/hceverything/parcel-js-moving-static-resources-to-a-separate-folder-aef63a038cbd
-// const postsDir = require('../assets/images/100Days/resized/**/*.png');
 const postsDir = require('../assets/images/100Days/resized/**/*.*');
 
 /* postsDir STRUCTURE:
@@ -29,41 +27,45 @@ const postsDir = require('../assets/images/100Days/resized/**/*.*');
 */
 
 export class DaysGallery {
-    constructor(scene, location) {
-        this.scene = scene;
-        // this.location = {}
-        this.gallery = undefined; //not needed now, but might be useful later to change/update specific posts
-
-        if (location == 'classrooms'){
-            //starting point is front left corner of back classroom
-            // this.startPoint = {};
-            // this.startPoint.left = new Vector3(42, 2.5, 7);
-            // this.startPoint.right = new Vector3(47, 2.5, 19.4);
-            // this.startPoint.third  //TODO location and name
-
-            // this.setup(this.startPoint);
-            // this.testPlace();
-            this.setup();
-        } else { //just for testing the now defunct setupGrid()
-            // this.location.center = new Vector3(40.5, 0, 0);
-            // this.location.width = 2; //x
-            // this.location.depth = 2; //z
-            // this.location.height = 10; //y
-        }
+    constructor(scene, camera, mouse) {
+        this.scene = scene; //where the magic happens
+        this.gallery = undefined; //holds the canvas objects
+        //for interaction, from Billy's projectionScreens.js
+        this.camera = camera;
+        this.mouse = mouse;
+        this.shift_down = false; 
+        this.raycaster = new THREE.Raycaster();
+        this.selectedPost = null;
+        let domElement = document.getElementById('scene-container')
+        domElement.addEventListener('click', (e) => this.onMouseClick(e), false)
+        window.addEventListener('keydown', (e) => this.onKeyDown(e), false)
+        window.addEventListener('keyup', (e) => this.onKeyUp(e), false)
+        //get it goinnn
+        this.setup();
     }
 
-    //get posts and generate canvases along the walls of the back classrooms
-    // setup (startPoint){
+    /*
+     ~ * ~ * ~ * MAIN FUNCTION: SETUP
+     ~ * ~ * ~ * 
+     ~ * ~ * ~ * get posts from resized
+     ~ * ~ * ~ * sort to get today's post
+     ~ * ~ * ~ * generate canvases along the walls of the back classrooms
+    */
+
     setup () {
         this.galleryTitle(); //place the gallery title on the wall outside the classrooms
         let sortedDates = this.sortPosts();
         let todaysPosts = this.getTodaysPosts(sortedDates);
-        // log('postssss');
-        // log(todaysPosts);
         this.generateGallery(todaysPosts); //keeping classroom location info in relevant methods instead of whole class
     }
 
-    //sort all the posts by date so we can grab today's post and later show by date
+    
+    /*
+     ~ * ~ * ~ * SCRAPING AND SORTING
+     ~ * ~ * ~ * 
+     ~ * ~ * ~ * sort all the posts by date so we can grab today's post and later show by date
+    */
+
     sortPosts () {
         let sortedDates = {}; //want this to be same structure as postsDir, but account object holds an array of dates
         
@@ -100,7 +102,13 @@ export class DaysGallery {
         return todaysPosts;
     }
 
-    //place the meshes in the back classrooms 
+    /*
+     ~ * ~ * ~ * GENERATE GALLERY
+     ~ * ~ * ~ * 
+     ~ * ~ * ~ * use the Place tool and the posts array 
+     ~ * ~ * ~ * to generate canvases along the three back classrooms
+    */
+
     generateGallery (posts) {
         let galleryGroup = new THREE.Group();
         let galleryGeometry = new THREE.BoxGeometry(1.5, 1.5, .2);
@@ -109,7 +117,6 @@ export class DaysGallery {
         let kcPosts, kdPosts, paulaPosts;
         for (let section of Object.keys(posts)) {
             let sec = Object.keys(posts[section])[0];
-            // log(sec);
 
             if(sec == 'kc'){
                 kcPosts = posts[section][sec];
@@ -150,7 +157,7 @@ export class DaysGallery {
         
         kcGroup.add(southWallKC, eastWallKC, northWallKC, westWallKC);
 
-        //third classroom -- paula -- starts from west so last wall(see through) has least num of canvases
+        //third classroom -- paula 15 incl. p-- starts from west so last wall(see through) has least num of canvases
         let paulaGroup = new THREE.Group();
         let westGroupPaula = paulaPosts.slice(0, 5); //tight squeeze...
         let northGroupPaula = paulaPosts.slice(5, 8);
@@ -172,8 +179,105 @@ export class DaysGallery {
         this.gallery = galleryGroup;
     }
 
+    /*
+     ~ * ~ * ~ * INTERACTION
+     ~ * ~ * ~ * 
+     ~ * ~ * ~ * use Billy's Raycaster Shift-Click interaction from projectionScreens.js
+     ~ * ~ * ~ * to generate pop up links from Aidan's index.js coordinate modals
+    */
+
+    makeInstagramLinkModal(account) {
+        if (!document.getElementsByClassName('insta-modal')[0]) {
+            // yorbScene.controls.pause();
+            let modalEl = document.createElement('div');
+            modalEl.className = 'project-modal';
+            modalEl.id = 'insta_modal';
+
+            let contentEl = document.createElement('div');
+            contentEl.className = 'project-modal-content';
+
+            let link = `https://instagram.com/${account}`;
+
+            let linkEl = document.createElement('a');
+            linkEl.href = link;
+            linkEl.innerHTML = `Check out all of ${account}'s posts on Instagram!`;
+            linkEl.target = '_blank';
+            linkEl.rel = 'noopener noreferrer';
+
+            let closeButton = document.createElement('button');
+            closeButton.addEventListener('click', () => {
+                modalEl.remove();
+                // yorbScene.controls.resume();
+            });
+            closeButton.innerHTML = 'X';
+
+
+            let spacerDiv = document.createElement('div');
+            spacerDiv.innerHTML += "<br><br>"
+
+            let spacerDiv2 = document.createElement('div');
+            spacerDiv2.innerHTML += "<br><br>"
+
+            contentEl.appendChild(closeButton);
+            contentEl.appendChild(spacerDiv)
+            contentEl.appendChild(linkEl);
+            contentEl.appendChild(spacerDiv2)
+
+            modalEl.appendChild(contentEl);
+            document.body.appendChild(modalEl);
+        }
+    }
+
+    checkProjectionScreenCollisions() {
+        this.raycaster.setFromCamera(this.mouse, this.camera);
+
+        var intersects = this.raycaster.intersectObject(this.gallery, true);
+
+        // if we have intersections, highlight them
+        let thresholdDist = 7;
+        if (intersects.length > 0) {
+            if (intersects[0].distance < thresholdDist) {
+                let post = intersects[0].object;
+                this.selectedPost = post;
+            } else {
+                this.selectedPost = null;
+            }
+        } else {
+            this.selectedPost = null;
+        }
+    }
+
+    
+    onMouseClick(e) {
+        // log('gallery');
+        // log(JSON.stringify(this.gallery));
+        this.checkProjectionScreenCollisions();
+        if (this.selectedPost && this.shift_down) {
+            log('selected: ' + JSON.stringify(this.selectedPost.name));
+            this.makeInstagramLinkModal(this.selectedPost.name);
+            this.shift_down = false // reset this because the displayMedia dialog means we lose the onKeyUp event
+        }
+    }
+
+    onKeyDown(e) {
+        if (e.keyCode == 16) {
+            this.shift_down = true
+        }
+    }
+
+    onKeyUp(e) {
+        if (e.keyCode == 16) {
+            this.shift_down = false
+        }
+    }
+
+    /*
+     ~ * ~ * ~ * TITLE // BANNER
+     ~ * ~ * ~ * 
+     ~ * ~ * ~ * use YG's yorblet.js/portal.js labels to make a big banner
+    */
+
     galleryTitle () {
-        // title code from YG's yorblet.js labels, thanks!
         const fontJson = require('../assets/fonts/helvetiker_regular_copy.typeface.json')
         const font = new THREE.Font(fontJson)
         const text = '100 Days of Making'
@@ -187,7 +291,7 @@ export class DaysGallery {
             bevelThickness: 0.1,
             bevelSize: 0.1,
             bevelSegments: 6,
-        })
+        });
 
         const fontMaterial1 = new THREE.MeshBasicMaterial({ color: 0x18DD6C, flatShading: true })
         const fontMaterial2 = new THREE.MeshBasicMaterial({ color: 0x1250CC, flatShading: true })
@@ -198,69 +302,6 @@ export class DaysGallery {
         this.scene.add(fontMesh)
     }
 
-    testPlace () {
-        log(postsDir);
-        // log(postsDir['kd']['100dayscoffee']['20101005']['0']);
-        let startPoint = new Vector3(42, 2, 7.4);
-        let endPoint = new Vector3(47, 2, 7.4);
-        let assets = [
-            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0],
-            Object.values(postsDir['kd']['100dayscoffee']['20210110']['0'])[0],
-            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0]
-        ]
-        let geometry = new THREE.BoxGeometry(1.5, 1.5, .2);
-        let group = Place.onWall(startPoint, endPoint, assets, geometry);
-        this.scene.add(group);
-
-        let startPoint2 = new Vector3(47, 2, 7.4);
-        let endPoint2 = new Vector3(47, 2, 18.4);
-        let assets2 = [
-            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0],
-            Object.values(postsDir['kd']['100dayscoffee']['20210110']['0'])[0],
-            Object.values(postsDir['kd']['moving.drawing']['20210118']['0needsResize'])[0],
-            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0]
-        ]
-        let geometry2 = new THREE.BoxGeometry(1.5, 1.5, .2);
-        let group2 = Place.onWall(startPoint2, endPoint2, assets2, geometry2);
-        this.scene.add(group2);
-    }
-
-    setupTest(){ //just for testing flow, test cube in elevators
-
-        // create the video element from url
-        // let protoVideo = document.createElement( 'video' )
-        // protoVideo.setAttribute('id', 'protoVideo')
-        // protoVideo.src = "https://scontent-lga3-1.cdninstagram.com/v/t50.2886-16/125367180_843826916364667_3564841615660490363_n.mp4?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=107&_nc_ohc=ImHrFkZ1GVkAX_-q_Ug&oe=5FB6A187&oh=51e86203ab5bf76414f27be6b0110138"
-        // protoVideo.load() // must call after setting/changing source
-        // protoVideo.loop = true
-        // protoVideo.play()
-
-        //loading video into texture
-        // const protoVideoTexture = new THREE.VideoTexture( document.getElementById('protoVideo'))
-
-
-        //loading photo from url
-        // const protoTexture = new THREE.TextureLoader().load("https://scontent-lga3-1.cdninstagram.com/v/t51.2885-15/e35/125364127_1230307457348884_674277153923938623_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=104&_nc_ohc=twpkkEj5BDAAX_svcnq&tp=18&oh=883284a6619ab238bde83e5cb291814f&oe=5FDD0EEE")
-        // const protoTexture = new THREE.TextureLoader().load("https://scontent-lga3-1.cdninstagram.com/v/t51.2885-15/e35/55742633_587080988439344_46306404217687397_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=108&_nc_ohc=reT_0gAvwvkAX_6CfaB&tp=1&oh=c6851409abc5764c2824f1c5a71d6921&oe=602083E2")
-        const protoTexture = new THREE.TextureLoader().load(postsDir['kcconch']['20101005']['0']);
-
-        //set up proto cube
-        const protoGeometry = new THREE.BoxGeometry(1,1,1)
-        // const protoMaterial = new THREE.MeshBasicMaterial({map: protoVideoTexture})
-        const protoMaterial = new THREE.MeshBasicMaterial({map: protoTexture})
-
-        var dayProto = new THREE.Mesh(protoGeometry, protoMaterial)
-
-        dayProto.position.set(
-            4.5,
-            .5,
-            0.5
-        )
-        // dayProto.position.set(this.location.center);
-
-        this.scene.add(dayProto)
-        console.log("PROTOTYPE ADDED")
-    }
 }
 
 /*
@@ -357,6 +398,70 @@ OLD FUNCTIONS -- I know I could probably just delete these, but I'm a hoarder
                 return [spot, room, direction];
             }
         }
+    }
+
+    testPlace () {
+        log(postsDir);
+        // log(postsDir['kd']['100dayscoffee']['20101005']['0']);
+        let startPoint = new Vector3(42, 2, 7.4);
+        let endPoint = new Vector3(47, 2, 7.4);
+        let assets = [
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20210110']['0'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0]
+        ]
+        let geometry = new THREE.BoxGeometry(1.5, 1.5, .2);
+        let group = Place.onWall(startPoint, endPoint, assets, geometry);
+        this.scene.add(group);
+
+        let startPoint2 = new Vector3(47, 2, 7.4);
+        let endPoint2 = new Vector3(47, 2, 18.4);
+        let assets2 = [
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20210110']['0'])[0],
+            Object.values(postsDir['kd']['moving.drawing']['20210118']['0needsResize'])[0],
+            Object.values(postsDir['kd']['100dayscoffee']['20101005']['0'])[0]
+        ]
+        let geometry2 = new THREE.BoxGeometry(1.5, 1.5, .2);
+        let group2 = Place.onWall(startPoint2, endPoint2, assets2, geometry2);
+        this.scene.add(group2);
+    }
+
+    setupTest(){ //just for testing flow, test cube in elevators
+
+        // create the video element from url
+        // let protoVideo = document.createElement( 'video' )
+        // protoVideo.setAttribute('id', 'protoVideo')
+        // protoVideo.src = "https://scontent-lga3-1.cdninstagram.com/v/t50.2886-16/125367180_843826916364667_3564841615660490363_n.mp4?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=107&_nc_ohc=ImHrFkZ1GVkAX_-q_Ug&oe=5FB6A187&oh=51e86203ab5bf76414f27be6b0110138"
+        // protoVideo.load() // must call after setting/changing source
+        // protoVideo.loop = true
+        // protoVideo.play()
+
+        //loading video into texture
+        // const protoVideoTexture = new THREE.VideoTexture( document.getElementById('protoVideo'))
+
+
+        //loading photo from url
+        // const protoTexture = new THREE.TextureLoader().load("https://scontent-lga3-1.cdninstagram.com/v/t51.2885-15/e35/125364127_1230307457348884_674277153923938623_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=104&_nc_ohc=twpkkEj5BDAAX_svcnq&tp=18&oh=883284a6619ab238bde83e5cb291814f&oe=5FDD0EEE")
+        // const protoTexture = new THREE.TextureLoader().load("https://scontent-lga3-1.cdninstagram.com/v/t51.2885-15/e35/55742633_587080988439344_46306404217687397_n.jpg?_nc_ht=scontent-lga3-1.cdninstagram.com&_nc_cat=108&_nc_ohc=reT_0gAvwvkAX_6CfaB&tp=1&oh=c6851409abc5764c2824f1c5a71d6921&oe=602083E2")
+        const protoTexture = new THREE.TextureLoader().load(postsDir['kcconch']['20101005']['0']);
+
+        //set up proto cube
+        const protoGeometry = new THREE.BoxGeometry(1,1,1)
+        // const protoMaterial = new THREE.MeshBasicMaterial({map: protoVideoTexture})
+        const protoMaterial = new THREE.MeshBasicMaterial({map: protoTexture})
+
+        var dayProto = new THREE.Mesh(protoGeometry, protoMaterial)
+
+        dayProto.position.set(
+            4.5,
+            .5,
+            0.5
+        )
+        // dayProto.position.set(this.location.center);
+
+        this.scene.add(dayProto)
+        console.log("PROTOTYPE ADDED")
     }
 
 //go to resized folder and grab the most recent post for each student

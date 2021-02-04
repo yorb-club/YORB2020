@@ -15,10 +15,10 @@ const log = debugModule('YORB: Place Tool');
 
 const onWall = (startPoint, endPoint, assets, geometry, options) => {
     // takes two Vec3 points, an array of assets to generate the textures from, and a shared canvas geometry
-    // returns a THREE.Group with the meshes
+    // returns a THREE.Group with the meshes, and if a label is included, names the object by the label for easy raycast checking
     // right now defaults to placing along a flat wall, assumes square canvases, center aligned, evenly spaced -- eventually can add options parameter with those.
     // doesn't need to be wall along an axis, since uses vector math to determine direction of placement
-    // assumes start point is on the left for orientation, though since all faces are same, shouldn't matter.
+    // assumes start point is on the left for orientation, though since all faces are same, shouldn't matter unless using labels
     // assumes spacing also on extreme sides, so start/end shouldn't be center of first/last canvas, but the edges of the wall
     // right now, only option is label placement location {labelLocation: 'top' or 'alternating'}, defaults to bottom placement
     
@@ -75,7 +75,8 @@ const onWall = (startPoint, endPoint, assets, geometry, options) => {
         //first, see if object with label or just file
         if (typeof asset === 'object') {
             let canvasAndLabel = new THREE.Group();
-            let label = createLabel(Object.keys(asset)[0], geometry.parameters.width);
+            let text = Object.keys(asset)[0];
+            let label = createLabel(text, geometry.parameters.width);
             let canvas;
             let file = Object.values(asset)[0];
             
@@ -105,6 +106,8 @@ const onWall = (startPoint, endPoint, assets, geometry, options) => {
             } else {
                 log("unsupported file type: " + file);
             }
+            //give the canvas a name for raycast stuff later
+            canvas.name = text;
             //now adjust label pos and rotation based on canvas'
             let labelVec3 = canvas.position.clone();
             if (options.labelLocation = "alternating") {
