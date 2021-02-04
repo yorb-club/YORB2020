@@ -143,7 +143,7 @@ export class DaysGallery {
         
         kdGroup.add(southWallKD, eastWallKD, northWallKD, westWallKD);
 
-        //right classroom -- kc 15 incl. kc
+        //right classroom -- kc 14 incl. kc
         let kcGroup = new THREE.Group();
         let southGroupKC = kcPosts.slice(0, 3);
         let westGroupKC = kcPosts.slice(3, 7);
