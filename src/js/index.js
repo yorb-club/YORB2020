@@ -32,12 +32,12 @@ let WEB_SOCKET_SERVER = false;
 let INSTANCE_PATH = false;
 
 // For running against local server
-// WEB_SOCKET_SERVER = 'localhost:3000'
-// INSTANCE_PATH = '/socket.io'
+WEB_SOCKET_SERVER = 'localhost:3000'
+INSTANCE_PATH = '/socket.io'
 
 // For running against ITP server
-WEB_SOCKET_SERVER = 'https://yorb.itp.io';
-INSTANCE_PATH = '/socket.io';
+// WEB_SOCKET_SERVER = 'https://yorb.itp.io';
+// INSTANCE_PATH = '/socket.io';
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 // Setup Global Variables:
@@ -206,6 +206,14 @@ function initSocketConnection() {
             info('Received project list from server.');
             updateProjects(_projects);
         });
+
+        socket.on('calendarEvents', (events) => {
+            console.log('got calendar events!');
+            console.log(events);
+            if (yorbScene.calendar) {
+                yorbScene.calendar.update(events);
+            }
+        })
 
         socket.on('userDisconnected', (_id, _ids) => {
             // Update the data from the server

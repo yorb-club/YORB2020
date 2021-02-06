@@ -17,8 +17,8 @@ import { ProjectionScreens } from './projectionScreens';
 import { YorbControls2 } from './yorbControls2.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
+import {Calendar} from "./calendar";
 import { DaysGallery } from './daysGallery';
-
 
 import * as THREE from 'three';
 
@@ -124,6 +124,8 @@ export class Yorb {
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     // add YORB parts
     addYORBParts() {
+        this.calendar = new Calendar(this.scene, this.camera);
+
         this.controls = new YorbControls2(this.scene, this.camera, this.renderer);
 
         this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
