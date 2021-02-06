@@ -12,7 +12,7 @@
  *
  */
 
-import { create3DText, createSimpleText } from './utils';
+import { create3DText, createSimpleText, addLineBreak, formatDate} from './utils';
 import * as THREE from 'three';
 
 const scene = scene;
@@ -23,7 +23,7 @@ export class Calendar {
         this.scene = scene;
         this.camera = camera;
 
-        let fontJson = require('../assets/fonts/helvetiker_regular_copy.typeface.json');
+        let fontJson = require('../assets/fonts/Righteous_Regular.json');
         this.font = new THREE.Font(fontJson);
     }
 
@@ -31,14 +31,14 @@ export class Calendar {
         console.log('Upcoming events:', events);
 
         if (events.length > 0) {
-            for (let i = 0; i < events.length; i++) {
+            for (let i = 0; i < events.length && i < 7; i++) {
                 var event = events[i];
                 console.log(event);
                 var when = event.start.dateTime;
                 if (!when) {
                     when = event.start.date;
                 }
-                let eventMesh = this.createHyperlinkedMesh(40 + i * 1, 2, -20, event);
+                let eventMesh = this.createHyperlinkedMesh(25 - i * 3.5, 2, 2, event);
                 this.scene.add(eventMesh);
             }
         } else {
@@ -46,21 +46,6 @@ export class Calendar {
             console.log('No upcoming events found.');
         }
     }
-
-    addCalendarItem(x, y, z, message) {
-        let cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-        let cubeMaterial = new THREE.MeshBasicMaterial({ color: 'blue' });
-        let cubeMesh = new THREE.Mesh(cubeGeometry, cubeMaterial);
-        cubeMesh.position.set(x, y, z);
-
-        let txt = create3DText(message, 0.25, 0.01, 10, 0.01, 0.01, true, false, this.font, 0xf9f910);
-        txt.position.set(x, y, z);
-        txt.rotateY(-Math.PI / 2);
-        this.scene.add(txt);
-
-        // this.scene.add(cubeMesh);
-    }
-
     /*
      * createHyperlinkedMesh(x,y,z,_project)
      *
@@ -72,58 +57,49 @@ export class Calendar {
 
     createHyperlinkedMesh(x, y, z, event) {
         let linkDepth = 0.1;
-        let fontColor = 0x343434;
-        let statusColor = 0xffffff;
-        let fontSize = 0.05;
+        let fontColor = 0x121212;
+        let fontSize = 0.2;
+        let dateFontSize = 0.15;
 
-        var geometry = new THREE.BoxGeometry(linkDepth, 0.75, 0.75);
-        var textBoxGeometry = new THREE.BoxGeometry(linkDepth, 0.5, 0.75);
+        let geometry = new THREE.BoxGeometry(3.25,2.25,linkDepth);
+        let mat = new THREE.MeshBasicMaterial({color: 'hotpink'});
+        let sideMat = new THREE.MeshBasicMaterial({color: "black"})
 
-        let textBoxMat = new THREE.MeshBasicMaterial();
-
-        // check whether we've visited the link before and set material accordingly
-        // if (localStorage.getItem(_project.project_id) == 'visited') {
-        //     textBoxMat = this.linkVisitedMaterial
-        // } else {
-        //     textBoxMat = this.linkMaterial
-        // }
-
-        // let tex
-        // if (project_thumbnails[_project.project_id]) {
-        //     tex = this.textureLoader.load(project_thumbnails[_project.project_id])
-        // } else {
-        //     tex = this.textureLoader.load(project_thumbnails['0000']) // default texture
-        // }
-        // tex.wrapS = THREE.RepeatWrapping
-        // tex.wrapT = THREE.RepeatWrapping
-        // tex.repeat.set(1, 1)
-
-        let imageMat = new THREE.MeshLambertMaterial({
-            color: 0xffffff,
-            // map: tex,
-        });
-
-        // this.linkMaterials[_project.project_id.toString()] = imageMat
-
-        var textSign = new THREE.Mesh(textBoxGeometry, textBoxMat);
-        var imageSign = new THREE.Mesh(geometry, imageMat);
+        let textSign = new THREE.Mesh(geometry, [sideMat,sideMat,sideMat,sideMat,mat,sideMat]);
+        
 
         // parse text of name and add line breaks if necessary
-        var name = event.summary;
-        // if (name.length > 15) {
-        //     name = this.addLineBreak(name)
-        // }
+        let name = event.summary;
+        let timeDate = new Date(event.start.dateTime || event.start.date)
+        let time = formatDate(timeDate);
+        if (name.length > 15) {
+            name = addLineBreak(name)
+        }
 
         // create name text mesh
-        var textMesh = createSimpleText(name, fontColor, fontSize, this.font);
+        let nameTextMesh = createSimpleText(name, fontColor, fontSize, this.font);
+        let timeTextMesh = createSimpleText(time, dateFontSize, fontSize, this.font);
 
-        textMesh.position.x += linkDepth / 2 + 0.01; // offset forward
-        textMesh.rotateY(Math.PI / 2);
+        // position text meshes w/r/t each other
+        nameTextMesh.position.y += 0.25;
+        timeTextMesh.position.y -= 0.75;
 
-        imageSign.position.set(x, y, z);
-        textSign.position.set(0, -0.75 / 2 - 0.5 / 2, 0);
-        textSign.add(textMesh);
-        imageSign.add(textSign);
+        let textGroup = new THREE.Group();
+        textGroup.add(nameTextMesh);
+        textGroup.add(timeTextMesh);
+        textGroup.position.z += linkDepth / 2 + 0.01; // offset forward
+
+        textSign.add(textGroup);
+        textSign.position.set(x,y,z);
+        textSign.rotateY(Math.PI);
+
+        // textMesh.position.y += linkDepth / 2 + 0.01; // offset forward
+        // textMesh.rotateY(Math.PI / 2);
+
+        // imageSign.position.set(x, y, z);
+        // textSign.position.set(0, -0.75 / 2 - 0.5 / 2, 0);
+        // textSign.add(textMesh);
+        // imageSign.add(textSign);
 
         // parse zoom room status
         // var status_code = _project.zoom_status
@@ -153,11 +129,11 @@ export class Calendar {
 
         // imageSign.name = _project.project_id
 
-        imageSign.lookAt(0, 1.5, 0);
-        imageSign.rotateY(-Math.PI / 2);
-        imageSign.translateZ(2);
-        imageSign.translateX(7);
-        imageSign.translateY(0.25);
+        // imageSign.lookAt(0, 1.5, 0);
+        // imageSign.rotateY(-Math.PI / 2);
+        // imageSign.translateZ(2);
+        // imageSign.translateX(7);
+        // imageSign.translateY(0.25);
 
         // let pedestalGeo = new THREE.CylinderBufferGeometry(0.5, 0.65, 1, 12)
         // let pedestalMat = new THREE.MeshBasicMaterial({ color: 0x232323, flatShading: true, side: THREE.DoubleSide })
@@ -174,6 +150,6 @@ export class Calendar {
         // pedestalMesh.add(line);
         // pedestalMesh.position.set(0, -1.5, 0)
 
-        return imageSign;
+        return textSign;
     }
 }

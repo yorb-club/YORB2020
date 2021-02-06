@@ -10,65 +10,63 @@
  *
  */
 
-require('dotenv').config({ path: process.cwd() + '/server/.env' })
+require('dotenv').config({ path: process.cwd() + '/server/.env' });
 
 // Mediasoup configuration
-const config = require(process.cwd() + '/server/config.js')
-config.httpIp = process.env.PRODUCTION_IP
-config.httpPort = process.env.PRODUCTION_PORT
+const config = require(process.cwd() + '/server/config.js');
+config.httpIp = process.env.PRODUCTION_IP;
+config.httpPort = process.env.PRODUCTION_PORT;
 
 config.mediasoup.webRtcTransport.listenIps = [
     { ip: '127.0.0.1', announcedIp: null },
     { ip: process.env.PRODUCTION_IP, announcedIp: null },
-]
+];
 
 // IMPORTS
 
 // set debug name
-process.env.DEBUG = 'YORBSERVER*'
+process.env.DEBUG = 'YORBSERVER*';
 
-const debugModule = require('debug')
-const mediasoup = require('mediasoup')
-const fs = require('fs')
-const https = require('https')
-const {listEvents} = require("./calendar");
-
-listEvents();
+const debugModule = require('debug');
+const mediasoup = require('mediasoup');
+const fs = require('fs');
+const https = require('https');
+const { listEvents } = require('./calendar');
 
 // HTTP Server setup:
 // https://stackoverflow.com/questions/27393705/how-to-resolve-a-socket-io-404-not-found-error
 var express = require('express'),
-    http = require('http')
-var app = express()
-var server = http.createServer(app)
+    http = require('http');
+var app = express();
+var server = http.createServer(app);
 
-let io = require('socket.io')()
+let io = require('socket.io')();
 io.listen(server, {
     cors: {
         origin: '*',
         methods: ['GET', 'POST'],
         credentials: true,
     },
-})
+});
 
-const distFolder = process.cwd() + '/dist'
-console.log('Serving static files at ', distFolder)
-app.use(express.static(process.cwd() + '/dist'))
+const distFolder = process.cwd() + '/dist';
+console.log('Serving static files at ', distFolder);
+app.use(express.static(process.cwd() + '/dist'));
 
-server.listen(process.env.PRODUCTION_PORT)
-console.log(`Server listening on http://${process.env.PRODUCTION_IP}:${process.env.PRODUCTION_PORT}`)
+server.listen(process.env.PRODUCTION_PORT);
+console.log(`Server listening on http://${process.env.PRODUCTION_IP}:${process.env.PRODUCTION_PORT}`);
 
-const log = debugModule('YORBSERVER')
-const warn = debugModule('YORBSERVER:WARN')
-const err = debugModule('YORBSERVER:ERROR')
+const log = debugModule('YORBSERVER');
+const warn = debugModule('YORBSERVER:WARN');
+const err = debugModule('YORBSERVER:ERROR');
 
 // one mediasoup worker and router
 //
 // let worker, router, audioLevelObserver;
-let workers = []
-let routers = []
+let workers = [];
+let routers = [];
 // let audioLevelObservers = [];
-let roomStates = []
+let roomStates = [];
 
 //
 // and one "room" ...
@@ -84,7 +82,7 @@ let roomStates = []
 // }
 
 // this will store which worker/router/room a peer is in
-let peerLocations = {}
+let peerLocations = {};
 //
 // for each peer that connects, we keep a table of peers and what
 // tracks are being sent and received. we also need to know the last
@@ -141,12 +139,12 @@ let peerLocations = {}
  * Using Math.round() will give you a non-uniform distribution!
  */
 function getRandomInt(min, max) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min + 1)) + min
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-let clients = {}
+let clients = {};
 let testProjects = [
     {
         project_id: '8558',
@@ -157,92 +155,92 @@ let testProjects = [
             'I have a background in stage lighting design. In most stage performances, designers hide the light instrument above the stage or on the side behind curtains where audience could not see the light source itself. When I designed lighting for dance, I always thought I am also creating choreography but with medium of light. With this experience, I started to wonder what if I put light on stage, so that they are no longer complimentary roles in performance, but instead an actor, an expressive performing instrument on stage. &amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;\r\n&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;\r\nYou Are Not the Only Particle in Universe is a continued research from a past performance project, In a Box, which I first created a performance that included a custom made instrument with home lamps and home lamp switches. My thesis project further develops this instrument with more interactive functions and allows the performer to create more versatile music and movement.&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;\r\n&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;\r\nLight 2.0 is a multimedia performance that combines light, music, and movement, when light and music are not complementary roles and movement and performers are also not leading roles. Together, all these elements become performing instruments on stage.&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;\r\n&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;&amp;lt;br /&amp;gt;\r\nThe performer can bow, tap, or spin the lamps to create various combinations of music, light, and movement. When bowing the lamp with a bow or tap near the sensors, it looks like bowing a cello and plucking. The performer can also spin the lamp shade to activate different parts of music composition.&amp;lt;br /&amp;gt;',
         zoom_link: 'https://nyu.zoom.us/j/2673933378',
     },
-]
-let projects = []
+];
+let projects = [];
 // projects = testProjects;
 
 //
 // main() -- our execution entry point
 //
 
-const os = require('os')
-const { eventNames } = require('process')
-// const { Calendar } = require('../src/js/calendar')
-const numCPUs = os.cpus().length
+const os = require('os');
+const numCPUs = os.cpus().length;
+let events = [];
 
 async function main() {
     // start mediasoup
-    log('starting mediasoup')
+    log('starting mediasoup');
     for (let i = 0; i < numCPUs; i++) {
-        log('Starting Mediasoup worker in CPU #', i)
-        let worker, router, roomState
-        ;({ worker, router, roomState } = await startMediasoup())
-        workers[i] = worker
-        routers[i] = router
+        log('Starting Mediasoup worker in CPU #', i);
+        let worker, router, roomState;
+        ({ worker, router, roomState } = await startMediasoup());
+        workers[i] = worker;
+        routers[i] = router;
         // audioLevelObservers[i] = audioLevelObserver;
-        roomStates[i] = roomState
+        roomStates[i] = roomState;
     }
 
-    runSocketServer()
+    runSocketServer();
 
     // periodically clean up peers that disconnected without sending us
     // a final "beacon"
     setInterval(() => {
-        let now = Date.now()
+        let now = Date.now();
         for (let i = 0; i < roomStates.length; i++) {
             Object.entries(roomStates[i].peers).forEach(([id, p]) => {
                 if (now - p.lastSeenTs > config.httpPeerStale) {
-                    warn(`removing stale peer ${id}`)
-                    closePeer(id)
+                    warn(`removing stale peer ${id}`);
+                    closePeer(id);
                 }
-            })
+            });
         }
-    }, 1000)
+    }, 1000);
 
     // periodically update video stats we're sending to peers
     // setInterval(updatePeerStats, 3000);
 
-    updateProjects()
-    setInterval(updateProjects, 180000) // update projects every five minutes
+    updateProjects();
+    setInterval(updateProjects, 180000); // update projects every five minutes
 
-    // let events = listEvents();
-    // console.log('evennts: ',events.length);
+    updateCalendarEvents();
+    setInterval(updateCalendarEvents, 3600000);
 }
 
-main()
-
-// getCalendarEvents();
+main();
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 
 async function updateProjects() {
-    let url = process.env.PROJECT_DATABASE_URL
+    let url = process.env.PROJECT_DATABASE_URL;
 
     https
         .get(url, (res) => {
-            var body = ''
+            var body = '';
 
             res.on('data', function (chunk) {
-                body += chunk
-            })
+                body += chunk;
+            });
 
             res.on('end', function () {
-                
                 try {
                     // TODO parse JSON so we render HTML text correctly?  i.e. so we don't end up with '</br>' or '&amp;' ...
-                    const json = JSON.parse(body)
-                    projects = json
-                    log('Updated projects from database.')
-                    io.sockets.emit('projects', projects)
+                    const json = JSON.parse(body);
+                    projects = json;
+                    log('Updated projects from database.');
+                    io.sockets.emit('projects', projects);
                 } catch (err) {
-                    console.error('update projects error: ' + err)
+                    console.error('update projects error: ' + err);
                 }
-            })
+            });
         })
         .on('error', function (e) {
-            log('Got an error: ', e)
-        })
+            log('Got an error: ', e);
+        });
+}
+
+async function updateCalendarEvents() {
+    events = await listEvents();
 }
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -251,22 +249,22 @@ async function updateProjects() {
 async function runSocketServer() {
     // update all sockets at regular intervals
     setInterval(() => {
-        io.sockets.emit('userPositions', clients)
-    }, 200)
+        io.sockets.emit('userPositions', clients);
+    }, 200);
 
     // every 5 seconds, check for inactive clients and send them into cyberspace
     setInterval(() => {
-        let now = Date.now()
+        let now = Date.now();
         for (let id in clients) {
             if (now - clients[id].lastSeenTs > 60000) {
-                log('Culling inactive user with id', id)
-                clients[id].position = [1000, 1000, 1000]
+                log('Culling inactive user with id', id);
+                clients[id].position = [1000, 1000, 1000];
             }
         }
-    }, 5000)
+    }, 5000);
 
     io.on('connection', (socket) => {
-        log('User ' + socket.id + ' connected, there are ' + io.engine.clientsCount + ' clients connected')
+        log('User ' + socket.id + ' connected, there are ' + io.engine.clientsCount + ' clients connected');
 
         //Add a new client indexed by his id
         clients[socket.id] = {
@@ -275,56 +273,59 @@ async function runSocketServer() {
             // rotation: [0, 0, 0, 1] // stored as XYZW values of Quaternion
             rotation: [0, 0, 0],
             projectionScreenId: -1,
-        }
+        };
 
-        socket.emit('introduction', socket.id, Object.keys(clients))
+        socket.emit('introduction', socket.id, Object.keys(clients));
         // also give the client all existing clients positions:
-        socket.emit('userPositions', clients)
+        socket.emit('userPositions', clients);
 
         // Give new socket the projects database
-        socket.emit('projects', projects)
+        socket.emit('projects', projects);
+
+        // give new socket the events:
+        socket.emit('calendarEvents', events);
 
         //Update everyone that the number of users has changed
-        io.sockets.emit('newUserConnected', io.engine.clientsCount, socket.id, Object.keys(clients))
-        io.sockets.emit('projectionScreenUpdate', clients) // send initial screenshare info
+        io.sockets.emit('newUserConnected', io.engine.clientsCount, socket.id, Object.keys(clients));
+        io.sockets.emit('projectionScreenUpdate', clients); // send initial screenshare info
 
         socket.on('move', (data) => {
-            let now = Date.now()
+            let now = Date.now();
             if (clients[socket.id]) {
-                clients[socket.id].position = data[0]
-                clients[socket.id].rotation = data[1]
-                clients[socket.id].lastSeenTs = now
+                clients[socket.id].position = data[0];
+                clients[socket.id].rotation = data[1];
+                clients[socket.id].lastSeenTs = now;
             }
-        })
+        });
 
         socket.on('claimProjectionScreen', (data) => {
             if (clients[socket.id]) {
-                clients[socket.id].projectionScreenId = data.screenId
+                clients[socket.id].projectionScreenId = data.screenId;
             }
 
-            io.sockets.emit('projectionScreenUpdate', clients)
-        })
+            io.sockets.emit('projectionScreenUpdate', clients);
+        });
 
         socket.on('releaseProjectionScreen', (data) => {
             if (clients[socket.id]) {
-                clients[socket.id].projectionScreenId = -1
+                clients[socket.id].projectionScreenId = -1;
             }
-            console.log('release', data.screenId)
-            io.sockets.emit('releaseProjectionScreen', data)
-        })
+            console.log('release', data.screenId);
+            io.sockets.emit('releaseProjectionScreen', data);
+        });
 
         // Handle the disconnection
         socket.on('disconnect', () => {
             // release screen when someone leaves
             if (clients[socket.id].projectionScreenId !== -1) {
-                let data = { screenId: clients[socket.id].projectionScreenId }
-                io.sockets.emit('releaseProjectionScreen', data)
+                let data = { screenId: clients[socket.id].projectionScreenId };
+                io.sockets.emit('releaseProjectionScreen', data);
             }
             //Delete this client from the object
-            delete clients[socket.id]
-            io.sockets.emit('userDisconnected', socket.id, Object.keys(clients))
-            log('User ' + socket.id + ' diconnected, there are ' + io.engine.clientsCount + ' clients connected')
-        })
+            delete clients[socket.id];
+            io.sockets.emit('userDisconnected', socket.id, Object.keys(clients));
+            log('User ' + socket.id + ' diconnected, there are ' + io.engine.clientsCount + ' clients connected');
+        });
 
         //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
         //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
@@ -347,38 +348,38 @@ async function runSocketServer() {
         // socket.on('sync', async (req, res) => {
         socket.on('sync', async (data, callback) => {
             // let { peerId } = req.body;
-            let peerId = socket.id
+            let peerId = socket.id;
 
             try {
-                let allPeers = {}
+                let allPeers = {};
                 for (let i = 0; i < roomStates.length; i++) {
-                    Object.assign(allPeers, roomStates[i].peers)
+                    Object.assign(allPeers, roomStates[i].peers);
                 }
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerLoc = peerLocations[peerId.toString()];
                 if (peerLoc == undefined) {
-                    throw new Error('No peerLoc found!')
+                    throw new Error('No peerLoc found!');
                 }
                 // make sure this peer is connected. if we've disconnected the
                 // peer because of a network outage we want the peer to know that
                 // happened, when/if it returns
                 if (!roomStates[peerLoc].peers[peerId]) {
-                    throw new Error('not connected')
+                    throw new Error('not connected');
                 }
 
                 // update our most-recently-seem timestamp -- we're not stale!
-                roomStates[peerLoc].peers[peerId].lastSeenTs = Date.now()
+                roomStates[peerLoc].peers[peerId].lastSeenTs = Date.now();
 
                 callback({
                     peers: allPeers,
                     // peers: roomStates[peerLoc].peers,
                     // activeSpeaker: roomStates[peerLoc].activeSpeaker,
                     // producers: roomStates[peerLoc].producers
-                })
+                });
             } catch (e) {
-                console.error(e.message)
-                callback({ error: e.message })
+                console.error(e.message);
+                callback({ error: e.message });
             }
-        })
+        });
 
         // --> /signaling/join-as-new-peer
         //
@@ -389,14 +390,14 @@ async function runSocketServer() {
         socket.on('join-as-new-peer', async (data, callback) => {
             try {
                 // let { peerId } = req.body;
-                let peerId = socket.id
-                let now = Date.now()
-                log('join-as-new-peer', peerId)
+                let peerId = socket.id;
+                let now = Date.now();
+                log('join-as-new-peer', peerId);
 
                 // assign random room:
-                let peerLoc = getRandomInt(0, numCPUs - 1)
-                log('assigning new peer to location in room ', peerLoc)
-                peerLocations[peerId.toString()] = peerLoc
+                let peerLoc = getRandomInt(0, numCPUs - 1);
+                log('assigning new peer to location in room ', peerLoc);
+                peerLocations[peerId.toString()] = peerLoc;
 
                 roomStates[peerLoc].peers[peerId] = {
                     joinTs: now,
@@ -404,14 +405,14 @@ async function runSocketServer() {
                     media: {},
                     consumerLayers: {},
                     stats: {},
-                }
+                };
 
-                callback({ routerRtpCapabilities: routers[peerLoc].rtpCapabilities })
+                callback({ routerRtpCapabilities: routers[peerLoc].rtpCapabilities });
             } catch (e) {
-                console.error('error in /signaling/join-as-new-peer', e)
-                callback({ error: e })
+                console.error('error in /signaling/join-as-new-peer', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/leave
         //
@@ -421,16 +422,16 @@ async function runSocketServer() {
         socket.on('leave', async (data, callback) => {
             try {
                 // let { peerId } = req.body;
-                let peerId = socket.id
-                log('leave', peerId)
+                let peerId = socket.id;
+                log('leave', peerId);
 
-                await closePeer(peerId)
-                callback({ left: true })
+                await closePeer(peerId);
+                callback({ left: true });
             } catch (e) {
-                console.error('error in /signaling/leave', e)
-                callback({ error: e })
+                console.error('error in /signaling/leave', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/create-transport
         //
@@ -439,16 +440,16 @@ async function runSocketServer() {
         //
         socket.on('create-transport', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
                 // let { peerId, direction } = req.body;
-                let { direction } = data
-                log('create-transport', peerId, direction)
+                let { direction } = data;
+                log('create-transport', peerId, direction);
 
-                let transport = await createWebRtcTransport({ peerId, direction })
-                roomStates[peerLoc].transports[transport.id] = transport
+                let transport = await createWebRtcTransport({ peerId, direction });
+                roomStates[peerLoc].transports[transport.id] = transport;
 
-                let { id, iceParameters, iceCandidates, dtlsParameters } = transport
+                let { id, iceParameters, iceCandidates, dtlsParameters } = transport;
                 callback({
                     transportOptions: {
                         id,
@@ -456,12 +457,12 @@ async function runSocketServer() {
                         iceCandidates,
                         dtlsParameters,
                     },
-                })
+                });
             } catch (e) {
-                console.error('error in /signaling/create-transport', e)
-                callback({ error: e })
+                console.error('error in /signaling/create-transport', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/connect-transport
         //
@@ -470,28 +471,28 @@ async function runSocketServer() {
         //
         socket.on('connect-transport', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 // let { peerId, transportId, dtlsParameters } = req.body,
                 let { transportId, dtlsParameters } = data,
-                    transport = roomStates[peerLoc].transports[transportId]
+                    transport = roomStates[peerLoc].transports[transportId];
 
                 if (!transport) {
-                    err(`connect-transport: server-side transport ${transportId} not found`)
-                    callback({ error: `server-side transport ${transportId} not found` })
-                    return
+                    err(`connect-transport: server-side transport ${transportId} not found`);
+                    callback({ error: `server-side transport ${transportId} not found` });
+                    return;
                 }
 
-                log('connect-transport', peerId, transport.appData)
+                log('connect-transport', peerId, transport.appData);
 
-                await transport.connect({ dtlsParameters })
-                callback({ connected: true })
+                await transport.connect({ dtlsParameters });
+                callback({ connected: true });
             } catch (e) {
-                console.error('error in /signaling/connect-transport', e)
-                callback({ error: e })
+                console.error('error in /signaling/connect-transport', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/close-transport
         //
@@ -500,28 +501,28 @@ async function runSocketServer() {
         //
         socket.on('close-transport', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 // let { peerId, transportId } = req.body,
-                let { transportId } = data
-                transport = roomStates[peerLoc].transports[transportId]
+                let { transportId } = data;
+                transport = roomStates[peerLoc].transports[transportId];
 
                 if (!transport) {
-                    err(`close-transport: server-side transport ${transportId} not found`)
-                    callback({ error: `server-side transport ${transportId} not found` })
-                    return
+                    err(`close-transport: server-side transport ${transportId} not found`);
+                    callback({ error: `server-side transport ${transportId} not found` });
+                    return;
                 }
 
-                log('close-transport', peerId, transport.appData)
+                log('close-transport', peerId, transport.appData);
 
-                await closeTransport(transport, peerId)
-                callback({ closed: true })
+                await closeTransport(transport, peerId);
+                callback({ closed: true });
             } catch (e) {
-                console.error('error in /signaling/close-transport', e)
-                callback({ error: e.message })
+                console.error('error in /signaling/close-transport', e);
+                callback({ error: e.message });
             }
-        })
+        });
 
         // --> /signaling/close-producer
         //
@@ -529,30 +530,30 @@ async function runSocketServer() {
         //
         socket.on('close-producer', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 // let { peerId, producerId } = req.body,
                 let { producerId } = data,
-                    producer = roomStates[peerLoc].producers.find((p) => p.id === producerId)
+                    producer = roomStates[peerLoc].producers.find((p) => p.id === producerId);
 
                 if (!producer) {
-                    err(`close-producer: server-side producer ${producerId} not found`)
-                    callback({ error: `server-side producer ${producerId} not found` })
-                    return
+                    err(`close-producer: server-side producer ${producerId} not found`);
+                    callback({ error: `server-side producer ${producerId} not found` });
+                    return;
                 }
 
-                log('close-producer', peerId, producer.appData)
+                log('close-producer', peerId, producer.appData);
 
                 // await closeProducer(producer, peerId);
-                await closeProducerAndAllPipeProducers(producer, peerId)
+                await closeProducerAndAllPipeProducers(producer, peerId);
 
-                callback({ closed: true })
+                callback({ closed: true });
             } catch (e) {
-                console.error(e)
-                callback({ error: e.message })
+                console.error(e);
+                callback({ error: e.message });
             }
-        })
+        });
 
         // --> /signaling/send-track
         //
@@ -560,17 +561,17 @@ async function runSocketServer() {
         //
         socket.on('send-track', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 // let { peerId, transportId, kind, rtpParameters,
                 let { transportId, kind, rtpParameters, paused = false, appData } = data,
-                    transport = roomStates[peerLoc].transports[transportId]
+                    transport = roomStates[peerLoc].transports[transportId];
 
                 if (!transport) {
-                    err(`send-track: server-side transport ${transportId} not found`)
-                    callback({ error: `server-side transport ${transportId} not found` })
-                    return
+                    err(`send-track: server-side transport ${transportId} not found`);
+                    callback({ error: `server-side transport ${transportId} not found` });
+                    return;
                 }
 
                 let producer = await transport.produce({
@@ -578,34 +579,34 @@ async function runSocketServer() {
                     rtpParameters,
                     paused,
                     appData: { ...appData, peerId, transportId },
-                })
+                });
 
                 // log("ID: ", peerId);
                 // log("ProducerID: ",producer.id);
                 // log(roomStates[peerLoc]);
 
                 // pipe to all other routers
-                log('Cloning Producer with ID: ', producer.id, ' from peer with id ', producer.appData.peerId)
+                log('Cloning Producer with ID: ', producer.id, ' from peer with id ', producer.appData.peerId);
                 for (let i = 0; i < numCPUs; i++) {
                     if (i == peerLoc) {
-                        continue
+                        continue;
                     } else {
                         let { pipeProducer } = await routers[peerLoc].pipeToRouter({
                             producerId: producer.id,
                             router: routers[i],
-                        })
+                        });
                         // await routers[peerLoc].pipeToRouter({ producerId: peerId, router: routers[i] })
-                        roomStates[i].producers.push(pipeProducer)
-                        log('Adding pipeProducer with id:', pipeProducer.id, ' from peer with id ', producer.appData.peerId, ' to room # ', i)
+                        roomStates[i].producers.push(pipeProducer);
+                        log('Adding pipeProducer with id:', pipeProducer.id, ' from peer with id ', producer.appData.peerId, ' to room # ', i);
                     }
                 }
 
                 // if our associated transport closes, close ourself, too
                 producer.on('transportclose', () => {
-                    log("producer's transport closed", producer.id)
-                    closeProducerAndAllPipeProducers(producer, peerId)
+                    log("producer's transport closed", producer.id);
+                    closeProducerAndAllPipeProducers(producer, peerId);
                     // closeProducer(producer, peerId);
-                })
+                });
 
                 // monitor audio level of this producer. we call addProducer() here,
                 // but we don't ever need to call removeProducer() because the core
@@ -614,15 +615,15 @@ async function runSocketServer() {
                 //   audioLevelObservers[peerLoc].addProducer({ producerId: producer.id });
                 // }
 
-                roomStates[peerLoc].producers.push(producer)
+                roomStates[peerLoc].producers.push(producer);
                 roomStates[peerLoc].peers[peerId].media[appData.mediaTag] = {
                     paused,
                     encodings: rtpParameters.encodings,
-                }
+                };
 
-                callback({ id: producer.id })
+                callback({ id: producer.id });
             } catch (e) {}
-        })
+        });
 
         // --> /signaling/recv-track
         //
@@ -633,18 +634,18 @@ async function runSocketServer() {
         //
         socket.on('recv-track', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
-                let { mediaPeerId, mediaTag, rtpCapabilities } = data
+                let { mediaPeerId, mediaTag, rtpCapabilities } = data;
 
-                let producer = roomStates[peerLoc].producers.find((p) => p.appData.mediaTag === mediaTag && p.appData.peerId === mediaPeerId)
+                let producer = roomStates[peerLoc].producers.find((p) => p.appData.mediaTag === mediaTag && p.appData.peerId === mediaPeerId);
 
                 if (!producer) {
-                    let msg = 'server-side producer for ' + `${mediaPeerId}:${mediaTag} not found`
-                    err('recv-track: ' + msg)
-                    callback({ error: msg })
-                    return
+                    let msg = 'server-side producer for ' + `${mediaPeerId}:${mediaTag} not found`;
+                    err('recv-track: ' + msg);
+                    callback({ error: msg });
+                    return;
                 }
 
                 if (
@@ -653,19 +654,19 @@ async function runSocketServer() {
                         rtpCapabilities,
                     })
                 ) {
-                    let msg = `client cannot consume ${mediaPeerId}:${mediaTag}`
-                    err(`recv-track: ${peerId} ${msg}`)
-                    callback({ error: msg })
-                    return
+                    let msg = `client cannot consume ${mediaPeerId}:${mediaTag}`;
+                    err(`recv-track: ${peerId} ${msg}`);
+                    callback({ error: msg });
+                    return;
                 }
 
-                let transport = Object.values(roomStates[peerLoc].transports).find((t) => t.appData.peerId === peerId && t.appData.clientDirection === 'recv')
+                let transport = Object.values(roomStates[peerLoc].transports).find((t) => t.appData.peerId === peerId && t.appData.clientDirection === 'recv');
 
                 if (!transport) {
-                    let msg = `server-side recv transport for ${peerId} not found`
-                    err('recv-track: ' + msg)
-                    callback({ error: msg })
-                    return
+                    let msg = `server-side recv transport for ${peerId} not found`;
+                    err('recv-track: ' + msg);
+                    callback({ error: msg });
+                    return;
                 }
 
                 let consumer = await transport.consume({
@@ -673,36 +674,36 @@ async function runSocketServer() {
                     rtpCapabilities,
                     paused: true, // see note above about always starting paused
                     appData: { peerId, mediaPeerId, mediaTag },
-                })
+                });
 
                 // need both 'transportclose' and 'producerclose' event handlers,
                 // to make sure we close and clean up consumers in all
                 // circumstances
                 consumer.on('transportclose', () => {
-                    log(`consumer's transport closed`, consumer.id)
-                    closeConsumer(consumer, peerId)
-                })
+                    log(`consumer's transport closed`, consumer.id);
+                    closeConsumer(consumer, peerId);
+                });
                 consumer.on('producerclose', () => {
-                    log(`consumer's producer closed`, consumer.id)
-                    closeConsumer(consumer, peerId)
-                })
+                    log(`consumer's producer closed`, consumer.id);
+                    closeConsumer(consumer, peerId);
+                });
 
                 // stick this consumer in our list of consumers to keep track of,
                 // and create a data structure to track the client-relevant state
                 // of this consumer
-                roomStates[peerLoc].consumers.push(consumer)
+                roomStates[peerLoc].consumers.push(consumer);
                 roomStates[peerLoc].peers[peerId].consumerLayers[consumer.id] = {
                     currentLayer: null,
                     clientSelectedLayer: null,
-                }
+                };
 
                 // update above data structure when layer changes.
                 consumer.on('layerschange', (layers) => {
-                    log(`consumer layerschange ${mediaPeerId}->${peerId}`, mediaTag, layers)
+                    log(`consumer layerschange ${mediaPeerId}->${peerId}`, mediaTag, layers);
                     if (roomStates[peerLoc].peers[peerId] && roomStates[peerLoc].peers[peerId].consumerLayers[consumer.id]) {
-                        roomStates[peerLoc].peers[peerId].consumerLayers[consumer.id].currentLayer = layers && layers.spatialLayer
+                        roomStates[peerLoc].peers[peerId].consumerLayers[consumer.id].currentLayer = layers && layers.spatialLayer;
                     }
-                })
+                });
 
                 callback({
                     producerId: producer.id,
@@ -711,12 +712,12 @@ async function runSocketServer() {
                     rtpParameters: consumer.rtpParameters,
                     type: consumer.type,
                     producerPaused: consumer.producerPaused,
-                })
+                });
             } catch (e) {
-                console.error('error in /signaling/recv-track', e)
-                callback({ error: e })
+                console.error('error in /signaling/recv-track', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/pause-consumer
         //
@@ -724,28 +725,28 @@ async function runSocketServer() {
         //
         socket.on('pause-consumer', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 let { consumerId } = data,
-                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId)
+                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId);
 
                 if (!consumer) {
-                    err(`pause-consumer: server-side consumer ${consumerId} not found`)
-                    callback({ error: `server-side producer ${consumerId} not found` })
-                    return
+                    err(`pause-consumer: server-side consumer ${consumerId} not found`);
+                    callback({ error: `server-side producer ${consumerId} not found` });
+                    return;
                 }
 
-                log('pause-consumer', consumer.appData)
+                log('pause-consumer', consumer.appData);
 
-                await consumer.pause()
+                await consumer.pause();
 
-                callback({ paused: true })
+                callback({ paused: true });
             } catch (e) {
-                console.error('error in /signaling/pause-consumer', e)
-                callback({ error: e })
+                console.error('error in /signaling/pause-consumer', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/resume-consumer
         //
@@ -753,28 +754,28 @@ async function runSocketServer() {
         //
         socket.on('resume-consumer', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 let { consumerId } = data,
-                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId)
+                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId);
 
                 if (!consumer) {
-                    err(`pause-consumer: server-side consumer ${consumerId} not found`)
-                    callback({ error: `server-side consumer ${consumerId} not found` })
-                    return
+                    err(`pause-consumer: server-side consumer ${consumerId} not found`);
+                    callback({ error: `server-side consumer ${consumerId} not found` });
+                    return;
                 }
 
-                log('resume-consumer', consumer.appData)
+                log('resume-consumer', consumer.appData);
 
-                await consumer.resume()
+                await consumer.resume();
 
-                callback({ resumed: true })
+                callback({ resumed: true });
             } catch (e) {
-                console.error('error in /signaling/resume-consumer', e)
-                callback({ error: e })
+                console.error('error in /signaling/resume-consumer', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signalign/close-consumer
         //
@@ -783,26 +784,26 @@ async function runSocketServer() {
         //
         socket.on('close-consumer', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 let { consumerId } = data,
-                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId)
+                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId);
 
                 if (!consumer) {
-                    err(`close-consumer: server-side consumer ${consumerId} not found`)
-                    callback({ error: `server-side consumer ${consumerId} not found` })
-                    return
+                    err(`close-consumer: server-side consumer ${consumerId} not found`);
+                    callback({ error: `server-side consumer ${consumerId} not found` });
+                    return;
                 }
 
-                await closeConsumer(consumer, peerId)
+                await closeConsumer(consumer, peerId);
 
-                callback({ closed: true })
+                callback({ closed: true });
             } catch (e) {
-                console.error('error in /signaling/close-consumer', e)
-                callback({ error: e })
+                console.error('error in /signaling/close-consumer', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/consumer-set-layers
         //
@@ -811,28 +812,28 @@ async function runSocketServer() {
         //
         socket.on('consumer-set-layers', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 let { consumerId, spatialLayer } = data,
-                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId)
+                    consumer = roomStates[peerLoc].consumers.find((c) => c.id === consumerId);
 
                 if (!consumer) {
-                    err(`consumer-set-layers: server-side consumer ${consumerId} not found`)
-                    callback({ error: `server-side consumer ${consumerId} not found` })
-                    return
+                    err(`consumer-set-layers: server-side consumer ${consumerId} not found`);
+                    callback({ error: `server-side consumer ${consumerId} not found` });
+                    return;
                 }
 
-                log('consumer-set-layers', spatialLayer, consumer.appData)
+                log('consumer-set-layers', spatialLayer, consumer.appData);
 
-                await consumer.setPreferredLayers({ spatialLayer })
+                await consumer.setPreferredLayers({ spatialLayer });
 
-                callback({ layersSet: true })
+                callback({ layersSet: true });
             } catch (e) {
-                console.error('error in /signaling/consumer-set-layers', e)
-                callback({ error: e })
+                console.error('error in /signaling/consumer-set-layers', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/pause-producer
         //
@@ -840,30 +841,30 @@ async function runSocketServer() {
         //
         socket.on('pause-producer', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 let { producerId } = data,
-                    producer = roomStates[peerLoc].producers.find((p) => p.id === producerId)
+                    producer = roomStates[peerLoc].producers.find((p) => p.id === producerId);
 
                 if (!producer) {
-                    err(`pause-producer: server-side producer ${producerId} not found`)
-                    callback({ error: `server-side producer ${producerId} not found` })
-                    return
+                    err(`pause-producer: server-side producer ${producerId} not found`);
+                    callback({ error: `server-side producer ${producerId} not found` });
+                    return;
                 }
 
-                log('pause-producer', producer.appData)
+                log('pause-producer', producer.appData);
 
-                await producer.pause()
+                await producer.pause();
 
-                roomStates[peerLoc].peers[peerId].media[producer.appData.mediaTag].paused = true
+                roomStates[peerLoc].peers[peerId].media[producer.appData.mediaTag].paused = true;
 
-                callback({ paused: true })
+                callback({ paused: true });
             } catch (e) {
-                console.error('error in /signaling/pause-producer', e)
-                callback({ error: e })
+                console.error('error in /signaling/pause-producer', e);
+                callback({ error: e });
             }
-        })
+        });
 
         // --> /signaling/resume-producer
         //
@@ -871,34 +872,34 @@ async function runSocketServer() {
         //
         socket.on('resume-producer', async (data, callback) => {
             try {
-                let peerId = socket.id
-                let peerLoc = peerLocations[peerId.toString()]
+                let peerId = socket.id;
+                let peerLoc = peerLocations[peerId.toString()];
 
                 let { producerId } = data,
-                    producer = roomStates[peerLoc].producers.find((p) => p.id === producerId)
+                    producer = roomStates[peerLoc].producers.find((p) => p.id === producerId);
 
                 if (!producer) {
-                    err(`resume-producer: server-side producer ${producerId} not found`)
-                    callback({ error: `server-side producer ${producerId} not found` })
-                    return
+                    err(`resume-producer: server-side producer ${producerId} not found`);
+                    callback({ error: `server-side producer ${producerId} not found` });
+                    return;
                 }
 
-                log('resume-producer', producer.appData)
+                log('resume-producer', producer.appData);
 
-                await producer.resume()
+                await producer.resume();
 
-                roomStates[peerLoc].peers[peerId].media[producer.appData.mediaTag].paused = false
+                roomStates[peerLoc].peers[peerId].media[producer.appData.mediaTag].paused = false;
 
-                callback({ resumed: true })
+                callback({ resumed: true });
             } catch (e) {
-                console.error('error in /signaling/resume-producer', e)
-                callback({ error: e })
+                console.error('error in /signaling/resume-producer', e);
+                callback({ error: e });
             }
-        })
+        });
 
         //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
         //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
-    })
+    });
 }
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -917,104 +918,104 @@ async function startMediasoup() {
         transports: {},
         producers: [],
         consumers: [],
-    }
+    };
 
     let worker = await mediasoup.createWorker({
         logLevel: config.mediasoup.worker.logLevel,
         logTags: config.mediasoup.worker.logTags,
         rtcMinPort: config.mediasoup.worker.rtcMinPort,
         rtcMaxPort: config.mediasoup.worker.rtcMaxPort,
-    })
+    });
 
     worker.on('died', () => {
-        console.error('mediasoup worker died (this should never happen)')
-        process.exit(1)
-    })
+        console.error('mediasoup worker died (this should never happen)');
+        process.exit(1);
+    });
 
-    const mediaCodecs = config.mediasoup.router.mediaCodecs
-    const router = await worker.createRouter({ mediaCodecs })
+    const mediaCodecs = config.mediasoup.router.mediaCodecs;
+    const router = await worker.createRouter({ mediaCodecs });
 
-    return { worker, router, roomState }
+    return { worker, router, roomState };
 }
 
 function closePeer(peerId) {
-    log('closing peer', peerId)
-    let peerLoc = peerLocations[peerId.toString()]
+    log('closing peer', peerId);
+    let peerLoc = peerLocations[peerId.toString()];
     for (let [id, transport] of Object.entries(roomStates[peerLoc].transports)) {
         if (transport.appData.peerId === peerId) {
-            closeTransport(transport, peerId)
+            closeTransport(transport, peerId);
         }
     }
-    delete roomStates[peerLoc].peers[peerId]
+    delete roomStates[peerLoc].peers[peerId];
 }
 
 async function closeTransport(transport, peerId) {
     try {
-        let peerLoc = peerLocations[peerId.toString()]
-        log('closing transport', transport.id, transport.appData)
+        let peerLoc = peerLocations[peerId.toString()];
+        log('closing transport', transport.id, transport.appData);
 
         // our producer and consumer event handlers will take care of
         // calling closeProducer() and closeConsumer() on all the producers
         // and consumers associated with this transport
-        await transport.close()
+        await transport.close();
 
         // so all we need to do, after we call transport.close(), is update
         // our roomState data structure
-        delete roomStates[peerLoc].transports[transport.id]
+        delete roomStates[peerLoc].transports[transport.id];
     } catch (e) {
-        err(e)
+        err(e);
     }
 }
 
 async function closeProducerAndAllPipeProducers(producer, peerId) {
-    log('closing producer', producer.id, producer.appData)
+    log('closing producer', producer.id, producer.appData);
     try {
-        let peerLoc = peerLocations[peerId.toString()]
+        let peerLoc = peerLocations[peerId.toString()];
 
         // first, close all of the pipe producer clones
-        log('Closing all pipe producers for peer with id', peerId)
+        log('Closing all pipe producers for peer with id', peerId);
         for (let i = 0; i < roomStates.length; i++) {
             if (i == peerLoc) {
-                continue // we'll deal with this one later
+                continue; // we'll deal with this one later
             } else {
                 // remove this producer from our roomState.producers list
-                log('Closing pipe producer in room ', i)
-                roomStates[i].producers = roomStates[i].producers.filter((p) => p.id !== producer.id)
+                log('Closing pipe producer in room ', i);
+                roomStates[i].producers = roomStates[i].producers.filter((p) => p.id !== producer.id);
             }
         }
 
         // finally, close the original producer
-        await producer.close()
+        await producer.close();
 
         // remove this producer from our roomState.producers list
-        roomStates[peerLoc].producers = roomStates[peerLoc].producers.filter((p) => p.id !== producer.id)
+        roomStates[peerLoc].producers = roomStates[peerLoc].producers.filter((p) => p.id !== producer.id);
 
         // remove this track's info from our roomState...mediaTag bookkeeping
         if (roomStates[peerLoc].peers[producer.appData.peerId]) {
-            delete roomStates[peerLoc].peers[producer.appData.peerId].media[producer.appData.mediaTag]
+            delete roomStates[peerLoc].peers[producer.appData.peerId].media[producer.appData.mediaTag];
         }
     } catch (e) {
-        err(e)
+        err(e);
     }
 }
 
 async function closeConsumer(consumer, peerId) {
-    log('closing consumer', consumer.id, consumer.appData)
-    let peerLoc = peerLocations[peerId.toString()]
-    await consumer.close()
+    log('closing consumer', consumer.id, consumer.appData);
+    let peerLoc = peerLocations[peerId.toString()];
+    await consumer.close();
 
     // remove this consumer from our roomState.consumers list
-    roomStates[peerLoc].consumers = roomStates[peerLoc].consumers.filter((c) => c.id !== consumer.id)
+    roomStates[peerLoc].consumers = roomStates[peerLoc].consumers.filter((c) => c.id !== consumer.id);
 
     // remove layer info from from our roomState...consumerLayers bookkeeping
     if (roomStates[peerLoc].peers[consumer.appData.peerId]) {
-        delete roomStates[peerLoc].peers[consumer.appData.peerId].consumerLayers[consumer.id]
+        delete roomStates[peerLoc].peers[consumer.appData.peerId].consumerLayers[consumer.id];
     }
 }
 
 async function createWebRtcTransport({ peerId, direction }) {
-    let peerLoc = peerLocations[peerId.toString()]
-    const { listenIps, initialAvailableOutgoingBitrate } = config.mediasoup.webRtcTransport
+    let peerLoc = peerLocations[peerId.toString()];
+    const { listenIps, initialAvailableOutgoingBitrate } = config.mediasoup.webRtcTransport;
 
     const transport = await routers[peerLoc].createWebRtcTransport({
         listenIps: listenIps,
@@ -1023,7 +1024,7 @@ async function createWebRtcTransport({ peerId, direction }) {
         preferUdp: true,
         initialAvailableOutgoingBitrate: initialAvailableOutgoingBitrate,
         appData: { peerId, clientDirection: direction },
-    })
+    });
 
-    return transport
+    return transport;
 }
