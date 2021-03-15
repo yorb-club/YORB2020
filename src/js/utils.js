@@ -13,7 +13,7 @@ export function createSimpleText(message, fontColor, fontSize, font) {
 
     var shapes = font.generateShapes(message, fontSize)
 
-    var geometry = new THREE.ShapeBufferGeometry(shapes)
+    var geometry = new THREE.ShapeGeometry(shapes)
 
     geometry.computeBoundingBox()
 
@@ -84,7 +84,7 @@ export function create3DText(text, size, height, curveSegments, bevelThickness, 
 
     var centerOffset = -0.5 * (textGeo.boundingBox.max.x - textGeo.boundingBox.min.x)
 
-    textGeo = new THREE.BufferGeometry().fromGeometry(textGeo)
+    // textGeo = new THREE.Geometry().fromGeometry(textGeo)
 
     // geometry.computeBoundingBox();
 

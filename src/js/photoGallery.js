@@ -179,7 +179,7 @@ export class PhotoGallery {
 
     makeImageMesh(imageName) {
         if (photos[imageName]) {
-            let geo = new THREE.BoxBufferGeometry(1.6, 0.9, 0.01)
+            let geo = new THREE.BoxGeometry(1.6, 0.9, 0.01)
 
             let tex = this.textureLoader.load(photos[imageName])
             tex.wrapS = THREE.RepeatWrapping

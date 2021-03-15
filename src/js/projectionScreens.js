@@ -123,7 +123,7 @@ export class ProjectionScreens {
         const radialSegments = 32
         const heightSegments1 = 1
         const openEnded = false
-        const cylinderGeometry = new THREE.CylinderBufferGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments1, openEnded)
+        const cylinderGeometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments1, openEnded)
         const cylinderMaterial = new THREE.MeshPhongMaterial({ color: 0x000000, side: THREE.DoubleSide })
         const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial)
         cylinder.position.set(centerX, 0, centerZ)
@@ -140,7 +140,7 @@ export class ProjectionScreens {
         const phiLength = Math.PI * 1
         const thetaStart = Math.PI * 0.0
         const thetaLength = Math.PI * 0.9
-        const domeGeometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments2, phiStart, phiLength, thetaStart, thetaLength)
+        const domeGeometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments2, phiStart, phiLength, thetaStart, thetaLength)
 
         // domeGeometry.scale(0.7, 0.7, 0.7)
         domeGeometry.scale(scaleFactor * 0.7, scaleFactor * 0.7, scaleFactor * 0.7)

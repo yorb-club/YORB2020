@@ -175,7 +175,7 @@ export class Yorblet {
     createYorbletExterior() {
         let fenceRadius = FENCE_RADIUS
         // add entrance:
-        const geometry = new THREE.TorusBufferGeometry(12, 2, 16, 24, Math.PI)
+        const geometry = new THREE.TorusGeometry(12, 2, 16, 24, Math.PI)
         const material = new THREE.MeshBasicMaterial({ color: ENTRANCE_COLOR })
         const torus = new THREE.Mesh(geometry, material)
         this.scene.add(torus)
@@ -183,7 +183,7 @@ export class Yorblet {
         torus.lookAt(0, 0, 0)
 
         //backside fence
-        let fenceGeo = new THREE.BoxBufferGeometry(50, FENCE_HEIGHT, 0.1)
+        let fenceGeo = new THREE.BoxGeometry(50, FENCE_HEIGHT, 0.1)
         let fenceMat = new THREE.MeshBasicMaterial({ color: OUTER_FENCE_COLOR, side: THREE.DoubleSide })
         let fenceMesh = new THREE.Mesh(fenceGeo, fenceMat)
         this.scene.add(fenceMesh)
@@ -191,7 +191,7 @@ export class Yorblet {
         fenceMesh.rotateY(Math.PI / 2)
 
         // side of entrance fences
-        fenceGeo = new THREE.BoxBufferGeometry(20, FENCE_HEIGHT, 0.1)
+        fenceGeo = new THREE.BoxGeometry(20, FENCE_HEIGHT, 0.1)
         fenceMat = new THREE.MeshBasicMaterial({ color: OUTER_FENCE_COLOR, side: THREE.DoubleSide })
         fenceMesh = new THREE.Mesh(fenceGeo, fenceMat)
         this.scene.add(fenceMesh)
@@ -199,7 +199,7 @@ export class Yorblet {
         fenceMesh.rotateY(Math.PI / 2)
 
         // side of entrance fences
-        fenceGeo = new THREE.BoxBufferGeometry(20, FENCE_HEIGHT, 0.1)
+        fenceGeo = new THREE.BoxGeometry(20, FENCE_HEIGHT, 0.1)
         fenceMat = new THREE.MeshBasicMaterial({ color: OUTER_FENCE_COLOR, side: THREE.DoubleSide })
         fenceMesh = new THREE.Mesh(fenceGeo, fenceMat)
         this.scene.add(fenceMesh)
@@ -211,7 +211,7 @@ export class Yorblet {
         let zOffset = 20
 
         // add left fence:
-        let cylinderGeometry = new THREE.CylinderBufferGeometry(fenceRadius, fenceRadius, FENCE_HEIGHT, 32, 1, true, 0, Math.PI)
+        let cylinderGeometry = new THREE.CylinderGeometry(fenceRadius, fenceRadius, FENCE_HEIGHT, 32, 1, true, 0, Math.PI)
         let cylinderMaterial = new THREE.MeshPhongMaterial({ color: OUTER_FENCE_COLOR, side: THREE.DoubleSide })
         let cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial)
         cylinder.position.set(xOffset, 0, zOffset)
@@ -222,7 +222,7 @@ export class Yorblet {
         zOffset = -20
 
         // add right side fence
-        cylinderGeometry = new THREE.CylinderBufferGeometry(fenceRadius, fenceRadius, FENCE_HEIGHT, 32, 1, true, 0, Math.PI)
+        cylinderGeometry = new THREE.CylinderGeometry(fenceRadius, fenceRadius, FENCE_HEIGHT, 32, 1, true, 0, Math.PI)
         cylinderMaterial = new THREE.MeshPhongMaterial({ color: OUTER_FENCE_COLOR, side: THREE.DoubleSide })
         cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial)
         cylinder.position.set(xOffset, 0, zOffset)
@@ -238,7 +238,7 @@ export class Yorblet {
         const font = new THREE.Font(fontJson)
         const text = 'Yorblet ' + YORBLET_INDEX.toString()
 
-        const fontGeometry = new THREE.TextBufferGeometry(text, {
+        const fontGeometry = new THREE.TextGeometry(text, {
             font: font,
             size: 2.5,
             height: 0.01,
@@ -625,7 +625,7 @@ export class Yorblet {
 
     addPresentationStage(projectIndex, centerX, centerZ, lookAtX, lookAtZ, scaleFactor = 1, angle) {
         // add the stage itself
-        const cylinderGeometry = new THREE.CylinderBufferGeometry(3 * scaleFactor, 3 * scaleFactor, 1, 32, 1, false)
+        const cylinderGeometry = new THREE.CylinderGeometry(3 * scaleFactor, 3 * scaleFactor, 1, 32, 1, false)
         const cylinderMaterial = new THREE.MeshPhongMaterial({ color: STAGE_COLOR, side: THREE.DoubleSide })
         const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial)
         cylinder.position.set(centerX, 0, centerZ)
@@ -683,7 +683,7 @@ export class Yorblet {
         const phiLength = Math.PI * 1
         const thetaStart = Math.PI * 0.0
         const thetaLength = Math.PI * 0.9
-        const domeGeometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
+        const domeGeometry = new THREE.SphereGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
 
         domeGeometry.scale(0.7, 0.7, 0.7)
         const domeMaterial = new THREE.MeshPhongMaterial({ color: DOME_COLOR, side: THREE.DoubleSide })
@@ -704,7 +704,7 @@ export class Yorblet {
         const index = YORBLET_INDEX.toString()
         const text = index + projectLetters[projectIndex - 1]
 
-        const fontGeometry = new THREE.TextBufferGeometry(text, {
+        const fontGeometry = new THREE.TextGeometry(text, {
             font: font,
             size: 2.5,
             height: 0.01,
@@ -980,7 +980,7 @@ export class Yorblet {
 
         const text = 'Room Name'
 
-        const fontGeometry = new THREE.TextBufferGeometry(text, {
+        const fontGeometry = new THREE.TextGeometry(text, {
             font: font,
             size: 2,
             height: 0.01,
@@ -1024,7 +1024,7 @@ export class Yorblet {
 
     drawRect(height, width, faces, matColor, posX, posY, posZ, offsetX, offsetY, offsetZ, lookAtX, lookatZ) {
         //plane  1
-        const planegeometry = new THREE.PlaneBufferGeometry(height, width, faces)
+        const planegeometry = new THREE.PlaneGeometry(height, width, faces)
         const planematerial = new THREE.MeshBasicMaterial({ color: matColor, side: THREE.DoubleSide })
         const plane = new THREE.Mesh(planegeometry, planematerial)
 
@@ -1115,7 +1115,7 @@ export class Yorblet {
     //lay out some random big objects in the distance
     addOuterDecoration() {
         //
-        // let geo = new THREE.BoxBufferGeometry(20, 120, 30)
+        // let geo = new THREE.BoxGeometry(20, 120, 30)
         // let mat = new THREE.MeshLambertMaterial({ color: 'hotpink' })
         // mat.flatShading = true
         // let mesh = new THREE.Mesh(geo, mat)
@@ -1123,14 +1123,14 @@ export class Yorblet {
         // mesh.position.set(-70, 20, 120)
         // mesh.rotateX(-0.25)
 
-        // geo = new THREE.BoxBufferGeometry(10, 30, 80)
+        // geo = new THREE.BoxGeometry(10, 30, 80)
         // mat = new THREE.MeshLambertMaterial({ color: 'darkblue' })
         // mat.flatShading = true
         // mesh = new THREE.Mesh(geo, mat)
         // this.scene.add(mesh)
         // mesh.position.set(70, 60, -120)
 
-        // geo = new THREE.ConeBufferGeometry(10, 200, 4)
+        // geo = new THREE.ConeGeometry(10, 200, 4)
         // mat = new THREE.MeshLambertMaterial({ color: 'red' })
         // mat.flatShading = true
         // mesh = new THREE.Mesh(geo, mat)
@@ -1139,7 +1139,7 @@ export class Yorblet {
         // mesh.rotateY(3);
 
         //cone
-        const coneGeometry = new THREE.ConeBufferGeometry(30, 40, 6)
+        const coneGeometry = new THREE.ConeGeometry(30, 40, 6)
         const coneEdges = new THREE.EdgesGeometry(coneGeometry)
         const coneLine = new THREE.LineSegments(coneEdges, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1, linecap: 'round' }))
 
@@ -1148,7 +1148,7 @@ export class Yorblet {
         this.scene.add(coneLine)
 
         //octahedron
-        const octGeometry = new THREE.OctahedronBufferGeometry(15)
+        const octGeometry = new THREE.OctahedronGeometry(15)
         const octEdges = new THREE.EdgesGeometry(octGeometry)
         const octLine = new THREE.LineSegments(octEdges, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1, linecap: 'round' }))
 
@@ -1157,7 +1157,7 @@ export class Yorblet {
         this.scene.add(octLine)
 
         //box
-        const boxGeometry = new THREE.BoxBufferGeometry(120, 30, 30)
+        const boxGeometry = new THREE.BoxGeometry(120, 30, 30)
         const boxEdges = new THREE.EdgesGeometry(boxGeometry)
         const boxLine = new THREE.LineSegments(boxEdges, new THREE.LineBasicMaterial({ color: 0xffffff }))
 
@@ -1167,7 +1167,7 @@ export class Yorblet {
         this.scene.add(boxLine)
 
         //cyllinder
-        const cylGeometry = new THREE.CylinderBufferGeometry(20, 20, 3, 9)
+        const cylGeometry = new THREE.CylinderGeometry(20, 20, 3, 9)
         const cylEdges = new THREE.EdgesGeometry(cylGeometry)
         const cylLine = new THREE.LineSegments(cylEdges, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1, linecap: 'round' }))
 
@@ -1175,7 +1175,7 @@ export class Yorblet {
         this.scene.add(cylLine)
 
         //ring
-        const ringGeometry = new THREE.RingBufferGeometry(20, 10, 32)
+        const ringGeometry = new THREE.RingGeometry(20, 10, 32)
         const ringEdges = new THREE.EdgesGeometry(ringGeometry)
         const ringLine = new THREE.LineSegments(ringEdges, new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1, linecap: 'round' }))
 
@@ -1191,7 +1191,7 @@ export class Yorblet {
         floorTexture.wrapT = THREE.RepeatWrapping
         floorTexture.repeat.set(40, 40)
 
-        const floorGeometry = new THREE.PlaneBufferGeometry(512, 512, 1, 1)
+        const floorGeometry = new THREE.PlaneGeometry(512, 512, 1, 1)
         const floorMaterial = new THREE.MeshPhongMaterial({ map: floorTexture, side: THREE.DoubleSide })
         const plane = new THREE.Mesh(floorGeometry, floorMaterial)
         plane.lookAt(0, 1, 0)
@@ -1296,10 +1296,10 @@ export class Yorblet {
         imageSign.translateX(7)
         imageSign.translateY(0.25)
 
-        let pedestalGeo = new THREE.CylinderBufferGeometry(0.5, 0.65, 1, 12)
+        let pedestalGeo = new THREE.CylinderGeometry(0.5, 0.65, 1, 12)
         let pedestalMat = new THREE.MeshBasicMaterial({ color: 0x232323, flatShading: true, side: THREE.DoubleSide })
         let pedestalMesh = new THREE.Mesh(pedestalGeo, pedestalMat)
-        // let pedestalGeoBigger = new THREE.CylinderBufferGeometry(0.5 + 0.01, 0.65+ 0.01, 1+ 0.01, 12)
+        // let pedestalGeoBigger = new THREE.CylinderGeometry(0.5 + 0.01, 0.65+ 0.01, 1+ 0.01, 12)
         // const wireframe = new THREE.WireframeGeometry(pedestalGeoBigger)
         // const line = new THREE.LineSegments(wireframe)
 

@@ -66,7 +66,7 @@ export class Portal {
 
                 const text = this.label.text
 
-                const fontGeometry = new THREE.TextBufferGeometry(text, {
+                const fontGeometry = new THREE.TextGeometry(text, {
                     font: font,
                     size: this.label.size,
                     height: 0.01,

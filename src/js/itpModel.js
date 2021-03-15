@@ -106,7 +106,7 @@ export class ITPModel {
     }
 
     coverElevatorBankArea() {
-        let boxGeo = new THREE.BoxBufferGeometry(24.75,5,0.1);
+        let boxGeo = new THREE.BoxGeometry(24.75,5,0.1);
         let leftSideCover = new THREE.Mesh(boxGeo, this.wallMaterial);
         leftSideCover.position.set(16,2,-4.1);
 

@@ -288,7 +288,7 @@ export class DaysGallery {
         const font = new THREE.Font(fontJson)
         const text = 'X Days of Making'
 
-        const fontGeometry = new THREE.TextBufferGeometry(text, {
+        const fontGeometry = new THREE.TextGeometry(text, {
             font: font,
             size: .8,
             height: 0.01,

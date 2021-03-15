@@ -19,10 +19,11 @@ import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
 
-import {sceneSetup, sceneDraw} from "./sandbox";
-
+import { sceneSetup, sceneDraw } from './sandbox';
 
 import * as THREE from 'three';
+import { Octree } from 'three/examples/jsm/math/Octree.js';
+// import { Capsule } from 'three/examples/jsm/math/Capsule.js';
 
 const Stats = require('./libs/stats.min.js');
 
@@ -41,6 +42,8 @@ export class Yorb {
     constructor(_movementCallback, _clients, mySocketID) {
         // add this to window to allow javascript console debugging
         window.scene = this;
+
+        this.clock = new THREE.Clock();
 
         // this pauses or restarts rendering and updating
         let domElement = document.getElementById('scene-container');
@@ -112,12 +115,16 @@ export class Yorb {
         //Setup event listeners for events and handle the states
         window.addEventListener('resize', (e) => this.onWindowResize(e), false);
         window.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
+        window.addEventListener('keydown', (e) => this.onKeyDown(e), false);
 
         // Helpers
         this.helperGrid = new THREE.GridHelper(500, 500);
         this.helperGrid.position.y = -0.1; // offset the grid down to avoid z fighting with floor
         this.scene.add(this.helperGrid);
 
+        setTimeout(() => {
+            this.setupOctree();
+        }, 5000);
         this.update();
         this.render();
     }
@@ -132,8 +139,8 @@ export class Yorb {
 
         //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
-        
-	this.show = false;
+
+        this.show = false;
         this.yorblet = false;
 
         if (MODE === 'YORBLET') {
@@ -144,7 +151,7 @@ export class Yorb {
             this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
             //this.projectionScreens.createYorbProjectionScreens()
-	    this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+            this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
@@ -156,6 +163,97 @@ export class Yorb {
         // }, 5000) // try to let the sketches finish loading
     }
 
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    // Octree 💡
+
+    setupOctree() {
+        const NUM_SPHERES = 20;
+        const SPHERE_RADIUS = 0.2;
+        const sphereGeometry = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32);
+        const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+
+        this.spheres = [];
+        this.sphereIdx = 0;
+
+        for (let i = 0; i < NUM_SPHERES; i++) {
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.castShadow = true;
+            sphere.receiveShadow = true;
+
+            this.scene.add(sphere);
+
+            this.spheres.push({ mesh: sphere, collider: new THREE.Sphere(new THREE.Vector3(0, -100, 0), SPHERE_RADIUS), velocity: new THREE.Vector3() });
+        }
+
+        this.octree = new Octree();
+        let walls = this.scene.getObjectByName('walls');
+        this.octree.fromGraphNode(walls);
+
+        this.octreeIsSetup = true;
+        console.log(this.octree);
+    }
+
+    spheresCollisions() {
+        for (let i = 0; i < this.spheres.length; i++) {
+            const s1 = this.spheres[i];
+
+            for (let j = i + 1; j < this.spheres.length; j++) {
+                const s2 = this.spheres[j];
+
+                const d2 = s1.collider.center.distanceToSquared(s2.collider.center);
+                const r = s1.collider.radius + s2.collider.radius;
+                const r2 = r * r;
+
+                if (d2 < r2) {
+                    const normal = s1.collider.clone().center.sub(s2.collider.center).normalize();
+                    const v1 = normal.clone().multiplyScalar(normal.dot(s1.velocity));
+                    const v2 = normal.clone().multiplyScalar(normal.dot(s2.velocity));
+                    s1.velocity.add(v2).sub(v1);
+                    s2.velocity.add(v1).sub(v2);
+
+                    const d = (r - Math.sqrt(d2)) / 2;
+
+                    s1.collider.center.addScaledVector(normal, d);
+                    s2.collider.center.addScaledVector(normal, -d);
+                }
+            }
+        }
+    }
+
+    updateSpheres(deltaTime) {
+        let GRAVITY = 30;
+        this.spheres.forEach((sphere) => {
+            sphere.collider.center.addScaledVector(sphere.velocity, deltaTime);
+
+            const result = this.octree.sphereIntersect(sphere.collider);
+
+            if (result) {
+                sphere.velocity.addScaledVector(result.normal, -result.normal.dot(sphere.velocity) * 1.5);
+                sphere.collider.center.add(result.normal.multiplyScalar(result.depth));
+            } else {
+                sphere.velocity.y -= GRAVITY * deltaTime;
+            }
+
+            const damping = Math.exp(-1.5 * deltaTime) - 1;
+            sphere.velocity.addScaledVector(sphere.velocity, damping);
+
+            this.spheresCollisions();
+
+            sphere.mesh.position.copy(sphere.collider.center);
+        });
+    }
+
+    throwBall() {
+        const sphere = this.spheres[this.sphereIdx];
+        let dir = new THREE.Vector3();
+        this.camera.getWorldDirection(dir);
+
+        sphere.collider.center.copy(this.camera.position);
+        sphere.velocity.copy(dir).multiplyScalar(30);
+
+        this.sphereIdx = (this.sphereIdx + 1) % this.spheres.length;
+    }
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     // Lighting 💡
@@ -485,8 +583,8 @@ export class Yorb {
 
         // any query params in the URL?
         let params = new URLSearchParams(window.location.search);
-        let xParam = params.get("x");
-        let zParam = params.get("z");
+        let xParam = params.get('x');
+        let zParam = params.get('z');
 
         if (xParam) startX = parseFloat(xParam);
         if (zParam) startZ = parseFloat(zParam);
@@ -504,10 +602,13 @@ export class Yorb {
 
     update() {
         requestAnimationFrame(() => this.update());
-
+        const deltaTime = Math.min(0.1, this.clock.getDelta());
         if (!this.controls.paused) {
             this.frameCount++;
 
+            if (this.octreeIsSetup) {
+                this.updateSpheres(deltaTime);
+            }
             // things to update 50 times per seconds:
             this.controls.update();
             this.projectionScreens.update();
@@ -647,6 +748,13 @@ export class Yorb {
 
         this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+
+    onKeyDown(event) {
+        if (event.keyCode == 69) {
+            console.log('throw');
+            this.throwBall();
+        }
     }
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//

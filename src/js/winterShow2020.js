@@ -95,7 +95,7 @@ export class WinterShow2020 {
         welcomeTexture.wrapT = THREE.RepeatWrapping
         welcomeTexture.repeat.set(1, 1)
 
-        const signGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1)
+        const signGeometry = new THREE.PlaneGeometry(2.7, 2, 1, 1)
         const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true})
         const signPlane = new THREE.Mesh(signGeometry, signMaterial)
         //plane.lookAt(0, 1, 0)
@@ -114,7 +114,7 @@ export class WinterShow2020 {
         tipsTexture.wrapT = THREE.RepeatWrapping
         tipsTexture.repeat.set(1, 1)
 
-        const tipsGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1)
+        const tipsGeometry = new THREE.PlaneGeometry(2.7, 2, 1, 1)
         const tipsMaterial = new THREE.MeshBasicMaterial({ map: tipsTexture, transparent: true})
         const tipsPlane = new THREE.Mesh(tipsGeometry, tipsMaterial)
         //plane.lookAt(0, 1, 0)
@@ -134,7 +134,7 @@ export class WinterShow2020 {
         mapTexture.wrapT = THREE.RepeatWrapping
         mapTexture.repeat.set(1, 1)
 
-        const mapGeometry = new THREE.PlaneBufferGeometry(5, 2.5, 1, 1)
+        const mapGeometry = new THREE.PlaneGeometry(5, 2.5, 1, 1)
         const mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture, transparent: true})
         const mapPlane = new THREE.Mesh(mapGeometry, mapMaterial)
         //plane.lookAt(0, 1, 0)
@@ -169,7 +169,7 @@ export class WinterShow2020 {
             imgTxture.wrapT = THREE.RepeatWrapping
             imgTxture.repeat.set(1, 1)
     
-            const imgGeometry = new THREE.PlaneBufferGeometry(img.w, img.h, 1, 1)
+            const imgGeometry = new THREE.PlaneGeometry(img.w, img.h, 1, 1)
             const imgMaterial = new THREE.MeshBasicMaterial({ map: imgTxture, transparent: true, side: THREE.DoubleSide })
             const imgPlane = new THREE.Mesh(imgGeometry, imgMaterial)
 
