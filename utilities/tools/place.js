@@ -168,7 +168,7 @@ function createLabel(label, canvasWidth) {
     const text = label;
     let textSize = canvasWidth / 10; //can be bigger now that we're alternating
 
-    const fontGeometry = new THREE.TextBufferGeometry(text, {
+    const fontGeometry = new THREE.TextGeometry(text, {
         font: font,
         size: textSize, //need to test
         height: textSize / 4,

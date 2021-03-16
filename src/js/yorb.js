@@ -24,6 +24,7 @@ import { sceneSetup, sceneDraw } from './sandbox';
 import * as THREE from 'three';
 import { Octree } from 'three/examples/jsm/math/Octree.js';
 // import { Capsule } from 'three/examples/jsm/math/Capsule.js';
+import BeachBallImage from "../assets/images/beach-ball.png";
 
 const Stats = require('./libs/stats.min.js');
 
@@ -168,10 +169,12 @@ export class Yorb {
     // Octree 💡
 
     setupOctree() {
-        const NUM_SPHERES = 20;
-        const SPHERE_RADIUS = 0.2;
+        const NUM_SPHERES = 100;
+        const SPHERE_RADIUS = 0.5;
+        let tex = new THREE.TextureLoader().load(require('../assets/images/beach-ball.png'));
+
         const sphereGeometry = new THREE.SphereGeometry(SPHERE_RADIUS, 32, 32);
-        const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+        const sphereMaterial = new THREE.MeshStandardMaterial({ map: tex });
 
         this.spheres = [];
         this.sphereIdx = 0;
@@ -188,7 +191,11 @@ export class Yorb {
 
         this.octree = new Octree();
         let walls = this.scene.getObjectByName('walls');
+        let floor = this.scene.getObjectByName('floor');
+        let glass = this.scene.getObjectByName('glass');
         this.octree.fromGraphNode(walls);
+        this.octree.fromGraphNode(floor);
+        this.octree.fromGraphNode(glass);
 
         this.octreeIsSetup = true;
         console.log(this.octree);
