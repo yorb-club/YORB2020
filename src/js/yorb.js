@@ -120,6 +120,8 @@ export class Yorb {
 
         this.update();
         this.render();
+
+        this.yataIds= [];
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -154,6 +156,25 @@ export class Yorb {
         // setTimeout(() => {
         //     this.sketches.addSketches()
         // }, 5000) // try to let the sketches finish loading
+    }
+
+    updateFromYatabase(yata){
+        let userGeneratedPhotos = yata.userGeneratedPhotos;
+        for (let i = 0; i < userGeneratedPhotos.length; i++){
+            let pic = userGeneratedPhotos[i];
+            if (!this.yataIds.includes(pic._id)) {
+
+                this.yataIds.push(pic._id);
+
+
+                let tex = this.textureLoader.load(pic.src);
+                let mat = new THREE.MeshBasicMaterial({map: tex});
+                let geo = new THREE.BoxGeometry(1,1,1);
+                let mesh = new THREE.Mesh(geo,mat);
+                mesh.position.set(pic.x,pic.y,pic.z);
+                this.scene.add(mesh);
+            }
+        }
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//

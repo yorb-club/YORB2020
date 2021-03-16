@@ -24,6 +24,24 @@ config.mediasoup.webRtcTransport.listenIps = [
 
 // IMPORTS
 
+let DataStore = require('nedb');
+// let yatabase = new DataStore({filename: '/server/yatabase.db'});
+let yatabase = new DataStore();
+
+// yatabase.loadDatabase();
+console.log("Loading Yatabase");
+
+var doc = { src: 'https://i.imgur.com/AD3MbBi.jpeg', x: 0, y: 1, z: 0};
+
+setTimeout(() => {
+    yatabase.insert(doc, function (err, newDoc) {   // Callback is optional
+        // newDoc is the newly inserted document, including its _id
+        // newDoc has no key called notToBeSaved since its value was undefined
+        console.log(newDoc);
+      });
+}, 5000);               
+
+
 // set debug name
 process.env.DEBUG = 'YORBSERVER*'
 
@@ -197,8 +215,11 @@ async function main() {
     // periodically update video stats we're sending to peers
     // setInterval(updatePeerStats, 3000);
 
-    updateProjects()
-    setInterval(updateProjects, 180000) // update projects every five minutes
+    // updateProjects()
+    // setInterval(updateProjects, 180000) // update projects every five minutes
+
+    sendYata()
+    setInterval(sendYata, 5000) // update projects every five minutes
 }
 
 main()
@@ -233,6 +254,13 @@ async function updateProjects() {
         .on('error', function (e) {
             log('Got an error: ', e)
         })
+}
+
+function sendYata() {
+    yatabase.find({},function(err, docs) {
+        console.log(docs);
+        io.sockets.emit('yatabase', {userGeneratedPhotos: docs});
+    })
 }
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -314,6 +342,11 @@ async function runSocketServer() {
             delete clients[socket.id]
             io.sockets.emit('userDisconnected', socket.id, Object.keys(clients))
             log('User ' + socket.id + ' diconnected, there are ' + io.engine.clientsCount + ' clients connected')
+        })
+
+        socket.on('yata', (data) => {
+            log('Got yata!');
+            yatabase.insert(data);
         })
 
         //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//

@@ -32,12 +32,12 @@ let WEB_SOCKET_SERVER = false;
 let INSTANCE_PATH = false;
 
 // For running against local server
-// WEB_SOCKET_SERVER = 'localhost:3000'
-// INSTANCE_PATH = '/socket.io'
+WEB_SOCKET_SERVER = 'localhost:3000'
+INSTANCE_PATH = '/socket.io'
 
 // For running against ITP server
-WEB_SOCKET_SERVER = 'https://yorb.itp.io';
-INSTANCE_PATH = '/socket.io';
+// WEB_SOCKET_SERVER = 'https://yorb.itp.io';
+// INSTANCE_PATH = '/socket.io';
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 // Setup Global Variables:
@@ -236,6 +236,11 @@ function initSocketConnection() {
             info('Releasing screen with id', data.screenId);
             yorbScene.releaseProjectionScreen(data.screenId);
         });
+
+        socket.on('yatabase', (data) => {
+            console.log('yatabase:', data);
+            yorbScene.updateFromYatabase(data);
+        })
     });
 }
 
@@ -327,6 +332,13 @@ function setupControls() {
                 let url = `https://yorb.itp.io/?x=${position[0].toFixed(2)}&y=${position[1].toFixed(2)}&z=${position[2].toFixed(2)}`;
                 console.log('Have your friends meet you here: ', url);
                 makePositionLinkModal(position);
+            }
+            if (e.keyCode == 76) {
+                // 'l'
+                let position = yorbScene.getPlayerPosition()[0];
+                console.log("adding photo at this position");
+                let url = `https://i.imgur.com/AD3MbBi.jpeg`;
+                socket.emit('yata', {src: url, x: position[0], y: 1, z: position[2]});
             }
         },
         false
