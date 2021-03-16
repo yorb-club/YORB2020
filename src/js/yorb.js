@@ -19,8 +19,7 @@ import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
 
-import {sceneSetup, sceneDraw} from "./sandbox";
-
+import { sceneSetup, sceneDraw } from './sandbox';
 
 import * as THREE from 'three';
 
@@ -121,7 +120,7 @@ export class Yorb {
         this.update();
         this.render();
 
-        this.yataIds= [];
+        this.yataIds = [];
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -134,8 +133,8 @@ export class Yorb {
 
         //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
-        
-	this.show = false;
+
+        this.show = false;
         this.yorblet = false;
 
         if (MODE === 'YORBLET') {
@@ -146,7 +145,7 @@ export class Yorb {
             this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
             //this.projectionScreens.createYorbProjectionScreens()
-	    this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+            this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
@@ -158,20 +157,18 @@ export class Yorb {
         // }, 5000) // try to let the sketches finish loading
     }
 
-    updateFromYatabase(yata){
+    updateFromYatabase(yata) {
         let userGeneratedPhotos = yata.userGeneratedPhotos;
-        for (let i = 0; i < userGeneratedPhotos.length; i++){
+        for (let i = 0; i < userGeneratedPhotos.length; i++) {
             let pic = userGeneratedPhotos[i];
             if (!this.yataIds.includes(pic._id)) {
-
                 this.yataIds.push(pic._id);
 
-
                 let tex = this.textureLoader.load(pic.src);
-                let mat = new THREE.MeshBasicMaterial({map: tex});
-                let geo = new THREE.BoxGeometry(1,1,1);
-                let mesh = new THREE.Mesh(geo,mat);
-                mesh.position.set(pic.x,pic.y,pic.z);
+                let mat = new THREE.MeshBasicMaterial({ map: tex });
+                let geo = new THREE.BoxGeometry(1, 1, 1);
+                let mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(pic.x, pic.y, pic.z);
                 this.scene.add(mesh);
             }
         }
@@ -506,8 +503,8 @@ export class Yorb {
 
         // any query params in the URL?
         let params = new URLSearchParams(window.location.search);
-        let xParam = params.get("x");
-        let zParam = params.get("z");
+        let xParam = params.get('x');
+        let zParam = params.get('z');
 
         if (xParam) startX = parseFloat(xParam);
         if (zParam) startZ = parseFloat(zParam);
