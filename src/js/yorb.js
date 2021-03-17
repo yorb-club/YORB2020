@@ -18,6 +18,7 @@ import { YorbControls2 } from './yorbControls2.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
+import {YatabaseConnection} from "./yata";
 
 import { sceneSetup, sceneDraw } from './sandbox';
 
@@ -120,7 +121,6 @@ export class Yorb {
         this.update();
         this.render();
 
-        this.yataIds = [];
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -151,6 +151,7 @@ export class Yorb {
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
         }
 
+        this.yatabaseConnection = new YatabaseConnection(this.scene);
         // this.sketches = new Sketches(this.scene)
         // setTimeout(() => {
         //     this.sketches.addSketches()
@@ -158,20 +159,7 @@ export class Yorb {
     }
 
     updateFromYatabase(yata) {
-        let userGeneratedPhotos = yata.userGeneratedPhotos;
-        for (let i = 0; i < userGeneratedPhotos.length; i++) {
-            let pic = userGeneratedPhotos[i];
-            if (!this.yataIds.includes(pic._id)) {
-                this.yataIds.push(pic._id);
-
-                let tex = this.textureLoader.load(pic.src);
-                let mat = new THREE.MeshBasicMaterial({ map: tex });
-                let geo = new THREE.BoxGeometry(1, 1, 1);
-                let mesh = new THREE.Mesh(geo, mat);
-                mesh.position.set(pic.x, pic.y, pic.z);
-                this.scene.add(mesh);
-            }
-        }
+        this.yatabaseConnection.dealWithYata(yata);
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
