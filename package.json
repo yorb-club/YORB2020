@@ -13,8 +13,11 @@
   "license": "ISC",
   "dependencies": {
     "debug": "^4.1.1",
+    "dotenv": "^8.2.0",
+    "firebase": "^8.2.6",
     "mediasoup-client": "^3.6.5",
     "p5": "^1.0.0",
+    "simple-dropzone": "^0.7.1",
     "socket.io-client": "^3.0.3",
     "three": "^0.115.0"
   },

@@ -4,6 +4,8 @@ import { create3DText, createSimpleText } from './utils'
 import { hackToRemovePlayerTemporarily } from './index'
 import { Vector3 } from 'three'
 import { Portal } from './portals'
+import { OnlineAssets } from './onlineAssets.js'
+import { SimpleDropzone } from 'simple-dropzone';
 
 const project_thumbnails = require('../assets/images/project_thumbnails/winterShow2020/*.png')
 
@@ -28,7 +30,7 @@ if (hostname === 'yorblet1.itp.io') {
     YORBLET_INDEX = 5
 } else if (hostname === 'yorblet6.itp.io') {
     YORBLET_INDEX = 6
-}else if (hostname === 'yorbletsix.itp.io') {
+} else if (hostname === 'yorbletsix.itp.io') {
     YORBLET_INDEX = 6
 } else if (hostname === 'yorblet7.itp.io') {
     YORBLET_INDEX = 7
@@ -133,6 +135,72 @@ export class Yorblet {
 
         //add portal back to lobby -- change position (2nd param) TODO
         this.portal = new Portal(this.scene, new Vector3(0, 0, 0), 0) //third param is index of lobby
+
+        //add online assets
+        this.onlineAssets = new OnlineAssets(this.scene) //add online assets
+        this.onlineAssets.load3DAssets("glbs");
+
+        //add drag & drop support
+        this.spinnerEl = document.body.querySelector('.spinner');
+        this.dropEl = document.body.querySelector('.dropzone');
+        this.inputEl = document.body.querySelector('#file-input');
+
+        this.createDropzone();
+        this.hideSpinner();
+    }
+
+    /**
+     * Sets up the drag-and-drop controller.
+     */
+    createDropzone() {
+        const dropCtrl = new SimpleDropzone(this.dropEl, this.inputEl);
+        dropCtrl.on('drop', ({ files }) => { this.loadDroppedFile(files) });
+        dropCtrl.on('dropstart', () => this.showSpinner());
+        dropCtrl.on('droperror', () => this.hideSpinner());
+    }
+
+    showSpinner() {
+        this.spinnerEl.style.display = '';
+    }
+
+    hideSpinner() {
+        this.spinnerEl.style.display = 'none';
+    }
+
+    /**
+     * Loads a fileset provided by user action.
+     * @param  {Map<string, File>} fileMap
+     */
+    loadDroppedFile(fileMap) {
+        let rootFile;
+        let rootPath;
+        Array.from(fileMap).forEach(([path, file]) => {
+            if (file.name.match(/\.(gltf|glb)$/)) {
+                rootFile = file;
+                rootPath = path.replace(file.name, '');
+            }
+        });
+
+        if (!rootFile) {
+            console.error('No .gltf or .glb asset found.');
+        }
+
+        const fileURL = typeof rootFile === 'string'
+        ? rootFile
+        : URL.createObjectURL(rootFile);
+  
+        const cleanup = () => {
+            this.hideSpinner();
+            if (typeof rootFile === 'object') URL.revokeObjectURL(fileURL);
+        };
+
+        /**
+         * Currently this relies on the online assets class's loader, which is not ideal. 
+         * We should probably rename the online assets class to be just the asset manager, so it can load local and remote assets.
+         */
+
+        this.onlineAssets.loadModel(fileURL, {x: Math.random() * 10 - 5, y:0, z: Math.random() * 10 - 5}, {x: 0, y:0, z:0}, 0.5);
+        cleanup();
     }
 
     setup() {
@@ -568,58 +636,58 @@ export class Yorblet {
 
 
     styleYorblet() {
-            // style the area according to which YORBLET we are in
-            if (YORBLET_INDEX === 1) {
-                // do styling for yorblet 1
-                this.addSky(SKY_COLOR_BLUE_ROOM);
-                this.createCircleFence(SKY_COLOR_BLUE_ROOM);
-            } else if (YORBLET_INDEX === 2) {
-                // do styling for yorblet 2
-                this.addSky(SKY_COLOR_PINK_ROOM);
-                this.createRectFence(SKY_COLOR_PINK_ROOM);
-            } else if (YORBLET_INDEX === 3) {
-                // do styling for yorblet 3
-                this.addSky(SKY_COLOR_YELLOW_ROOM);
-                this.createTriFence(SKY_COLOR_YELLOW_ROOM);
-            } else if (YORBLET_INDEX === 4) {
-                // do styling for yorblet 4
-                this.addSky(SKY_COLOR_GREEN_ROOM);
-                this.createBoltFence(SKY_COLOR_GREEN_ROOM);
-            } else if (YORBLET_INDEX === 5) { //PINK CIRCLE
-                // do styling for yorblet 5
-                this.addSky(SKY_COLOR_PINK_ROOM);
-                this.createCircleFence(SKY_COLOR_PINK_ROOM);
-            } else if (YORBLET_INDEX === 6) { // YELLOW SQUARE
-                // do styling for yorblet 6
-                this.addSky(SKY_COLOR_YELLOW_ROOM);
-                this.createRectFence(SKY_COLOR_YELLOW_ROOM);
-            } else if (YORBLET_INDEX === 7) { // GREEN TRIANGLE
-                // do styling for yorblet 7
-                this.addSky(SKY_COLOR_GREEN_ROOM);
-                this.createTriFence(SKY_COLOR_GREEN_ROOM);
-            } else if (YORBLET_INDEX === 8) { // PINK BOLT
-                // do styling for yorblet 8
-                this.addSky(SKY_COLOR_PINK_ROOM);
-                this.createBoltFence(SKY_COLOR_PINK_ROOM);
-            } else if (YORBLET_INDEX === 9) { // YELLOW CIRCLE
-                // do styling for yorblet 8
-                this.addSky(SKY_COLOR_YELLOW_ROOM);
-                this.createCircleFence(SKY_COLOR_YELLOW_ROOM);
-            } else if (YORBLET_INDEX === 10) { // BLUE SQUARE
-                // do styling for yorblet 8
-                this.addSky(SKY_COLOR_BLUE_ROOM);
-                this.createRectFence(SKY_COLOR_BLUE_ROOM);
-            }
-            else if (YORBLET_INDEX === 11) { // BLUE TRIANGLE
-                // do styling for yorblet 8
-                this.addSky(SKY_COLOR_BLUE_ROOM);
-                this.createTriFence(SKY_COLOR_BLUE_ROOM);
-            }
-            else if (YORBLET_INDEX === 12) { // GREEN CIRCLE
-                // do styling for yorblet 12
-                this.addSky(SKY_COLOR_GREEN_ROOM);
-                this.createCircleFence(SKY_COLOR_GREEN_ROOM);
-            }
+        // style the area according to which YORBLET we are in
+        if (YORBLET_INDEX === 1) {
+            // do styling for yorblet 1
+            this.addSky(SKY_COLOR_BLUE_ROOM);
+            this.createCircleFence(SKY_COLOR_BLUE_ROOM);
+        } else if (YORBLET_INDEX === 2) {
+            // do styling for yorblet 2
+            this.addSky(SKY_COLOR_PINK_ROOM);
+            this.createRectFence(SKY_COLOR_PINK_ROOM);
+        } else if (YORBLET_INDEX === 3) {
+            // do styling for yorblet 3
+            this.addSky(SKY_COLOR_YELLOW_ROOM);
+            this.createTriFence(SKY_COLOR_YELLOW_ROOM);
+        } else if (YORBLET_INDEX === 4) {
+            // do styling for yorblet 4
+            this.addSky(SKY_COLOR_GREEN_ROOM);
+            this.createBoltFence(SKY_COLOR_GREEN_ROOM);
+        } else if (YORBLET_INDEX === 5) { //PINK CIRCLE
+            // do styling for yorblet 5
+            this.addSky(SKY_COLOR_PINK_ROOM);
+            this.createCircleFence(SKY_COLOR_PINK_ROOM);
+        } else if (YORBLET_INDEX === 6) { // YELLOW SQUARE
+            // do styling for yorblet 6
+            this.addSky(SKY_COLOR_YELLOW_ROOM);
+            this.createRectFence(SKY_COLOR_YELLOW_ROOM);
+        } else if (YORBLET_INDEX === 7) { // GREEN TRIANGLE
+            // do styling for yorblet 7
+            this.addSky(SKY_COLOR_GREEN_ROOM);
+            this.createTriFence(SKY_COLOR_GREEN_ROOM);
+        } else if (YORBLET_INDEX === 8) { // PINK BOLT
+            // do styling for yorblet 8
+            this.addSky(SKY_COLOR_PINK_ROOM);
+            this.createBoltFence(SKY_COLOR_PINK_ROOM);
+        } else if (YORBLET_INDEX === 9) { // YELLOW CIRCLE
+            // do styling for yorblet 8
+            this.addSky(SKY_COLOR_YELLOW_ROOM);
+            this.createCircleFence(SKY_COLOR_YELLOW_ROOM);
+        } else if (YORBLET_INDEX === 10) { // BLUE SQUARE
+            // do styling for yorblet 8
+            this.addSky(SKY_COLOR_BLUE_ROOM);
+            this.createRectFence(SKY_COLOR_BLUE_ROOM);
+        }
+        else if (YORBLET_INDEX === 11) { // BLUE TRIANGLE
+            // do styling for yorblet 8
+            this.addSky(SKY_COLOR_BLUE_ROOM);
+            this.createTriFence(SKY_COLOR_BLUE_ROOM);
+        }
+        else if (YORBLET_INDEX === 12) { // GREEN CIRCLE
+            // do styling for yorblet 12
+            this.addSky(SKY_COLOR_GREEN_ROOM);
+            this.createCircleFence(SKY_COLOR_GREEN_ROOM);
+        }
 
     }
 
@@ -635,7 +703,7 @@ export class Yorblet {
 
         if (YORBLET_INDEX === 1) { // BLUE CIRCLE
             // do styling for yorblet 1
-            this.addCircleRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_BLUE, COL_SECOND_BLUE,COL_MAIN_PINK )
+            this.addCircleRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_BLUE, COL_SECOND_BLUE, COL_MAIN_PINK)
         } else if (YORBLET_INDEX === 2) { // PINK SQUARE
             // do styling for yorblet 2
             this.addRectRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_PINK, COL_SECOND_PINK, COL_MAIN_GREEN)
@@ -659,18 +727,18 @@ export class Yorblet {
             this.addLightningRoom(centerX, centerZ, lookAtX, lookAtZ, COL_MAIN_PINK, COL_SECOND_PINK, COL_MAIN_GREEN);
         } else if (YORBLET_INDEX === 9) { // YELLOW CIRCLE
             // do styling for yorblet 8
-            this.addCircleRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_YELLOW, COL_SECOND_YELLOW, COL_MAIN_BLUE )
+            this.addCircleRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_YELLOW, COL_SECOND_YELLOW, COL_MAIN_BLUE)
         } else if (YORBLET_INDEX === 10) { // BLUE SQUARE
             // do styling for yorblet 8
-            this.addRectRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_BLUE, COL_SECOND_BLUE,COL_MAIN_PINK )
+            this.addRectRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_BLUE, COL_SECOND_BLUE, COL_MAIN_PINK)
         }
         else if (YORBLET_INDEX === 11) { // BLUE SQUARE
             // do styling for yorblet 8
-            this.addTriRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_BLUE, COL_SECOND_BLUE,COL_MAIN_PINK)
+            this.addTriRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_MAIN_BLUE, COL_SECOND_BLUE, COL_MAIN_PINK)
         }
         else if (YORBLET_INDEX === 12) { // GREEN CIRCLE
             // do styling for yorblet 12
-            this.addCircleRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_ACCENT_BLUE, COL_SECOND_GREEN, COL_ACCENT_YELLOW )
+            this.addCircleRoom(centerX, centerZ, lookAtX, lookAtZ, angle, COL_ACCENT_BLUE, COL_SECOND_GREEN, COL_ACCENT_YELLOW)
         }
 
         // making a mini dome
@@ -726,13 +794,13 @@ export class Yorblet {
         fontMesh.position.set(centerX, 0, centerZ)
 
         // Check if this is the first stage in the group
-        let firstStageCheck = projectIndex == 1 || projectIndex == this.numProjects/2 + 1
+        let firstStageCheck = projectIndex == 1 || projectIndex == this.numProjects / 2 + 1
         // Check if this Yorblet is a bolt
         let yorbletBoltCheck = YORBLET_INDEX == 8 || YORBLET_INDEX == 4
-        
+
         if (firstStageCheck && yorbletBoltCheck) {
-          fontOffsetX = 5
-          fontOffsetZ = 2
+            fontOffsetX = 5
+            fontOffsetZ = 2
         }
 
         fontMesh.lookAt(lookAtX, 0, lookAtZ)
@@ -882,46 +950,46 @@ export class Yorblet {
 
     }
 
-    addLightningRoom(centerX, centerZ, lookAtX, lookAtZ, color1, color2, color3){
+    addLightningRoom(centerX, centerZ, lookAtX, lookAtZ, color1, color2, color3) {
 
 
-      let scale = 6;
-      let centerY = 4;
+        let scale = 6;
+        let centerY = 4;
 
-      let offsetX = 3;// how far to the circle's right
-      let offsetY = 0;// how far to the circle's up-down
-      let offsetZ = -4.8;// how far to the circle's forward-backward
-      this.drawLightning(scale, color2, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
-
-
-      //two
-      scale = 2;
-      centerY = 4;
-
-      offsetX = 3;// how far to the circle's right
-      offsetY = 2;// how far to the circle's up-down
-      offsetZ = -4.5;// how far to the circle's forward-backward
-      this.drawLightning(scale, color3, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
+        let offsetX = 3;// how far to the circle's right
+        let offsetY = 0;// how far to the circle's up-down
+        let offsetZ = -4.8;// how far to the circle's forward-backward
+        this.drawLightning(scale, color2, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
 
 
-      //three
-      scale = 5;
-      centerY = 4;
+        //two
+        scale = 2;
+        centerY = 4;
 
-      offsetX = -5;// how far to the circle's right
-      offsetY = -1;// how far to the circle's up-down
-      offsetZ = -4;// how far to the circle's forward-backward
-      this.drawLightning(scale, color1, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
+        offsetX = 3;// how far to the circle's right
+        offsetY = 2;// how far to the circle's up-down
+        offsetZ = -4.5;// how far to the circle's forward-backward
+        this.drawLightning(scale, color3, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
 
 
-      //three
-      // scale = 3;
-      // centerY = 4;
-      //
-      // offsetX = -6;// how far to the circle's right
-      // offsetY = 3;// how far to the circle's up-down
-      // offsetZ = -3.8;// how far to the circle's forward-backward
-      //this.drawLightning(scale, accentGreen, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
+        //three
+        scale = 5;
+        centerY = 4;
+
+        offsetX = -5;// how far to the circle's right
+        offsetY = -1;// how far to the circle's up-down
+        offsetZ = -4;// how far to the circle's forward-backward
+        this.drawLightning(scale, color1, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
+
+
+        //three
+        // scale = 3;
+        // centerY = 4;
+        //
+        // offsetX = -6;// how far to the circle's right
+        // offsetY = 3;// how far to the circle's up-down
+        // offsetZ = -3.8;// how far to the circle's forward-backward
+        //this.drawLightning(scale, accentGreen, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ);
 
         //two
         // scale F= -3.8 // how far to the circle's forward-backward
@@ -1077,12 +1145,12 @@ export class Yorblet {
         this.scene.add(triangleMesh)
     }
 
-    drawLightning(scale, matcolor, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ){
+    drawLightning(scale, matcolor, centerX, centerY, centerZ, offsetX, offsetY, offsetZ, lookAtX, lookAtZ) {
 
-      //draw lightning
-      const x = 0, y = 0;
+        //draw lightning
+        const x = 0, y = 0;
 
-      const lightningBolt = new THREE.Shape();
+        const lightningBolt = new THREE.Shape();
 
         lightningBolt.moveTo(x, y)
         lightningBolt.lineTo(x + 0.5, y)
