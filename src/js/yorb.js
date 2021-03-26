@@ -18,7 +18,7 @@ import { YorbControls2 } from './yorbControls2.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
-import {YatabaseConnection} from "./yata";
+import { YatabaseConnection } from './yata';
 
 import { sceneSetup, sceneDraw } from './sandbox';
 
@@ -34,6 +34,7 @@ if (hostname === 'yorb.itp.io') {
 }
 
 import debugModule from 'debug';
+import { InterleavedBufferAttribute } from 'three';
 
 const log = debugModule('YORB:YorbScene');
 
@@ -113,6 +114,10 @@ export class Yorb {
         window.addEventListener('resize', (e) => this.onWindowResize(e), false);
         window.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
 
+        window.addEventListener('mouseup', (e) => this.onMouseUp(e), false);
+        window.addEventListener('keydown', (e) => this.onKeyDown(e), false);
+        window.addEventListener('keyup', (e) => this.onKeyUp(e), false);
+
         // Helpers
         this.helperGrid = new THREE.GridHelper(500, 500);
         this.helperGrid.position.y = -0.1; // offset the grid down to avoid z fighting with floor
@@ -120,7 +125,6 @@ export class Yorb {
 
         this.update();
         this.render();
-
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -505,8 +509,47 @@ export class Yorb {
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    // interaction zone
+
+    setupPreviewObject() {
+        let geo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+        let mat = new THREE.MeshBasicMaterial({ color: 'hotpink' });
+        this.raycastPreviewMesh = new THREE.Mesh(geo, mat);
+        this.scene.add(this.raycastPreviewMesh);
+    }
+
+    castRayForImage() {
+        if (this.shift_down) {
+            // cast ray out from camera
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            var intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+            if (intersects.length > 0) {
+                let position = intersects[0].point;
+                let inputEl = document.getElementById('image-src-input');
+                let url = inputEl.value;
+
+                console.log('adding photo with src',url,'at position',position);
+
+                socket.emit('yata', { src: url, x: position.x, y: position.y, z: position.z });
+            }
+        }
+        if (this.option_down) {
+            this.raycaster.setFromCamera(this.mouse, this.camera);
+            var intersects = this.raycaster.intersectObjects(this.scene.children, true);
+
+            if (intersects.length > 0) {
+
+                let name = intersects[0].object.name;
+                console.log('removing mesh', name);
+                socket.emit('removeyata', { id: name });
+            }
+        }
+    }
+
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
-    // Loop ⭕️
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    // Loop ⭕
 
     update() {
         requestAnimationFrame(() => this.update());
@@ -653,6 +696,28 @@ export class Yorb {
 
         this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    }
+    onMouseUp(event) {
+        event.preventDefault()
+        this.castRayForImage();
+    }
+
+    onKeyDown(e) {
+        if (e.keyCode == 16) {
+            this.shift_down = true;
+        }
+        if (e.keyCode == 18) {
+            this.option_down = true;
+        }
+    }
+
+    onKeyUp(e) {
+        if (e.keyCode == 16) {
+            this.shift_down = false;
+        }
+        if (e.keyCode == 18) {
+            this.option_down = false;
+        }
     }
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//

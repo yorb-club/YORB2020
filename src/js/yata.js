@@ -6,14 +6,17 @@ export class YatabaseConnection {
         this.textureLoader = new THREE.TextureLoader();
 
         this.yataIds = [];
+        
     }
 
     dealWithYata(yata) {
+        let latestYataIds = [];
         let userGeneratedPhotos = yata.userGeneratedPhotos;
         for (let i = 0; i < userGeneratedPhotos.length; i++) {
             let pic = userGeneratedPhotos[i];
             if (!this.yataIds.includes(pic._id)) {
                 this.yataIds.push(pic._id);
+                latestYataIds.push(pic._id);
 
                 let tex = this.textureLoader.load(pic.src);
                 let mat = new THREE.MeshBasicMaterial({ map: tex });
@@ -21,9 +24,26 @@ export class YatabaseConnection {
                 let mesh = new THREE.Mesh(geo, mat);
                 mesh.position.set(pic.x, pic.y, pic.z);
                 this.scene.add(mesh);
+                mesh.name = pic._id;
+                console.log(mesh);
+            }
+        }
+
+        // this.clearOldYata(latestYataIds);
+    }
+
+    clearOldYata(latestYataIds){
+        for (let i = 0; i < this.yataIds.length; i++){
+            let id = this.yataIds[i];
+            if (!(latestYataIds.includes(id))){
+                let mesh = this.scene.getObjectByName( id );
+                this.scene.remove(mesh);
+
             }
         }
     }
+
+
 
     generateAddPhotoModal() {
         if (!document.getElementsByClassName('project-modal')[0]) {

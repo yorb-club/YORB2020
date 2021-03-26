@@ -333,13 +333,6 @@ function setupControls() {
                 console.log('Have your friends meet you here: ', url);
                 makePositionLinkModal(position);
             }
-            if (e.keyCode == 76) {
-                // 'l'
-                let position = yorbScene.getPlayerPosition()[0];
-                console.log("adding photo at this position");
-                let url = `https://i.imgur.com/AD3MbBi.jpeg`;
-                socket.emit('yata', {src: url, x: position[0], y: 1, z: position[2]});
-            }
         },
         false
     );

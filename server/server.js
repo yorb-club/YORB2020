@@ -23,24 +23,9 @@ config.mediasoup.webRtcTransport.listenIps = [
 ]
 
 // IMPORTS
-
 let DataStore = require('nedb');
-// let yatabase = new DataStore({filename: '/server/yatabase.db'});
-let yatabase = new DataStore();
-
-// yatabase.loadDatabase();
-console.log("Loading Yatabase");
-
-var doc = { src: 'https://i.imgur.com/AD3MbBi.jpeg', x: 0, y: 1, z: 0};
-
-setTimeout(() => {
-    yatabase.insert(doc, function (err, newDoc) {   // Callback is optional
-        // newDoc is the newly inserted document, including its _id
-        // newDoc has no key called notToBeSaved since its value was undefined
-        console.log(newDoc);
-      });
-}, 5000);               
-
+let yatabase = new DataStore('./server/yatabase.db');
+yatabase.loadDatabase();
 
 // set debug name
 process.env.DEBUG = 'YORBSERVER*'
@@ -347,6 +332,13 @@ async function runSocketServer() {
         socket.on('yata', (data) => {
             log('Got yata!');
             yatabase.insert(data);
+        })
+
+        socket.on('removeyata', (data) => {
+            console.log('Got remove request: ', data);
+            yatabase.remove({ _id: data.id }, {}, function (err, numRemoved) {
+                console.log('Removed', numRemoved, 'yatabase entries with id', data.id);
+              });
         })
 
         //*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//*//
