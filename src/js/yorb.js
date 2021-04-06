@@ -5,7 +5,7 @@
  *
  */
 
-import { hackToRemovePlayerTemporarily, pauseAllConsumersForPeer, resumeAllConsumersForPeer } from './index.js';
+import { hackToRemovePlayerTemporarily, pauseAllConsumersForPeer, resumeAllConsumersForPeer } from './signaling.js';
 
 import { redrawVideoCanvas, makeVideoTextureAndMaterial } from './utils';
 
