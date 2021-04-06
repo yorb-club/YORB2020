@@ -190,7 +190,7 @@ function initSocketConnection() {
 }
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
-// Clients / WebRTC
+// Clients 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 
 // Adds client object with THREE.js object, DOM video object and and an RTC peer connection for each :
@@ -230,9 +230,7 @@ export function hackToRemovePlayerTemporarily() {
 function createScene() {
     // initialize three.js scene
     info('Creating three.js scene...');
-
     yorbScene = new Yorb(onPlayerMove, clients, mySocketID);
-
     yorbScene.updateProjects(projects);
 }
 
@@ -263,9 +261,6 @@ function setupControls() {
                 // "M"
                 toggleWebcamAudioPauseState();
             }
-            // if (e.keyCode == 13) { // "Enter"
-            // 	yorbScene.activateHighlightedProject();
-            // }
             if (e.keyCode == 49) {
                 // "1"
                 yorbScene.swapMaterials();
