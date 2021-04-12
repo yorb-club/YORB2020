@@ -19,10 +19,10 @@ import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
 
-import {sceneSetup, sceneDraw} from "./sandbox";
-
+import { sceneSetup, sceneDraw } from './sandbox';
 
 import * as THREE from 'three';
+import { CSS3DRenderer, CSS3DObject } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
 
 const Stats = require('./libs/stats.min.js');
 
@@ -101,6 +101,81 @@ export class Yorb {
         this.renderer.setClearColor(new THREE.Color('lightblue')); // change sky color
         this.renderer.setSize(this.width, this.height);
 
+        this.css3drenderer = new CSS3DRenderer();
+        this.css3drenderer.domElement.style.position = 'absolute';
+        this.css3drenderer.domElement.style.top = 0;
+        // this.css3drenderer.domElement.style.width = this.width;
+        // this.css3drenderer.domElement.style.height = this.height;
+        document.getElementById('css-3d-scene-container').appendChild(this.css3drenderer.domElement);
+        this.onWindowResize();
+
+        // const myDiv = document.createElement( 'div' );
+        // myDiv.style.width = '480px';
+        // myDiv.style.height = '360px';
+        // myDiv.style.backgroundColor = '#ff0';
+
+        // const iframe = document.createElement( 'p' );
+        // iframe.style.width = '480px';
+        // iframe.style.height = '360px';
+        // iframe.style.border = '0px';
+        // // iframe.src = [ 'https://www.youtube.com/embed/V9xUQWo4vN0?rel=0' ].join( '' );
+        // iframe.innerText = "hello there test test test"
+        // myDiv.appendChild( iframe );
+
+        // // <iframe width="560" height="315" src="https://www.youtube.com/embed/V9xUQWo4vN0" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        // const object = new CSS3DObject( myDiv );
+        // object.position.set( 0,1,0 );
+        // object.rotation.y = 0;
+
+        // this.scene.add(object);
+        const obj = new THREE.Object3D();
+
+        const element = document.createElement('p');
+        element.style.width = '200 px';
+        element.style.height = '200 px';
+        element.style.fontSize = "10px";
+        element.style.opacity = 0.999;
+        element.style.boxSizing = 'border-box';
+        element.textContent = 'I am an HTML <div> element mixed into the WebGL scene. This text is editable!';
+        element.setAttribute('contenteditable', '');
+        obj.position.z = 20;
+        element.style.opacity = '1';
+        element.style.padding = '10px';
+        const color1 = '#7bb38d';
+        const color2 = '#71a381';
+        element.style.background = `repeating-linear-gradient(
+            45deg,
+            ${color1},
+            ${color1} 10px,
+            ${color2} 10px,
+            ${color2} 20px
+        )`;
+
+        var css3dObject = new CSS3DObject(element);
+        obj.css3dObject = css3dObject;
+        obj.add(css3dObject);
+
+        // make an invisible plane for the DOM element to chop
+        // clip a WebGL geometry with it.
+        var material = new THREE.MeshBasicMaterial({
+            opacity: 0.05,
+            transparent: true,
+            color: new THREE.Color(0x111111),
+            blending: THREE.NoBlending,
+            // side	: THREE.DoubleSide,
+        });
+        var geometry = new THREE.BoxGeometry(4, 4, 4);
+        var mesh = new THREE.Mesh(geometry, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        obj.lightShadowMesh = mesh;
+        // obj.add(mesh);
+
+        obj.position.set(0, 1, 0);
+
+        // root.add( background );
+        this.scene.add(obj);
+
         this.addLights();
         this.loadBackground();
 
@@ -132,8 +207,8 @@ export class Yorb {
 
         //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
-        
-	this.show = false;
+
+        this.show = false;
         this.yorblet = false;
 
         if (MODE === 'YORBLET') {
@@ -144,8 +219,8 @@ export class Yorb {
             this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
             //this.projectionScreens.createYorbProjectionScreens()
-	    this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
-            this.itpModel = new ITPModel(this.scene);
+            this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+            // this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
         }
@@ -485,8 +560,8 @@ export class Yorb {
 
         // any query params in the URL?
         let params = new URLSearchParams(window.location.search);
-        let xParam = params.get("x");
-        let zParam = params.get("z");
+        let xParam = params.get('x');
+        let zParam = params.get('z');
 
         if (xParam) startX = parseFloat(xParam);
         if (zParam) startZ = parseFloat(zParam);
@@ -558,7 +633,11 @@ export class Yorb {
     render() {
         // Update video canvases for each client
         this.updateVideoTextures();
+        // this.scene.updateMatrixWorld()
+
         this.renderer.render(this.scene, this.camera);
+        // console.log(this.css3drenderer);
+        this.css3drenderer.render(this.scene, this.camera);
     }
 
     updateVideoTextures() {
@@ -633,12 +712,17 @@ export class Yorb {
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
     // Event Handlers 🍽
 
-    onWindowResize(e) {
+    onWindowResize() {
         this.width = window.innerWidth * 0.9;
         this.height = window.innerHeight * 0.7;
         this.camera.aspect = this.width / this.height;
         this.camera.updateProjectionMatrix();
+
+        // set renderer size
         this.renderer.setSize(this.width, this.height);
+
+        // set the css3d renderer too!
+        this.css3drenderer.setSize(this.width, this.height);
     }
 
     onMouseMove(event) {

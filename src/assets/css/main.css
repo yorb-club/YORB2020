@@ -1,6 +1,6 @@
 @font-face {
-    font-family: "VCR";
-    src: url("../fonts/VCR_OSD_MONO_1.001.ttf");
+    font-family: 'VCR';
+    src: url('../fonts/VCR_OSD_MONO_1.001.ttf');
     /* for cross browser blah blah */
     /* src: url("CustomFont.woff") format("woff"),
     url("CustomFont.otf") format("opentype"),
@@ -12,7 +12,7 @@ body {
     padding: 0;
     overflow: hidden;
 
-    font-family: "VCR", Arial, sans-serif;
+    font-family: 'VCR', Arial, sans-serif;
     font-weight: normal;
     font-style: normal;
 }
@@ -48,6 +48,18 @@ body {
     top: 0;
     left: 0;
     z-index: 1;
+}
+
+#css-3d-scene-container {
+    /* positioning */
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    pointer-events: none;
+    --c1: #1225383e;
+    --c2: #1122334d;
+    background: repeating-linear-gradient(-45deg, var(--c1), var(--c1) 20px, var(--c2) 20px, var(--c2) 40px);
 }
 
 #overlay {
@@ -252,12 +264,12 @@ body {
 }
 
 #html-project-list {
-  text-align: left;
-  overflow: scrollable;
-  white-space: nowrap;
-  overflow-y: auto;
-  overflow-x: auto;
-  /* -webkit-animation: scroll 60s linear infinite;
+    text-align: left;
+    overflow: scrollable;
+    white-space: nowrap;
+    overflow-y: auto;
+    overflow-x: auto;
+    /* -webkit-animation: scroll 60s linear infinite;
   -moz-animation: scroll 60s linear infinite;
   animation: scroll 60s linear infinite; */
 }
@@ -306,12 +318,12 @@ body {
     /* Could be more or less, depending on screen size */
 }
 
-.project-modal-img{
+.project-modal-img {
     display: block;
     margin-left: auto;
     margin-right: auto;
     /* width: 30%; */
-    max-height:220px;
+    max-height: 220px;
 }
 
 .project-modal-title {
@@ -327,10 +339,10 @@ body {
     font-size: 14px;
     line-height: 17px;
     font-family: monospace;
-    width:80%;
+    width: 80%;
     margin-left: 5%;
 }
-.project-modal-links-header{
+.project-modal-links-header {
     display: flex;
     margin-left: auto;
     margin-right: auto;
