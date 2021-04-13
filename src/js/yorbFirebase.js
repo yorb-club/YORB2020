@@ -46,21 +46,34 @@ export class YorbFirebase {
     }
 
     /**
-     * placeholder for download files from the storage
+     * upload files to the storage and get it's the file's download URL
      * @param {*} ref 
-     * @param {*} path 
+     * @param {*} file 
      */
-    download(ref, path) {
-
+    async upload(ref, file) {
+        const fileRef = this.storage.ref().child(ref);
+        await fileRef.put(file);
+        const fileURL = await fileRef.getDownloadURL();
+        return fileURL;
     }
 
     /**
-     * placeholder for upload files to the storage and save the corresponding data record to the database
+     * getting download URL from the storage
      * @param {*} ref 
-     * @param {*} path 
-     * @param {*} data 
      */
-    upload(ref, path, data) {
+    async getFileURL(ref) {
+        //create a storage reference
+        let storage = this.storage.ref(ref);
 
+        //get file url
+        const fileURL = storage.getDownloadURL().then(function (url) {
+            return url;
+        }).catch(function (error) {
+            console.log("error encountered:" + error);
+        });
+        return await fileURL;
     }
+
+
+
 }

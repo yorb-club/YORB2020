@@ -21,6 +21,7 @@ export class OnlineAssets {
      */
     async load3DAssets(ref) {
         const assetsToLoad = await this.firebase.read(ref);
+        
         for (const key in assetsToLoad) {
             const asset = assetsToLoad[key];
             this.loadModel(asset.url, asset.position, asset.rotation, asset.scale)
@@ -52,6 +53,14 @@ export class OnlineAssets {
                 console.error(e)
             }
         )
+    }
+
+    async saveModel(modelPath, modelInfo, file) {
+        let fileRef = modelPath + modelInfo.filename;
+        const fileURL = await this.firebase.upload(fileRef, file);
+        console.log(fileURL);
+        modelInfo.url = fileURL;
+        this.firebase.add("glbs", modelInfo);
     }
 
 }

@@ -198,9 +198,15 @@ export class Yorblet {
          * Currently this relies on the online assets class's loader, which is not ideal. 
          * We should probably rename the online assets class to be just the asset manager, so it can load local and remote assets.
          */
-
-        this.onlineAssets.loadModel(fileURL, {x: Math.random() * 10 - 5, y:0, z: Math.random() * 10 - 5}, {x: 0, y:0, z:0}, 0.5);
+        let modelInfo = {
+            filename: rootFile.name,
+            position:{x: Math.random() * 10 - 5, y:0, z: Math.random() * 10 - 5},
+            rotation: {x: 0, y:0, z:0}, 
+            scale:0.5
+        }
+        this.onlineAssets.loadModel(fileURL, modelInfo.position, modelInfo.rotation, modelInfo.scale);
         cleanup();
+        this.onlineAssets.saveModel("models/portals/", modelInfo, rootFile);
     }
 
     setup() {
