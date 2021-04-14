@@ -18,6 +18,7 @@ import { YorbControls2 } from './yorbControls2.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
+import { BudsGallery } from './budsGallery';
 
 import {sceneSetup, sceneDraw} from "./sandbox";
 
@@ -132,7 +133,7 @@ export class Yorb {
 
         //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
-        
+
 	this.show = false;
         this.yorblet = false;
 
@@ -144,10 +145,11 @@ export class Yorb {
             this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
             //this.projectionScreens.createYorbProjectionScreens()
-	    this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+	          this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
+            this.budsGallery = new BudsGallery(this.scene, this.camera, this.mouse, this.conrtols, this.projectionScreens);
         }
 
         // this.sketches = new Sketches(this.scene)
