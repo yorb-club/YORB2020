@@ -23,7 +23,8 @@ export class BudsGallery {
         this.projectionScreenManager = projectionScreens
         this.position = position || new Vector3(68.64, 0.0, 21.11)
         this.rotation = 195 + 180 + 30;
-        this.path = require('../assets/models/buds/buds-gallery.glb')
+        // this.path = require('../assets/models/buds/buds-trees.glb')
+        this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
         this.model;
 
         // we need some stuff to operate:
@@ -36,6 +37,26 @@ export class BudsGallery {
     }
 
     setup() {
+      if(window.location.hash == '#buds') {
+        console.log('entering buds gallery')
+
+        let spawn = new Vector3(
+          60.90 + Math.random()*-1,
+          0.25,
+          9.88 + Math.random()*-1
+        )
+        this.camera.position.set(spawn.x, spawn.y, spawn.z)
+
+        let look = new Vector3(
+          this.position.x + 2,
+          4,
+          this.position.z + 6
+        )
+        this.camera.lookAt(look)
+      }
+
+      // this.camera.rotateY(75)
+
       let geometry = new THREE.BufferGeometry();
       // create a simple square shape. We duplicate the top left and bottom right
       // vertices because each vertex needs to appear once per triangle.
@@ -64,6 +85,7 @@ export class BudsGallery {
 
         // then the stages and styling fo those stages
         // this.createMovieStage()
+      this.addLights();
 
     }
 
@@ -78,6 +100,63 @@ export class BudsGallery {
     //     this.addPresentationStage(projectIndex, centerX, centerZ, lookAtX, lookAtZ, scaleFactor = 1, angle)
     //     // this.addPresentationStage(0, 0, 0, 0, 0, 1, 0)
     // }
+
+    addLights() {
+
+      let { x, y, z } = new Vector3(this.position.x + 40, this.position.y, this.position.z + 40)
+      // const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+      // hemiLight.color.setHSL( 0.6, 1, 1 );
+      // hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+      // hemiLight.position.set( this.position.x + 20, this.position.y + 20, this.position.z + 40 );
+      // this.scene.add( hemiLight );
+      //
+      // const hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
+      // this.scene.add( hemiLightHelper );
+
+      // const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
+			// 	dirLight.color.setHSL( 0.1, 1, 0.95 );
+			// 	dirLight.position.set( x, y, z );
+			// 	// dirLight.position.multiplyScalar( 30 );
+      //   // dirLight.rotateX(45)
+      //   // dirLight.rotateX(45)
+      //   // dirLight.rotateY(180)
+      //   const target= new THREE.Object3D()
+      //   target.position.set(this.position.x, this.position.y, this.position.z)
+      //   this.scene.add( target )
+      //   dirLight.target = target
+      //
+			// 	this.scene.add( dirLight )
+      //
+			// 	dirLight.castShadow = true;
+      //
+			// 	dirLight.shadow.mapSize.width = 2048;
+			// 	dirLight.shadow.mapSize.height = 2048;
+      //
+			// 	const d = 50;
+      //
+			// 	dirLight.shadow.camera.left = - d;
+			// 	dirLight.shadow.camera.right = d;
+			// 	dirLight.shadow.camera.top = d;
+			// 	dirLight.shadow.camera.bottom = - d;
+      //
+			// 	dirLight.shadow.camera.far = -3500;
+			// 	dirLight.shadow.bias = - 0.0001;
+      //
+			// 	const dirLightHelper = new THREE.DirectionalLightHelper( dirLight, 10 );
+			// 	this.scene.add( dirLightHelper );
+      for(let i = 0; i < 4; i++) {
+        let width = 20;
+        let light = new THREE.PointLight( 0xffffff, 3, 2000, 2 );
+        light.position.set(
+          x + Math.sin(Math.PI*2/i)*width,
+          5,
+          z + Math.cos(Math.PI*2/i)*width
+        );
+        this.scene.add( light );
+      }
+
+
+    }
 
     addPresentationStage(projectIndex, centerX, centerZ, lookAtX, lookAtZ, scaleFactor = 1, angle) {
       // The alphabet (for project labels)

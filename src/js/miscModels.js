@@ -15,23 +15,24 @@ export class MiscModel {
         this.position = position; //vec3
         this.rotation = rotation;
         this.portalLoader = new GLTFLoader();
-        this.loadPortalModel(this.model);
+        this.loadModel(this.model)
     }
 
-    loadPortalModel(modelPath) {
+    loadModel(modelPath) {
+
         this.portalLoader.load(
             modelPath,
             (gltf) => {
-                var modelScene = gltf.scene
+                let modelScene = gltf.scene
                 modelScene.rotateY(this.rotation)
                 modelScene.position.set(this.position.x, this.position.y, this.position.z)
-                // modelScene.scale.set(.1, .1, .1)
-                modelScene.scale.set(4, 4, 4)
+                // modelScene.scale.set(2, 2, 2)
                 modelScene.traverse((child) => {
                     if (child.isMesh) {
                         // child.material = _material
                         child.castShadow = true
                         child.receiveShadow = true
+                        child.material.metalness = 0.1
                     }
                 })
                 this.scene.add(modelScene)
@@ -43,4 +44,5 @@ export class MiscModel {
             }
         )
     }
+
 }

@@ -169,7 +169,7 @@ export class Yorb {
         //https://github.com/mrdoob/three.js/blob/master/examples/webgl_lights_hemisphere.html
         // main sunlight with shadows
         let dirLight = new THREE.DirectionalLight(0xffffe6, 0.7);
-        dirLight.color.setHSL(0.1, 1, 0.95);
+        dirLight.color.setHSL(0.0, 1, 0.95);
         dirLight.position.set(-1, 0.5, -1);
         dirLight.position.multiplyScalar(200);
         this.scene.add(dirLight);
@@ -193,6 +193,7 @@ export class Yorb {
         dirLight2.position.set(1, 0.5, -1);
         dirLight2.position.multiplyScalar(200);
         this.scene.add(dirLight2);
+
     }
 
     //
