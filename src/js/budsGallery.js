@@ -23,69 +23,49 @@ export class BudsGallery {
         this.projectionScreenManager = projectionScreens
         this.position = position || new Vector3(68.64, 0.0, 21.11)
         this.rotation = 195 + 180 + 30;
-        // this.path = require('../assets/models/buds/buds-trees.glb')
+        // this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
         this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
         this.model;
 
         // we need some stuff to operate:
-        this.raycaster = new THREE.Raycaster()
-        this.textureLoader = new THREE.TextureLoader()
-        this.textParser = new DOMParser()
+        // this.raycaster = new THREE.Raycaster()
+        // this.textureLoader = new THREE.TextureLoader()
+        // this.textParser = new DOMParser()
 
         // finally, call the setup function:
         this.setup()
     }
 
     setup() {
+      // check and see if we've visited #buds ...
       if(window.location.hash == '#buds') {
-        console.log('entering buds gallery')
 
-        let spawn = new Vector3(
-          60.90 + Math.random()*-1,
-          0.25,
-          9.88 + Math.random()*-1
-        )
-        this.camera.position.set(spawn.x, spawn.y, spawn.z)
+          console.log('entering buds gallery')
 
-        let look = new Vector3(
-          this.position.x + 2,
-          4,
-          this.position.z + 6
-        )
-        this.camera.lookAt(look)
-      }
+          let spawn = new Vector3(
+            60.90 + Math.random()*-1,
+            0.25,
+            9.88 + Math.random()*-1
+          )
+          this.camera.position.set(spawn.x, spawn.y, spawn.z)
 
-      // this.camera.rotateY(75)
+          let look = new Vector3(
+            this.position.x + 2,
+            4,
+            this.position.z + 6
+          )
+          this.camera.lookAt(look)
 
-      let geometry = new THREE.BufferGeometry();
-      // create a simple square shape. We duplicate the top left and bottom right
-      // vertices because each vertex needs to appear once per triangle.
-      let vertices = new Float32Array( [
-        -1.0, -1.0,  1.0,
-         1.0, -1.0,  1.0,
-         1.0,  1.0,  1.0,
 
-         1.0,  1.0,  1.0,
-        -1.0,  1.0,  1.0,
-        -1.0, -1.0,  1.0
-      ] );
+          this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
+          // font stuffs if we need them
+          var loader = new THREE.FontLoader()
+          let fontJSON = require('../assets/fonts/helvetiker_bold.json')
+          this.font = loader.parse(fontJSON)
 
-      // itemSize = 3 because there are 3 values (components) per vertex
-      geometry.setAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) )
-      let material = new THREE.MeshBasicMaterial( { color: 0xff0000 } )
-      const entrance = new THREE.Mesh( geometry, material )
-      entrance.position.set(this.position)
-      this.scene.add(entrance)
+          this.addLights();
 
-      this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
-      // font stuffs if we need them
-      var loader = new THREE.FontLoader()
-      let fontJSON = require('../assets/fonts/helvetiker_bold.json')
-      this.font = loader.parse(fontJSON)
-
-        // then the stages and styling fo those stages
-        // this.createMovieStage()
-      this.addLights();
+        } // end of "if" around window.location.hash, a way to hide parts of YORB!
 
     }
 
