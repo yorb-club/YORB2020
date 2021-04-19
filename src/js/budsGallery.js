@@ -3,6 +3,8 @@ import { create3DText, createSimpleText } from './utils'
 import { hackToRemovePlayerTemporarily } from './index'
 import { Vector3 } from 'three'
 import { MiscModel } from './miscModels'
+const proj_thumbnails = require('../assets/images/buds/projects/poster-mock-up-6.png')
+console.log(proj_thumbnails)
 
 import debugModule from 'debug'
 const log = debugModule('YORB:Gallery')
@@ -27,10 +29,27 @@ export class BudsGallery {
         this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
         this.model;
 
+        this.hightlightedProjectId = -1
+        this.activeProjectId = -1 // will change to project ID if a project is active
+
         // we need some stuff to operate:
-        // this.raycaster = new THREE.Raycaster()
-        // this.textureLoader = new THREE.TextureLoader()
-        // this.textParser = new DOMParser()
+        this.raycaster = new THREE.Raycaster()
+        this.textureLoader = new THREE.TextureLoader()
+        this.textParser = new DOMParser()
+
+        this.highlightMaterial = new THREE.MeshLambertMaterial({ color: 0xffff1a })
+        this.linkMaterial = new THREE.MeshLambertMaterial({ color: 0xb3b3ff })
+        this.linkVisitedMaterial = new THREE.MeshLambertMaterial({
+            color: 0x6699ff,
+        })
+        this.statusBoxMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
+
+        this.projects = new Array(0)
+        this.hyperlinkedObjects = []
+        this.linkMaterials = {}
+
+        window.addEventListener('click', (e) => this.onMouseClick(e), false)
+
 
         // finally, call the setup function:
         this.setup()
@@ -43,9 +62,9 @@ export class BudsGallery {
           console.log('entering buds gallery')
 
           let spawn = new Vector3(
-            60.90 + Math.random()*-1,
+            60.90 + Math.random()*2,
             0.25,
-            9.88 + Math.random()*-1
+            9.88 + Math.random()*-2
           )
           this.camera.position.set(spawn.x, spawn.y, spawn.z)
 
@@ -54,7 +73,7 @@ export class BudsGallery {
             4,
             this.position.z + 6
           )
-          this.camera.lookAt(look)
+          this.camera.lookAt(look.x, look.y, look.z)
 
 
           this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
@@ -63,9 +82,10 @@ export class BudsGallery {
           let fontJSON = require('../assets/fonts/helvetiker_bold.json')
           this.font = loader.parse(fontJSON)
 
-          this.addLights();
+          // this.addLights()
+          this.getProjects()
 
-        } // end of "if" around window.location.hash, a way to hide parts of YORB!
+        } // end of "if" for window.location.hash, a way to hide parts of YORB!
 
     }
 
@@ -83,47 +103,11 @@ export class BudsGallery {
 
     addLights() {
 
-      let { x, y, z } = new Vector3(this.position.x + 40, this.position.y, this.position.z + 40)
-      // const hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-      // hemiLight.color.setHSL( 0.6, 1, 1 );
-      // hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-      // hemiLight.position.set( this.position.x + 20, this.position.y + 20, this.position.z + 40 );
-      // this.scene.add( hemiLight );
-      //
-      // const hemiLightHelper = new THREE.HemisphereLightHelper( hemiLight, 10 );
-      // this.scene.add( hemiLightHelper );
-
-      // const dirLight = new THREE.DirectionalLight( 0xffffff, 1 );
-			// 	dirLight.color.setHSL( 0.1, 1, 0.95 );
-			// 	dirLight.position.set( x, y, z );
-			// 	// dirLight.position.multiplyScalar( 30 );
-      //   // dirLight.rotateX(45)
-      //   // dirLight.rotateX(45)
-      //   // dirLight.rotateY(180)
-      //   const target= new THREE.Object3D()
-      //   target.position.set(this.position.x, this.position.y, this.position.z)
-      //   this.scene.add( target )
-      //   dirLight.target = target
-      //
-			// 	this.scene.add( dirLight )
-      //
-			// 	dirLight.castShadow = true;
-      //
-			// 	dirLight.shadow.mapSize.width = 2048;
-			// 	dirLight.shadow.mapSize.height = 2048;
-      //
-			// 	const d = 50;
-      //
-			// 	dirLight.shadow.camera.left = - d;
-			// 	dirLight.shadow.camera.right = d;
-			// 	dirLight.shadow.camera.top = d;
-			// 	dirLight.shadow.camera.bottom = - d;
-      //
-			// 	dirLight.shadow.camera.far = -3500;
-			// 	dirLight.shadow.bias = - 0.0001;
-      //
-			// 	const dirLightHelper = new THREE.DirectionalLightHelper( dirLight, 10 );
-			// 	this.scene.add( dirLightHelper );
+      let { x, y, z } = new Vector3 (
+        this.position.x + 40,
+        this.position.y,
+        this.position.z + 40
+      )
       for(let i = 0; i < 4; i++) {
         let width = 20;
         let light = new THREE.PointLight( 0xffffff, 3, 2000, 2 );
@@ -134,8 +118,309 @@ export class BudsGallery {
         );
         this.scene.add( light );
       }
+    }
 
+    getProjects() {
+      let url = "https://billythemusical.github.io/data.json"
+      let req = new XMLHttpRequest()
+      req.onreadystatechange = () => {
+        if (req.readyState == 4 && req.status == 200) {
+          console.log('got the buds projects!!')
+          var data = JSON.parse(req.responseText)
+          if (data) data.forEach((key, i) => {
+            console.log(key)
+            this.projects.push(key)
+          });
+        }
+      }
+      req.open("GET", url, true)
+      req.send()
+      if(this.projects.length > 1) {
+        addProjects()
+      }
+    }
 
+    addProjects() {
+      // let proj = {
+      //   project_id: 0,
+      //   project_name: "a test project",
+      //   elevator_pitch: "this project is about my Aunt's cat from Yugoslavia.  The cat is really sort of on its own, but my Aunt cares for it, ya know?",
+      //   description: "This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... ",
+      //   website: "https://google.com"
+      // }
+
+      for ( let project in this.projects ) {
+        let hyperlink = this.createHyperlinkedMesh(this.position.x, 1.75, this.position.z, project)
+        this.hyperlinkedObjects.push(hyperlink)
+        this.scene.add(hyperlink)
+      }
+    }
+
+    createHyperlinkedMesh(x, y, z, _project=null) {
+        let linkDepth = 0.1
+        let fontColor = 0x343434
+        let statusColor = 0xffffff
+        let fontSize = 0.05
+
+        var geometry = new THREE.BoxGeometry(linkDepth, 0.75, 0.75)
+        var textBoxGeometry = new THREE.BoxGeometry(linkDepth, 0.5, 0.75)
+
+        let textBoxMat
+
+        // check whether we've visited the link before and set material accordingly
+        if (localStorage.getItem(_project.project_id) == 'visited') {
+            textBoxMat = this.linkVisitedMaterial
+        } else {
+            textBoxMat = this.linkMaterial
+        }
+
+        let tex
+        tex = this.textureLoader.load(proj_thumbnails) // default texture
+        tex.wrapS = THREE.RepeatWrapping
+        tex.wrapT = THREE.RepeatWrapping
+        tex.repeat.set(1, 1)
+
+        let imageMat = new THREE.MeshLambertMaterial({
+            color: 0xffffff,
+            map: tex,
+        })
+
+        this.linkMaterials[_project.project_id.toString()] = imageMat
+
+        var textSign = new THREE.Mesh(textBoxGeometry, textBoxMat)
+        var imageSign = new THREE.Mesh(geometry, imageMat)
+
+        // parse text of name and add line breaks if necessary
+        var name = _project.project_name
+        if (name.length > 15) {
+            name = this.addLineBreak(name)
+        }
+
+        // create name text mesh
+        var textMesh = createSimpleText(name, fontColor, fontSize, this.font)
+
+        textMesh.position.x += linkDepth / 2 + 0.01 // offset forward
+        textMesh.rotateY(Math.PI / 2)
+
+        imageSign.position.set(x, y, z)
+        textSign.position.set(0, -0.75 / 2 - 0.5 / 2, 0)
+        textSign.add(textMesh)
+        imageSign.add(textSign)
+
+        // https://stackoverflow.com/questions/24690731/three-js-3d-models-as-hyperlink/24692057
+        let now = Date.now()
+        imageSign.userData = {
+            project: _project,
+            lastVisitedTime: now,
+        }
+
+        imageSign.name = _project.project_id
+
+        return imageSign
+    }
+
+    generateProjectModal(project) {
+        // parse project descriptions to render without &amp; etc.
+        // https://stackoverflow.com/questions/3700326/decode-amp-back-to-in-javascript
+
+        if (!document.getElementsByClassName('project-modal')[0]) {
+            this.controls.pause()
+            localStorage.setItem(project.project_id, 'visited')
+
+            let id = project.project_id
+            let name = project.project_name
+            let pitch = project.elevator_pitch
+            let description = project.description
+            let link = project.website
+            let room_status = this.zoomStatusDecoder(project.zoom_status)
+
+            let modalEl = document.createElement('div')
+            modalEl.className = 'project-modal'
+            modalEl.id = id + '_modal'
+
+            let contentEl = document.createElement('div')
+            contentEl.className = 'project-modal-content'
+
+            let closeButton = document.createElement('button')
+            closeButton.addEventListener('click', () => {
+                modalEl.remove()
+                // https://stackoverflow.com/questions/19426559/three-js-access-scene-objects-by-name-or-id
+                let now = Date.now()
+                let link = this.scene.getObjectByName(id)
+                link.userData.lastVisitedTime = now
+                this.controls.resume()
+                setTimeout(() => {
+                    this.activeProjectId = -1
+                }, 100) // this helps reset without reopening the modal
+            })
+            closeButton.innerHTML = 'X'
+
+            let projectImageEl = document.createElement('img')
+            let filename = 'https://itp.nyu.edu' + project.image
+            // let filename = "images/proj_thumbnails/" + project.project_id + ".png";
+            projectImageEl.src = filename
+            projectImageEl.className = 'project-modal-img'
+
+            let titleEl = document.createElement('h1')
+            titleEl.innerHTML = name
+            titleEl.className = 'project-modal-title'
+
+            // names
+            let names = ''
+            for (let i = 0; i < project.users.length; i++) {
+                names += project.users[i].user_name
+                if (i < project.users.length - 1) {
+                    names += ' & '
+                }
+            }
+            let namesEl = document.createElement('p')
+            namesEl.innerHTML = names
+            namesEl.className = 'project-modal-names'
+
+            let elevatorPitchHeaderEl = document.createElement('p')
+            elevatorPitchHeaderEl.innerHTML = 'Elevator Pitch'
+            let elevatorPitchEl = document.createElement('p')
+            elevatorPitchEl.innerHTML = pitch
+            elevatorPitchEl.className = 'project-modal-text'
+
+            let descriptionHeaderEl = document.createElement('p')
+            descriptionHeaderEl.innerHTML = 'Description'
+            let descriptionEl = document.createElement('p')
+            descriptionEl.innerHTML = description
+            descriptionEl.className = 'project-modal-text'
+
+            let talkToCreatorDiv = document.createElement('div')
+            talkToCreatorDiv.className = 'project-modal-links-header'
+            talkToCreatorDiv.innerHTML = 'Talk To The Project Creator:'
+
+            let linksDiv = document.createElement('div')
+            linksDiv.className = 'project-modal-link-container'
+
+            let projectLinkEl = document.createElement('a')
+            // projectLinkEl.href = link;
+            projectLinkEl.href = project.url
+            projectLinkEl.innerHTML = 'Project Website'
+            projectLinkEl.target = '_blank'
+            projectLinkEl.rel = 'noopener noreferrer'
+
+            let zoomLinkEl = document.createElement('a')
+            // zoomLinkEl.href = link
+            zoomLinkEl.href = link
+            // zoomLinkEl.innerHTML = 'Zoom Room - ' + room_status
+            zoomLinkEl.innerHTML = 'Join Live Presentation!'
+            zoomLinkEl.target = '_self'
+            zoomLinkEl.rel = 'noopener noreferrer'
+
+            linksDiv.appendChild(projectLinkEl)
+            linksDiv.innerHTML += '&nbsp;&nbsp;&nbsp;*&nbsp;&nbsp;&nbsp;'
+            if (project.zoom_status == 1) {
+                linksDiv.appendChild(zoomLinkEl)
+            }
+
+            contentEl.appendChild(closeButton)
+            contentEl.appendChild(projectImageEl)
+            contentEl.appendChild(titleEl)
+            contentEl.appendChild(namesEl)
+            contentEl.appendChild(elevatorPitchHeaderEl)
+            contentEl.appendChild(elevatorPitchEl)
+            contentEl.appendChild(descriptionHeaderEl)
+            contentEl.appendChild(descriptionEl)
+            contentEl.appendChild(talkToCreatorDiv)
+            contentEl.appendChild(linksDiv)
+
+            modalEl.appendChild(contentEl)
+            document.body.appendChild(modalEl)
+        }
+    }
+
+    /*
+     * highlightHyperlinks()
+     *
+     * Description:
+     * 	- checks distance between player and object3Ds in this.hyperlinkedObjects array,
+     * 	- calls this.generateProjectModal for any projects under a threshold distance
+     *
+     */
+    highlightHyperlinks() {
+        let thresholdDist = 5
+        let now = Date.now()
+
+        // store reference to last highlighted project id
+        let lastHighlightedProjectId = this.hightlightedProjectId
+
+        // cast ray out from camera
+        this.raycaster.setFromCamera(this.mouse, this.camera)
+
+        var intersects = this.raycaster.intersectObjects(this.hyperlinkedObjects)
+
+        // if we have intersections, highlight them
+        if (intersects.length > 0) {
+            if (intersects[0].distance < thresholdDist) {
+                let link = intersects[0].object
+                this.hightlightedProjectId = link.userData.project.project_id
+                // do styling
+                this.highlightLink(link)
+            }
+        }
+
+        // if we've changed which project is highlighted
+        if (lastHighlightedProjectId != this.hightlightedProjectId) {
+            let link = this.scene.getObjectByName(lastHighlightedProjectId)
+            if (link != null) {
+                // reset styling
+                this.resetLinkMaterial(link)
+            }
+        } else {
+            // no change, so lets check for
+            let link = this.scene.getObjectByName(this.hightlightedProjectId)
+            if (link != null) {
+                if (now - link.userData.lastVisitedTime > 500) {
+                    // reset styling
+                    this.hightlightedProjectId = -1
+                    this.resetLinkMaterial(link)
+                }
+            }
+        }
+    }
+
+    highlightLink(link) {
+        let now = Date.now()
+        link.userData.lastVisitedTime = now
+        link.userData.highlighted = true
+
+        link.children[0].material = this.highlightMaterial
+        link.scale.set(1.1, 1.1, 1.1)
+    }
+
+    resetLinkMaterial(link) {
+        link.scale.set(1, 1, 1)
+        // reset according to whether we have visited it or not yet
+        let mat
+        // check whether we've visited the link before and set material accordingly
+        if (localStorage.getItem(link.userData.project.project_id) == 'visited') {
+            mat = this.linkVisitedMaterial
+        } else {
+            mat = this.linkMaterial
+        }
+        // log(link);
+        link.children[0].material = mat
+    }
+
+    activateHighlightedProject() {
+        if (this.hightlightedProjectId != -1 && this.activeProjectId === -1) {
+            let link = this.scene.getObjectByName(this.hightlightedProjectId)
+            if (link != null) {
+                this.generateProjectModal(link.userData.project)
+                hackToRemovePlayerTemporarily()
+
+                // reset markers
+                this.activeProjectId = link.userData.project.project_id
+            }
+        }
+    }
+
+    onMouseClick(e) {
+        this.activateHighlightedProject()
     }
 
     addPresentationStage(projectIndex, centerX, centerZ, lookAtX, lookAtZ, scaleFactor = 1, angle) {
