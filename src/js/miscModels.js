@@ -32,7 +32,8 @@ export class MiscModel {
                         // child.material = _material
                         child.castShadow = true
                         child.receiveShadow = true
-                        child.material.metalness = 0.1
+                        child.material.metalness = 0.05
+                        child.material.roughness = 1.0
                     }
                 })
                 this.scene.add(modelScene)

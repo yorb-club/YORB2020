@@ -117,6 +117,7 @@ export class Yorb {
         // Helpers
         this.helperGrid = new THREE.GridHelper(500, 500);
         this.helperGrid.position.y = -0.1; // offset the grid down to avoid z fighting with floor
+        this.helperGrid.name = "Grid";
         this.scene.add(this.helperGrid);
 
         this.update();

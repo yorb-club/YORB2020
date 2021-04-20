@@ -3,6 +3,7 @@ import { create3DText, createSimpleText } from './utils'
 import { hackToRemovePlayerTemporarily } from './index'
 import { Vector3 } from 'three'
 import { MiscModel } from './miscModels'
+import { Flowers } from './flowers'
 const proj_thumbnails = require('../assets/images/buds/projects/poster-mock-up-6.png')
 console.log(proj_thumbnails)
 
@@ -24,9 +25,9 @@ export class BudsGallery {
         this.controls = controls
         this.projectionScreenManager = projectionScreens
         this.position = position || new Vector3(68.64, 0.0, 21.11)
-        this.rotation = 195 + 180 + 30;
+        this.rotation = 135.09;
         // this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
-        this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
+        this.path = require('../assets/models/buds/wood-floor.glb')
         this.model;
 
         this.hightlightedProjectId = -1
@@ -76,17 +77,35 @@ export class BudsGallery {
           this.camera.lookAt(look.x, look.y, look.z)
 
 
-          this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
+
           // font stuffs if we need them
           var loader = new THREE.FontLoader()
           let fontJSON = require('../assets/fonts/helvetiker_bold.json')
           this.font = loader.parse(fontJSON)
 
-          // this.addLights()
+          this.addLights()
+          this.setupGallery()
           this.getProjects()
 
         } // end of "if" for window.location.hash, a way to hide parts of YORB!
 
+    }
+
+    setupGallery() {
+      this.scene.remove(this.scene.getObjectByName("Grid"));
+      this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
+      this.addFlowers()
+    }
+
+    addFlowers() {
+      const NUM_DAISIES = 10
+      const NUM_VIOLETS = 12
+      let position = new THREE.Vector3( -4, 0, 4 )
+      // position.add(this.position.x, this.position.y, this.position.z) // put flowers in the middle of the scene for now
+      position.add(this.position)
+      let flowers1 = new Flowers(this.scene, position, NUM_DAISIES, NUM_VIOLETS);
+      // position.add(10, 2, 20)
+      // let flowers2 = new Flowers(this.scene, position, NUM_DAISIES, NUM_VIOLETS);
     }
 
     // createMovieStage() {
@@ -104,16 +123,16 @@ export class BudsGallery {
     addLights() {
 
       let { x, y, z } = new Vector3 (
-        this.position.x + 40,
+        this.position.x + 20,
         this.position.y,
-        this.position.z + 40
+        this.position.z + 20
       )
       for(let i = 0; i < 4; i++) {
         let width = 20;
-        let light = new THREE.PointLight( 0xffffff, 3, 2000, 2 );
+        let light = new THREE.PointLight( 0xffffff, 3, 200, 2 );
         light.position.set(
           x + Math.sin(Math.PI*2/i)*width,
-          5,
+          25,
           z + Math.cos(Math.PI*2/i)*width
         );
         this.scene.add( light );
