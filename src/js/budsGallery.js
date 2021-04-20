@@ -92,7 +92,6 @@ export class BudsGallery {
     }
 
     setupGallery() {
-      this.scene.remove(this.scene.getObjectByName("Grid"));
       this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
       this.addFlowers()
     }
@@ -147,7 +146,7 @@ export class BudsGallery {
           console.log('got the buds projects!!')
           var data = JSON.parse(req.responseText)
           if (data) data.forEach((key, i) => {
-            console.log(key)
+            // console.log(key)
             this.projects.push(key)
           });
         }
