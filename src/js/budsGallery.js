@@ -87,22 +87,98 @@ export class BudsGallery {
           this.setupGallery()
           this.getProjects()
 
+
+          //adding Gallery
+         //  //cube
+         // const squaregalleryGeometry = new THREE.BoxGeometry(20, 20, 20, 8, 8, 8)
+         // const squaregalleryMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
+         // const gallery = new THREE.Mesh(squaregalleryGeometry, squaregalleryMaterial)
+         // gallery.position.set(68.64, 10, 21.11)
+         // this.scene.add(gallery)
+
+
+         //plane 1
+         // const wallGeometry = new THREE.PlaneGeometry( 20, 20, 10 );
+         // const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true } );
+         // const wallPlane = new THREE.Mesh( wallGeometry, wallMaterial );
+         // wallPlane.position.set(58, 10, 21.11)
+         // wallPlane.rotation.y = (Math.PI/2)
+         // this.scene.add( wallPlane );
+
+         //plane 2
+         // const wallGeometryTWO = new THREE.PlaneGeometry( 20, 20, 10 );
+         // const wallMaterialTWO = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true });
+         // const wallPlaneTWO = new THREE.Mesh( wallGeometryTWO, wallMaterialTWO );
+         // wallPlaneTWO.position.set(78, 10, 21.11)
+         // wallPlaneTWO.rotation.y = (Math.PI/2)
+         // this.scene.add( wallPlaneTWO );
+
+         //plane 3
+         // const wallGeometryTHREE = new THREE.PlaneGeometry( 20, 20, 10 );
+         // const wallMaterialTHREE = new THREE.MeshBasicMaterial( { color: 0xffffff, wireframe: true } );
+         // const wallPlaneTHREE = new THREE.Mesh( wallGeometryTHREE, wallMaterialTHREE );
+         // wallPlaneTHREE.position.set(68, 10, 30)
+         // this.scene.add( wallPlaneTHREE );
+
+
+         /// walls ///
+         //wireframe
+         this.addWall(30, 15, 78, 7.5, 20, (Math.PI/2), false, true);
+         this.addWall(30, 15, 58, 7.5, 20, (Math.PI/2), false, true);
+         this.addWall(20, 15, 68, 7.5, 35, 0, false, true);
+
+        //transparent
+         this.addWall(30, 15, 78, 7.5, 20, (Math.PI/2), true, false);
+         this.addWall(30, 15, 58, 7.5, 20, (Math.PI/2), true, false);
+         this.addWall(20, 15, 68, 7.5, 35, 0, true, false);
+
+
+         //wall strip for mounting artwork
+         this.addWall(25, 4, 77, 3, 20, (Math.PI/2), false, false);
+         this.addWall(25, 4, 59, 3, 20, (Math.PI/2), false, false);
+         this.addWall(15, 4, 68, 3, 34, 0, false, false);
+
+         //floor
+         const floorGeometry = new THREE.PlaneGeometry( 30, 20, 10 );
+         const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xa87d52, side: THREE.DoubleSide } );
+         const floorPlane = new THREE.Mesh( floorGeometry, floorMaterial );
+         floorPlane.position.set(68, .1, 20)
+         floorPlane.rotation.z = (Math.PI/2)
+         floorPlane.rotation.x = (-Math.PI/2)
+         //floorPlane.rotation.z = (Math.PI/2)
+         this.scene.add( floorPlane );
         } // end of "if" for window.location.hash, a way to hide parts of YORB!
 
     }
 
     setupGallery() {
       this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
-      this.addFlowers()
+      this.addFlowers(10, 6.5, 0)
+      this.addFlowers(-12, 6.5, 0)
     }
 
-    addFlowers() {
-      const NUM_DAISIES = 10
-      const NUM_VIOLETS = 12
-      let position = new THREE.Vector3( -4, 0, 4 )
+
+    addWall(wallLength, wallWidth, posX, posY, posZ, rotation, transparent, wireframe){
+
+      const wallGeometry = new THREE.PlaneGeometry( wallLength, wallWidth, 8, 15 );
+      const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: .5, transparent: transparent, wireframe: wireframe, side: THREE.DoubleSide } );
+      const wallPlane = new THREE.Mesh( wallGeometry, wallMaterial );
+      wallPlane.position.set(posX, posY, posZ)
+      wallPlane.rotation.y = (rotation)
+      this.scene.add( wallPlane );
+
+
+    }
+
+    addFlowers(posX, posY, posZ) {
+      const NUM_DAISIES = 40
+      const NUM_VIOLETS = 40
+      let position1 = new THREE.Vector3( posX, posY, posZ )
+      let position2 = new THREE.Vector3( 68, 6.5, 36 )
       // position.add(this.position.x, this.position.y, this.position.z) // put flowers in the middle of the scene for now
-      position.add(this.position)
-      let flowers1 = new Flowers(this.scene, position, NUM_DAISIES, NUM_VIOLETS);
+      position1.add(this.position)
+      let flowers1 = new Flowers(this.scene, position1, NUM_DAISIES, NUM_VIOLETS, true);
+      let flowers2 = new Flowers(this.scene, position2, NUM_DAISIES, NUM_VIOLETS, false);
       // position.add(10, 2, 20)
       // let flowers2 = new Flowers(this.scene, position, NUM_DAISIES, NUM_VIOLETS);
     }

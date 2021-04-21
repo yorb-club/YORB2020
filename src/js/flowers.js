@@ -2,11 +2,12 @@
 import * as THREE from 'three'
 
 export class Flowers {
-  constructor(scene, position=new THREE.Vector3(0, 0, 0), numDaisies=1, numViolets=1) {
+  constructor(scene, position=new THREE.Vector3(0, 0, 0), numDaisies=1, numViolets=1, drawZ=true) {
     this.scene = scene
     this.position = position
     this.numDaisies = numDaisies
     this.numViolets = numViolets
+    this.drawZ = drawZ
     this.root = new THREE.Object3D()
     this.group;
     this.l0, this.l1, this.theta,  this.bn = 9, this.nfi;
@@ -28,10 +29,18 @@ export class Flowers {
       this.daisy( 1, 1, .5, 1 ); // age, l0, this.l1, this.theta
       this.daisy( .1, .8, .5, -.5 );
       this.leaves( 1, 0 ); // age, y0
-      group1.translateX( 1 + Math.random()*i );
-      group1.translateZ( 1 + Math.random()* i);
-      group1.translateY( Math.sin(Math.random()*360)*3 )
-      group1.rotateY( 90 );
+      //group1.translateX( 1 + Math.random()*i );
+      //group1.translateZ( 1 + Math.random()* i);
+      group1.translateY( Math.sin(Math.random()*360)*6 )
+
+      if (this.drawZ == true){
+          group1.translateZ( Math.sin(Math.random()*360)*15 )
+      }
+      else{
+         group1.translateX( Math.sin(Math.random()*360)*10 )
+      }
+
+      group1.rotateY( Math.PI/Math.random(-2, 2) );
       console.log('adding a flower')
 
     }
@@ -43,10 +52,18 @@ export class Flowers {
       this.violet( 1, 1, .5, 1 ); // age, l0, this.l1, this.theta
       this.violet( .1, .8, .5, -.5 );
       this.leaves( 1, 0);  // age, y0
-      group2.translateX( -1 + Math.random()*i );
-      group2.translateZ( -1 + Math.random()*i );
-      group2.translateY( Math.sin(Math.random()*360)*4 )
-      group2.rotateY( 90 );
+      //group2.translateX( -1 + Math.random()*i );
+      //group2.translateZ( -1 + Math.random()*i );
+      group2.translateY( Math.sin(Math.random()*360)*6 )
+
+      if (this.drawZ == true){
+        group2.translateZ( Math.sin(Math.random()*360)*15 )
+      }
+      else{
+        group2.translateX( Math.sin(Math.random()*360)*10 )
+      }
+      group2.rotateY( Math.PI/Math.random(-2, 2));
+
     }
 
   }
