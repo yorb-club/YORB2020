@@ -41,7 +41,7 @@ export class Flowers {
       }
 
       group1.rotateY( Math.PI/Math.random(-2, 2) );
-      console.log('adding a flower')
+      // console.log('adding a flower')
 
     }
 
