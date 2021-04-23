@@ -2,12 +2,13 @@
 import * as THREE from 'three'
 
 export class Flowers {
-  constructor(scene, position=new THREE.Vector3(0, 0, 0), numDaisies=1, numViolets=1, drawZ=true) {
+  constructor(scene, position=new THREE.Vector3(0, 0, 0), numDaisies=1, numViolets=1, drawZ=true, leftSide=true) {
     this.scene = scene
     this.position = position
     this.numDaisies = numDaisies
     this.numViolets = numViolets
     this.drawZ = drawZ
+    this.leftSide = leftSide
     this.root = new THREE.Object3D()
     this.group;
     this.l0, this.l1, this.theta,  this.bn = 9, this.nfi;
@@ -20,7 +21,23 @@ export class Flowers {
   setup() {
 
     this.root.position.set( this.position.x, this.position.y, this.position.z )
+
+    if (this.leftSide == 1){
+      this.root.rotation.y = (-Math.PI/5.5)
+    }
+    else if (this.leftSide == 2) {
+      //console.log("here")
+      this.root.rotation.y = (Math.PI/5.5)
+    }
+    else if (this.drawZ == 3){
+      this.root.rotation.y = 0
+    }
+
+
     this.scene.add(this.root)
+
+
+
 
     for(var i = 0; i < this.numDaisies; i++) {
       let group1 = new THREE.Object3D();
@@ -35,9 +52,11 @@ export class Flowers {
 
       if (this.drawZ == true){
           group1.translateZ( Math.sin(Math.random()*360)*15 )
+
       }
       else{
          group1.translateX( Math.sin(Math.random()*360)*10 )
+
       }
 
       group1.rotateY( Math.PI/Math.random(-2, 2) );
@@ -61,11 +80,10 @@ export class Flowers {
       }
       else{
         group2.translateX( Math.sin(Math.random()*360)*10 )
-      }
+        }
       group2.rotateY( Math.PI/Math.random(-2, 2));
 
     }
-
   }
 
   // ===================================================  lib
