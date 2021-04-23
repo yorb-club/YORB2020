@@ -148,45 +148,131 @@ export class BudsGallery {
 
     addVideoDisplays() {
 
-      for(var i = 0; i < this.projects.length; i++) {
+      // this.projects.forEach((proj, i) => {
+      for( let i = 0; i < this.projects.length; i++) {
 
-        let video = document.createElement('video')
-        let id = this.projects[i].video.mux_stream_id
-        let src = "https://stream.mux.com/"+id+".m3u8"
-        // Let native HLS support handle it if possible
-        if (video.canPlayType('application/vnd.apple.mpegurl')) {
-          video.src = src;
-        } else if (Hls.isSupported()) {
-          // HLS.js-specific setup code
-          this.hls = new Hls();
-          this.hls.loadSource(src);
-          this.hls.attachMedia(video);
+        const videos = this.projects[i].videos
+
+        if (videos.length > 0) {
+          videos.forEach((_video, j)=>{
+            let _playbackId = _video.mux_playback_id
+
+            let _volume = _video.volume_factor
+            let _element;
+            let _src = "https://stream.mux.com/"+_playbackId+".m3u8"
+            let _size = 3
+            let _frameColor = 0x6bdcff
+            // log("this project's info: ", playback_id, volume)
+
+            // create an element to be converted to a texture
+            _element = document.createElement('video')
+            _element.id = _playbackId
+            _element.volume = _volume
+            _element.loop = true
+            _element.style.display = 'none'
+            _element.autoplay = true
+            // Let native HLS support handle it if possible
+            if (_element.canPlayType('application/vnd.apple.mpegurl')) {
+              _element.src = _src;
+            } else if (Hls.isSupported()) {
+              // HLS.js-specific setup code
+              this.hls = new Hls();
+              this.hls.loadSource(_src);
+              this.hls.attachMedia(_element);
+            }
+            document.body.append(_element)
+
+            this.videoDisplays.push(new VideoDisplay(
+              this.scene,
+              this.camera,
+              new THREE.Vector3( 0, 0, 0 ), // position
+              new THREE.Vector3(0 , 0, 0), // rotation
+              _element, // the element
+              _size, // size in meters
+              _frameColor, // color
+            ))
+          })
         }
+
+
+        // const playback_id = proj.videos.mux_playback_id
+        // const volume = proj.videos.volume_factor
+        // let element = null // to pass to the texture
+        //
+        // if (playback_id != "") {
+        //
+        //   const src = "https://stream.mux.com/"+playback_id+".m3u8"
+        //   // log("this project's info: ", playback_id, volume)
+        //
+        //   // create an element to be converted to a texture
+        //   element = document.createElement('video')
+        //   element.id = playback_id
+        //   element.volume = volume
+        //   element.loop = true
+        //   element.style.display = 'none'
+        //   element.autoplay = true
+        //   // Let native HLS support handle it if possible
+        //   if (element.canPlayType('application/vnd.apple.mpegurl')) {
+        //     element.src = src;
+        //   } else if (Hls.isSupported()) {
+        //     // HLS.js-specific setup code
+        //     this.hls = new Hls();
+        //     this.hls.loadSource(src);
+        //     this.hls.attachMedia(element);
+        //   }
+        //   document.body.append(element)
+
+        //   // spacing the projects
+        //   let x, y = 2, z, rot
+        //   let spacing = ( i % 4 ) * 6
+        //   let size = 3
+        //   let frameColor = 0x6bdcff, frameOffset = 0.1
+        //
+        //   if (i < 4) { // first 4 projects
+        //     x = 77, z = 10 + spacing, rot = Math.PI/2
+        //   } else if (i >= 4 && i < 7) { // next 3 projects
+        //     x = 72 - spacing * 0.8, z = 34, rot = Math.PI
+        //   } else if (i >= 7 && i < 11) { // last 4 projects
+        //     spacing = ( i + 1 ) % 4 * 6, x = 59, z = 27 - spacing, rot = Math.PI*2.5, frameOffset = -0.1
+        //   }
+        //
+        //   this.videoDisplays.push(new VideoDisplay(
+        //     this.scene,
+        //     this.camera,
+        //     new THREE.Vector3( x, y, z ), // position
+        //     new THREE.Vector3(0 , rot, 0), // rotation
+        //     element, // the element
+        //     size, // size in meters
+        //     frameColor, // color
+        //     frameOffset, // how far offset the frame behind will be
+        //     volume // for adjusting the relative volume between videos
+        //   ))
+        // }
+      // });
+      }
+      this.placeProjects()
+    }
+
+    placeProjects() {
+
+      for( let i = 0; i < this.videoDisplays.length; i++) {
 
         // spacing the projects
         let x, y = 2, z, rot
         let spacing = ( i % 4 ) * 6
-        let size = 3
-        let frameColor = 0x6bdcff, frameOffset = 0.1
+        let frameColor = 0x6bdcff
 
-        if (i < 4) {
+        if (i < 4) { // first 4 projects
           x = 77, z = 10 + spacing, rot = Math.PI/2
-        } else if (i >= 4 && i < 8) {
-          x = 75 - spacing * 0.7, z = 34, rot = Math.PI
-        } else if (i >= 8 && i < 12) {
-          x = 60, z = 27 - spacing, rot = Math.PI*2.5, frameOffset = -0.1
+        } else if (i >= 4 && i < 7) { // next 3 projects
+          x = 72 - spacing * 0.8, z = 34, rot = -Math.PI
+        } else if (i >= 7 && i < 12) { // last 4 projects
+          spacing = ( i + 1 ) % 4 * 6, x = 59, z = 27 - spacing, rot = -Math.PI*2.5//, frameOffset = -0.1
         }
 
-        this.videoDisplays.push(new VideoDisplay(
-          this.scene,
-          this.camera,
-          new THREE.Vector3( x, y, z ), // position
-          new THREE.Vector3(0 , rot, 0), // rotation
-          video, // the video element
-          size, // size
-          frameColor, // color
-          frameOffset
-        ))
+        const display = this.videoDisplays[i]
+        display.updatePosition( x, y, z, rot, frameOffset )
+        // display.updateVolume(volume)
       }
     }
 
@@ -262,7 +348,7 @@ export class BudsGallery {
           if (data) data.forEach((key, i) => {
             this.projects.push(key)
           });
-          if(this.projects.length == 12) {
+          if(this.projects.length == 11) {
             this.addVideoDisplays()
           }
         }

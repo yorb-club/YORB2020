@@ -134,7 +134,7 @@ export class Yorb {
         //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
 
-	this.show = false;
+	      this.show = false;
         this.yorblet = false;
 
         if (MODE === 'YORBLET') {
