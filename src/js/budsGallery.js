@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 import { create3DText, createSimpleText } from './utils'
 import { hackToRemovePlayerTemporarily } from './index'
-import { Vector3 } from 'three'
 import { MiscModel } from './miscModels'
 import { Flowers } from './flowers'
+import { VideoDisplay } from './videoDisplay'
+import { ImageDisplay } from './imageDisplay'
+
 const proj_thumbnails = require('../assets/images/buds/projects/poster-mock-up-6.png')
-console.log(proj_thumbnails)
 
 import debugModule from 'debug'
 const log = debugModule('YORB:Gallery')
@@ -23,8 +24,7 @@ export class BudsGallery {
         this.mouse = mouse
         this.camera = camera
         this.controls = controls
-        this.projectionScreenManager = projectionScreens
-        this.position = position || new Vector3(68.64, 0.0, 21.11)
+        this.position = position || new THREE.Vector3(68.64, 0.0, 21.11)
         this.rotation = 135.09;
         // this.path = require('../assets/models/buds/buds-gallery-trees-plants_cast_shadow_test.glb')
         this.path = require('../assets/models/buds/wood-floor.glb')
@@ -45,7 +45,12 @@ export class BudsGallery {
         })
         this.statusBoxMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
 
-        this.projects = new Array(0)
+        // for displaying video and screen shares
+        this.projectionScreenManager = projectionScreens
+        this.videoDisplays = []
+        // this.hls = document.createElement('script') // doesn't work
+
+        this.projects = []
         this.hyperlinkedObjects = []
         this.linkMaterials = {}
 
@@ -57,35 +62,26 @@ export class BudsGallery {
     }
 
     setup() {
+
       // check and see if we've visited #buds ...
       if(window.location.hash == '#buds') {
 
-          console.log('entering buds gallery')
+          log('entering buds gallery')
 
-          let spawn = new Vector3(
-            60.90 + Math.random()*2,
-            0.25,
-            9.88 + Math.random()*-2
-          )
+          let spawn = new THREE.Vector3( 60.90 + Math.random()*2, 0.25, 9.88 + Math.random()*-2 )
           this.camera.position.set(spawn.x, spawn.y, spawn.z)
 
-          let look = new Vector3(
-            this.position.x + 2,
-            4,
-            this.position.z + 6
-          )
+          let { x, y, z } = this.position
+          let look = new THREE.Vector3( x + 2, 4, z + 6 )
           this.camera.lookAt(look.x, look.y, look.z)
-
-
 
           // font stuffs if we need them
           var loader = new THREE.FontLoader()
           let fontJSON = require('../assets/fonts/helvetiker_bold.json')
           this.font = loader.parse(fontJSON)
 
-          this.addLights()
           this.setupGallery()
-          this.getProjects()
+          this.getProjectInfo()
 
           //add welcome poster
           const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_v5.png'));
@@ -117,6 +113,7 @@ export class BudsGallery {
          this.addWall(20, 15, 78, 7.5, 35, 0xffffff, 0, true, false);
 
 
+
          // //wall strip for mounting artwork
          // this.addWall(25, 4, 77, 3, 20, 0xffffff, (Math.PI/2), false, false);
          // this.addWall(25, 4, 59, 3, 20, 0xffffff, (Math.PI/2), false, false);
@@ -145,10 +142,130 @@ export class BudsGallery {
 
     }
 
+    getProjectInfo() {
+      let url = "https://billythemusical.github.io/data.json"
+      let req = new XMLHttpRequest()
+      req.onreadystatechange = () => {
+        if (req.readyState == 4 && req.status == 200) {
+          var data = JSON.parse(req.responseText)
+          if (data) data.forEach((key, i) => {
+            this.projects.push(key)
+          });
+          if(this.projects.length == 11) {
+            this.addVideoDisplays()
+          }
+        }
+      }
+      req.open("GET", url, true)
+      req.send()
+    }
+
+    addVideoDisplays() {
+
+      // this.projects.forEach((proj, i) => {
+      for( let i = 0; i < this.projects.length; i++) {
+
+        const proj = this.projects[i]
+        const videos = proj.videos
+        const images = proj.images
+
+        if (videos.length > 0) {
+          videos.forEach((_video, j)=>{
+            let _playbackId = _video.mux_playback_id
+
+            let _volume = _video.volume_factor
+            let _element;
+            let _src = "https://stream.mux.com/"+_playbackId+".m3u8"
+            let _size = 3
+            let _frameColor = 0x6bdcff
+            // log("this project's info: ", playback_id, volume)
+
+            // create an element to be converted to a texture
+            _element = document.createElement('video')
+            _element.id = _playbackId
+            _element.volume = _volume
+            _element.loop = true
+            _element.style.display = 'none'
+            _element.autoplay = true
+            // Let native HLS support handle it if possible
+            if (_element.canPlayType('application/vnd.apple.mpegurl')) {
+              _element.src = _src;
+            } else if (Hls.isSupported()) {
+              // HLS.js-specific setup code
+              this.hls = new Hls();
+              this.hls.loadSource(_src);
+              this.hls.attachMedia(_element);
+            }
+            document.body.append(_element)
+
+            this.videoDisplays.push(new VideoDisplay(
+              this.scene,
+              this.camera,
+              new THREE.Vector3( 0, 0, 0 ), // position
+              new THREE.Vector3(0 , 0, 0), // rotation
+              _element, // the element
+              _size, // size in meters
+              _frameColor, // color
+            ))
+          })
+
+        } else if (images.length > 0 && videos.length < 1) {
+
+          let _element;
+          let _src = images[0]
+          let _size = 3
+          let _frameColor = 0x6bdcff
+          // log("this project's info: ", playback_id, volume)
+
+          // create an element to be converted to a texture
+          _element = document.createElement('image')
+          _element.id = proj.artist_name
+          _element.style.display = 'none'
+          document.body.append(_element)
+
+          this.videoDisplays.push(new ImageDisplay(
+            this.scene,
+            this.camera,
+            new THREE.Vector3( 0, 0, 0 ), // position
+            new THREE.Vector3(0 , 0, 0), // rotation
+            _element, // the element
+            _size, // size in meters
+            _frameColor, // color
+          ))
+        }
+      }
+
+      this.placeProjects()
+    }
+
+    placeProjects() {
+
+      for( let i = 0; i < this.videoDisplays.length; i++) {
+
+        // spacing the projects
+        let x, y = 2, z, rot
+        let spacing = ( i % 4 ) * 6
+        let frameColor = 0x6bdcff
+
+        if (i < 4) { // first 4 projects
+          x = 77, z = 10 + spacing, rot = Math.PI/2
+        } else if (i >= 4 && i < 7) { // next 3 projects
+          x = 72 - spacing * 0.8, z = 34, rot = -Math.PI
+        } else if (i >= 7 && i < 12) { // last 4 projects
+          spacing = ( i + 1 ) % 4 * 6, x = 59, z = 27 - spacing, rot = -Math.PI*2.5//, frameOffset = -0.1
+        }
+
+        const display = this.videoDisplays[i]
+        display.updatePosition( x, y, z, rot ) // frameOffset )
+        // display.updateVolume(volume)
+      }
+    }
+
     setupGallery() {
-      this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
+      // this.model = new MiscModel(this.scene, this.path, this.position, this.rotation)
       this.addFlowers(30, 6.5, 0, 1)
       this.addFlowers(-11.5, 6.5, 0, 2)
+
     }
 
 
@@ -193,7 +310,7 @@ export class BudsGallery {
 
     addLights() {
 
-      let { x, y, z } = new Vector3 (
+      let { x, y, z } = new THREE.Vector3 (
         this.position.x + 20,
         this.position.y,
         this.position.z + 20
@@ -210,37 +327,17 @@ export class BudsGallery {
       }
     }
 
-    getProjects() {
-      let url = "https://billythemusical.github.io/data.json"
-      let req = new XMLHttpRequest()
-      req.onreadystatechange = () => {
-        if (req.readyState == 4 && req.status == 200) {
-          console.log('got the buds projects!!')
-          var data = JSON.parse(req.responseText)
-          if (data) data.forEach((key, i) => {
-            // console.log(key)
-            this.projects.push(key)
-          });
-        }
-      }
-      req.open("GET", url, true)
-      req.send()
-      if(this.projects.length > 1) {
-        addProjects()
-      }
-    }
-
     addProjects() {
-      // let proj = {
-      //   project_id: 0,
-      //   project_name: "a test project",
-      //   elevator_pitch: "this project is about my Aunt's cat from Yugoslavia.  The cat is really sort of on its own, but my Aunt cares for it, ya know?",
-      //   description: "This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... ",
-      //   website: "https://google.com"
-      // }
+      let proj = {
+        project_id: 0,
+        project_name: "a test project",
+        elevator_pitch: "this project is about my Aunt's cat from Yugoslavia.  The cat is really sort of on its own, but my Aunt cares for it, ya know?",
+        description: "This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... This part is even longer... ",
+        website: "https://google.com"
+      }
 
       for ( let project in this.projects ) {
-        let hyperlink = this.createHyperlinkedMesh(this.position.x, 1.75, this.position.z, project)
+        let hyperlink = this.createHyperlinkedMesh(this.position.x, 1.75, this.position.z, proj)
         this.hyperlinkedObjects.push(hyperlink)
         this.scene.add(hyperlink)
       }
