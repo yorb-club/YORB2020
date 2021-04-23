@@ -87,6 +87,48 @@ export class BudsGallery {
           this.setupGallery()
           this.getProjects()
 
+          //add welcome poster
+          const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_v3.png'));
+
+          welcomeTexture.wrapS = THREE.RepeatWrapping
+          welcomeTexture.wrapT = THREE.RepeatWrapping
+          welcomeTexture.repeat.set(1, 1)
+          //
+          // const signGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1)
+          // const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true, side: THREE.DoubleSide})
+          // const signPlane = new THREE.Mesh(signGeometry, signMaterial)
+          // //plane.lookAt(0, 1, 0)
+          // signPlane.position.set(67.14043162856349, 0.25, 3.9363442608970143)
+          // //signPlane.rotateY(posterRotation)
+          // this.scene.add(signPlane)
+
+
+          const signGeometry = new THREE.PlaneBufferGeometry(4, 4, 1, 1)
+          const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true})
+          //const signMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
+          const signPlane = new THREE.Mesh(signGeometry, signMaterial)
+          signPlane.position.set(67.14043162856349, 2, 3.9363442608970143)
+          signPlane.rotateY(Math.PI)
+          this.scene.add(signPlane)
+
+
+          // const backgroundGeometry = new THREE.PlaneBufferGeometry(4.5, 5, 1, 1)
+          // const backgroundMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, opacity: .5, transparent: true})
+          // const backgroundPlane = new THREE.Mesh(backgroundGeometry, backgroundMaterial)
+          // backgroundPlane.position.set(67.14043162856349, 2, 4)
+          // backgroundPlane.rotateY(Math.PI)
+          // this.scene.add(backgroundPlane)
+
+
+
+          // const signGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1)
+          // const signMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
+          // const signPlane = new THREE.Mesh(signGeometry, signMaterial)
+          // signPlane.position.set(67.14043162856349, 2, 3.9363442608970143)
+          // this.scene.add(signPlane)
+         // const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true, side: THREE.DoubleSide})
+         // const signPlane = new THREE.Mesh(signGeometry, signMaterial)
+
 
           //adding Gallery
          //  //cube
@@ -123,20 +165,20 @@ export class BudsGallery {
 
          /// walls ///
          //wireframe
-         this.addWall(30, 15, 78, 7.5, 20, (Math.PI/2), false, true);
-         this.addWall(30, 15, 58, 7.5, 20, (Math.PI/2), false, true);
-         this.addWall(20, 15, 68, 7.5, 35, 0, false, true);
+         this.addWall(30, 15, 78, 7.5, 20, 0xffffff, (Math.PI/2), false, true);
+         this.addWall(30, 15, 58, 7.5, 20, 0xffffff, (Math.PI/2), false, true);
+         this.addWall(20, 15, 68, 7.5, 35, 0xffffff, 0, false, true);
 
         //transparent
-         this.addWall(30, 15, 78, 7.5, 20, (Math.PI/2), true, false);
-         this.addWall(30, 15, 58, 7.5, 20, (Math.PI/2), true, false);
-         this.addWall(20, 15, 68, 7.5, 35, 0, true, false);
+         this.addWall(30, 15, 78, 7.5, 20, 0xffffff, (Math.PI/2), true, false);
+         this.addWall(30, 15, 58, 7.5, 20, 0xffffff, (Math.PI/2), true, false);
+         this.addWall(20, 15, 68, 7.5, 35, 0xffffff, 0, true, false);
 
 
          //wall strip for mounting artwork
-         this.addWall(25, 4, 77, 3, 20, (Math.PI/2), false, false);
-         this.addWall(25, 4, 59, 3, 20, (Math.PI/2), false, false);
-         this.addWall(15, 4, 68, 3, 34, 0, false, false);
+         this.addWall(25, 4, 77, 3, 20, 0xffffff, (Math.PI/2), false, false);
+         this.addWall(25, 4, 59, 3, 20, 0xffffff, (Math.PI/2), false, false);
+         this.addWall(15, 4, 68, 3, 34, 0xffffff, 0, false, false);
 
          //floor
          const floorGeometry = new THREE.PlaneGeometry( 30, 20, 10 );
@@ -158,10 +200,10 @@ export class BudsGallery {
     }
 
 
-    addWall(wallLength, wallWidth, posX, posY, posZ, rotation, transparent, wireframe){
+    addWall(wallLength, wallWidth, posX, posY, posZ, color, rotation, transparent, wireframe){
 
       const wallGeometry = new THREE.PlaneGeometry( wallLength, wallWidth, 8, 15 );
-      const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: .5, transparent: transparent, wireframe: wireframe, side: THREE.DoubleSide } );
+      const wallMaterial = new THREE.MeshBasicMaterial({ color: color, opacity: .5, transparent: transparent, wireframe: wireframe, side: THREE.DoubleSide } );
       const wallPlane = new THREE.Mesh( wallGeometry, wallMaterial );
       wallPlane.position.set(posX, posY, posZ)
       wallPlane.rotation.y = (rotation)
