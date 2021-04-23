@@ -68,7 +68,7 @@ export class VideoDisplay {
     this.playSurface.add( this.frame );
   }
 
-  updatePosition(x, y, z, rot, frameOffset) {
+  updatePosition(x, y, z, rot, frameOffset=0.0) {
     this.playSurface.position.set( x, y, z )
     this.playSurface.rotateY( rot )
     this.frame.translateZ( frameOffset )

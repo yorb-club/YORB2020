@@ -4,6 +4,7 @@ import { hackToRemovePlayerTemporarily } from './index'
 import { MiscModel } from './miscModels'
 import { Flowers } from './flowers'
 import { VideoDisplay } from './videoDisplay'
+import { ImageDisplay } from './imageDisplay'
 
 const proj_thumbnails = require('../assets/images/buds/projects/poster-mock-up-6.png')
 
@@ -146,12 +147,32 @@ export class BudsGallery {
 
     }
 
+    getProjectInfo() {
+      let url = "https://billythemusical.github.io/data.json"
+      let req = new XMLHttpRequest()
+      req.onreadystatechange = () => {
+        if (req.readyState == 4 && req.status == 200) {
+          var data = JSON.parse(req.responseText)
+          if (data) data.forEach((key, i) => {
+            this.projects.push(key)
+          });
+          if(this.projects.length == 11) {
+            this.addVideoDisplays()
+          }
+        }
+      }
+      req.open("GET", url, true)
+      req.send()
+    }
+
     addVideoDisplays() {
 
       // this.projects.forEach((proj, i) => {
       for( let i = 0; i < this.projects.length; i++) {
 
-        const videos = this.projects[i].videos
+        const proj = this.projects[i]
+        const videos = proj.videos
+        const images = proj.images
 
         if (videos.length > 0) {
           videos.forEach((_video, j)=>{
@@ -192,64 +213,33 @@ export class BudsGallery {
               _frameColor, // color
             ))
           })
+
+        } else if (images.length > 0 && videos.length < 1) {
+
+          let _element;
+          let _src = images[0]
+          let _size = 3
+          let _frameColor = 0x6bdcff
+          // log("this project's info: ", playback_id, volume)
+
+          // create an element to be converted to a texture
+          _element = document.createElement('image')
+          _element.id = proj.artist_name
+          _element.style.display = 'none'
+          document.body.append(_element)
+
+          this.videoDisplays.push(new ImageDisplay(
+            this.scene,
+            this.camera,
+            new THREE.Vector3( 0, 0, 0 ), // position
+            new THREE.Vector3(0 , 0, 0), // rotation
+            _element, // the element
+            _size, // size in meters
+            _frameColor, // color
+          ))
         }
-
-
-        // const playback_id = proj.videos.mux_playback_id
-        // const volume = proj.videos.volume_factor
-        // let element = null // to pass to the texture
-        //
-        // if (playback_id != "") {
-        //
-        //   const src = "https://stream.mux.com/"+playback_id+".m3u8"
-        //   // log("this project's info: ", playback_id, volume)
-        //
-        //   // create an element to be converted to a texture
-        //   element = document.createElement('video')
-        //   element.id = playback_id
-        //   element.volume = volume
-        //   element.loop = true
-        //   element.style.display = 'none'
-        //   element.autoplay = true
-        //   // Let native HLS support handle it if possible
-        //   if (element.canPlayType('application/vnd.apple.mpegurl')) {
-        //     element.src = src;
-        //   } else if (Hls.isSupported()) {
-        //     // HLS.js-specific setup code
-        //     this.hls = new Hls();
-        //     this.hls.loadSource(src);
-        //     this.hls.attachMedia(element);
-        //   }
-        //   document.body.append(element)
-
-        //   // spacing the projects
-        //   let x, y = 2, z, rot
-        //   let spacing = ( i % 4 ) * 6
-        //   let size = 3
-        //   let frameColor = 0x6bdcff, frameOffset = 0.1
-        //
-        //   if (i < 4) { // first 4 projects
-        //     x = 77, z = 10 + spacing, rot = Math.PI/2
-        //   } else if (i >= 4 && i < 7) { // next 3 projects
-        //     x = 72 - spacing * 0.8, z = 34, rot = Math.PI
-        //   } else if (i >= 7 && i < 11) { // last 4 projects
-        //     spacing = ( i + 1 ) % 4 * 6, x = 59, z = 27 - spacing, rot = Math.PI*2.5, frameOffset = -0.1
-        //   }
-        //
-        //   this.videoDisplays.push(new VideoDisplay(
-        //     this.scene,
-        //     this.camera,
-        //     new THREE.Vector3( x, y, z ), // position
-        //     new THREE.Vector3(0 , rot, 0), // rotation
-        //     element, // the element
-        //     size, // size in meters
-        //     frameColor, // color
-        //     frameOffset, // how far offset the frame behind will be
-        //     volume // for adjusting the relative volume between videos
-        //   ))
-        // }
-      // });
       }
+
       this.placeProjects()
     }
 
@@ -271,7 +261,7 @@ export class BudsGallery {
         }
 
         const display = this.videoDisplays[i]
-        display.updatePosition( x, y, z, rot, frameOffset )
+        display.updatePosition( x, y, z, rot ) // frameOffset )
         // display.updateVolume(volume)
       }
     }
@@ -337,25 +327,6 @@ export class BudsGallery {
         );
         this.scene.add( light );
       }
-    }
-
-    getProjectInfo() {
-      let url = "https://billythemusical.github.io/data.json"
-      let req = new XMLHttpRequest()
-      req.onreadystatechange = () => {
-        if (req.readyState == 4 && req.status == 200) {
-          var data = JSON.parse(req.responseText)
-          if (data) data.forEach((key, i) => {
-            this.projects.push(key)
-          });
-          if(this.projects.length == 11) {
-            this.addVideoDisplays()
-          }
-        }
-      }
-      req.open("GET", url, true)
-      req.send()
-
     }
 
     addProjects() {
