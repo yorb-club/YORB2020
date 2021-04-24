@@ -93,7 +93,7 @@ export class BudsGallery {
           const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true})
           //const signMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
           const signPlane = new THREE.Mesh(signGeometry, signMaterial)
-          signPlane.position.set(78, 2, 3.9363442608970143)
+          signPlane.position.set(78, 2, 7)
           signPlane.rotateY(Math.PI)
           this.scene.add(signPlane)
 
@@ -246,13 +246,23 @@ export class BudsGallery {
         let frameColor = 0x6bdcff
         let off = 12
 
+        // if (i < 4) { // first 4 projects
+        //   x = 77 + off, z = 10 + spacing, rot = Math.PI/2
+        // } else if (i >= 4 && i < 7) { // next 3 projects
+        //   x = 72 + off - spacing * 0.8, z = 34 //, rot = -Math.PI
+        // } else if (i >= 7 && i < 12) { // last 4 projects
+        //   spacing = ( i + 1 ) % 4 * 6, x = 59 + off, z = 27 - spacing, rot = -Math.PI*2.5//, frameOffset = -0.1
+        // }
+
+        //new placement
         if (i < 4) { // first 4 projects
-          x = 77 + off, z = 10 + spacing, rot = Math.PI/2
+          x = 77 + off*((4-i)/3) + 10, z = 10 + spacing, rot = Math.PI/3
         } else if (i >= 4 && i < 7) { // next 3 projects
           x = 72 + off - spacing * 0.8, z = 34 //, rot = -Math.PI
         } else if (i >= 7 && i < 12) { // last 4 projects
-          spacing = ( i + 1 ) % 4 * 6, x = 59 + off, z = 27 - spacing, rot = -Math.PI*2.5//, frameOffset = -0.1
+          spacing = ( i + 1 ) % 4 * 6, x = 59 +10 + (24-i*4), z = 27 - spacing, rot = -Math.PI/3//, frameOffset = -0.1
         }
+
 
         const display = this.displays[i]
         display.updatePosition( x, y, z, rot ) // frameOffset )
