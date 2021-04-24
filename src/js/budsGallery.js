@@ -152,9 +152,13 @@ export class BudsGallery {
       req.onreadystatechange = () => {
         if (req.readyState == 4 && req.status == 200) {
           var data = JSON.parse(req.responseText)
-          if (data) data.forEach((key, i) => {
-            this.projects.push(key)
-          });
+          if (data) {
+            data.forEach((key, i) => {
+              this.projects.push(key)
+            });
+            this.projects.sort(this.sortByProperty("project_id"))
+            log(this.projects)
+          }
           // if(this.projects.length == 11) {
           //   this.addDisplays()
           // }
@@ -162,6 +166,17 @@ export class BudsGallery {
       }
       req.open("GET", url, true)
       req.send()
+    }
+
+    sortByProperty(property) {
+       return function (a,b) {
+          if( a[property] > b[property] ) {
+             return 1;
+          } else if ( a[property] < b[property] ) {
+             return -1;
+          }
+          return 0;
+       }
     }
 
     addDisplays() {
