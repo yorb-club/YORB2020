@@ -101,7 +101,7 @@ export class Yorb {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.renderer.setClearColor(new THREE.Color('lightblue')); // change sky color
         this.renderer.setSize(this.width, this.height);
-
+        
         this.addLights();
         this.loadBackground();
 
@@ -514,7 +514,7 @@ export class Yorb {
             // things to update 50 times per seconds:
             this.controls.update();
             this.projectionScreens.update();
-            this.budsGallery.updateDisplays();
+            // this.budsGallery.updateDisplays();
             sceneDraw(this.scene);
 
             // things to update 5 x per second

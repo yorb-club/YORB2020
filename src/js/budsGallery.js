@@ -67,7 +67,8 @@ export class BudsGallery {
 
           log('entering buds gallery')
 
-          let spawn = new THREE.Vector3( 60.90 + Math.random()*2, 0.25, 9.88 + Math.random()*-2 )
+          // let spawn = new THREE.Vector3( 60.90 + Math.random()*2, 0.25, 9.88 + Math.random()*-2 )
+          let spawn = new THREE.Vector3( 79.31 + Math.random()*2, 0.25, 0.13 + Math.random()*-2 )
           this.camera.position.set(spawn.x, spawn.y, spawn.z)
 
           let { x, y, z } = this.position
@@ -107,9 +108,9 @@ export class BudsGallery {
          this.addWall(20, 15, 78, 7.5, 35, 0xffffff, 0, false, true);
 
         //transparent
-         this.addWall(30, 15, 98, 7.5, 20, 0xffffff, (Math.PI/3), true, false);
-         this.addWall(30, 15, 58, 7.5, 20, 0xffffff, (-Math.PI/3), true, false);
-         this.addWall(20, 15, 78, 7.5, 35, 0xffffff, 0, true, false);
+         // this.addWall(30, 15, 98, 7.5, 20, 0xffffff, (Math.PI/3), true, false);
+         // this.addWall(30, 15, 58, 7.5, 20, 0xffffff, (-Math.PI/3), true, false);
+         // this.addWall(20, 15, 78, 7.5, 35, 0xffffff, 0, true, false);
 
 
 
@@ -167,6 +168,7 @@ export class BudsGallery {
         const proj = this.projects[i]
         const videos = proj.videos
         const images = proj.images
+        const frameColor = 0xcccbcc
 
         if (videos.length > 0) {
             let _video = videos[0]
@@ -176,11 +178,13 @@ export class BudsGallery {
             let _element;
             let _src = "https://stream.mux.com/"+_playbackId+".m3u8"
             let _size = 3
-            let _frameColor = 0x6bdcff
+            // let _frameColor = 0x6bdcff
             // log("this project's info: ", playback_id, volume)
 
             // create an element to be converted to a texture
             _element = document.createElement('video')
+            _element.style.width = '1280px'
+            _element.style.height = '720px'
             _element.id = _playbackId
             _element.volume = _volume
             _element.loop = true
@@ -204,31 +208,22 @@ export class BudsGallery {
               new THREE.Vector3( 0, 0, 0), // rotation
               _element, // the element
               _size, // size in meters
-              _frameColor, // color
+              frameColor, // color
             ))
         } else if (images.length > 0 && videos.length < 1) {
 
-          let _element;
-          let _src = images[0]
+          let path = '../assets/images/buds/projects/mary/pomodoro001.jpeg'
+          log(path)
           let _size = 3
-          let _frameColor = 0x6bdcff
-          // log("this project's info: ", playback_id, volume)
-
-          // create an element to be converted to a texture
-          _element = document.createElement('image')
-          _element.src = _src
-          _element.id = proj.artist_name
-          _element.style.display = 'none'
-          document.body.append(_element)
 
           this.displays.push(new ImageDisplay(
             this.scene,
             this.camera,
             new THREE.Vector3( 0, 0, 0 ), // position
             new THREE.Vector3(0 , 0, 0), // rotation
-            _element, // the element
+            path, // path to images
             _size, // size in meters
-            _frameColor, // color
+            frameColor, // color
           ))
         }
       }
@@ -281,7 +276,8 @@ export class BudsGallery {
     addWall(wallLength, wallWidth, posX, posY, posZ, color, rotation, transparent, wireframe){
 
       const wallGeometry = new THREE.PlaneGeometry( wallLength, wallWidth, 8, 15 );
-      const wallMaterial = new THREE.MeshBasicMaterial({ color: color, opacity: .5, transparent: transparent, wireframe: wireframe, side: THREE.DoubleSide } );
+      // const wallMaterial = new THREE.MeshBasicMaterial({ color: color, opacity: .5, transparent: transparent, wireframe: wireframe, side: THREE.DoubleSide } );
+      const wallMaterial = new THREE.MeshBasicMaterial({ color: color, wireframe: wireframe, side: THREE.DoubleSide } );
       const wallPlane = new THREE.Mesh( wallGeometry, wallMaterial );
       wallPlane.position.set(posX, posY, posZ)
       wallPlane.rotation.y = (rotation)
@@ -623,11 +619,13 @@ export class BudsGallery {
       // do nothing
       for( let display of this.displays ) {
         if (display) {
-          if (display.element.tagName == 'video') {
-            let element = display.element
-            let texture = display.screen.texture
-            if ( element.readyState >= element.HAVE_CURRENT_DATA ) {
-                texture.needsUpdate = true
+          if (display.type == 'video') {
+            if ( true ) { // check distance
+              let element = display.element
+              let texture = display.screen.mesh.texture
+              if ( element.readyState >= element.HAVE_CURRENT_DATA ) {
+                  texture.update()
+              }
             }
           }
         }
