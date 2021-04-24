@@ -17,7 +17,7 @@ export class BudsGallery {
       camera,
       mouse,
       controls,
-      projectionScreens,
+      projectionScreenManager,
       position
     ) {
         this.scene = scene
@@ -46,8 +46,7 @@ export class BudsGallery {
         this.statusBoxMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 })
 
         // for displaying video and screen shares
-        this.projectionScreenManager = projectionScreens
-        this.videoDisplays = []
+        this.displays = []
         // this.hls = document.createElement('script') // doesn't work
 
         this.projects = []
@@ -152,7 +151,7 @@ export class BudsGallery {
             this.projects.push(key)
           });
           if(this.projects.length == 11) {
-            this.addVideoDisplays()
+            this.addDisplays()
           }
         }
       }
@@ -160,7 +159,7 @@ export class BudsGallery {
       req.send()
     }
 
-    addVideoDisplays() {
+    addDisplays() {
 
       // this.projects.forEach((proj, i) => {
       for( let i = 0; i < this.projects.length; i++) {
@@ -170,7 +169,7 @@ export class BudsGallery {
         const images = proj.images
 
         if (videos.length > 0) {
-          videos.forEach((_video, j)=>{
+            let _video = videos[0]
             let _playbackId = _video.mux_playback_id
 
             let _volume = _video.volume_factor
@@ -198,17 +197,15 @@ export class BudsGallery {
             }
             document.body.append(_element)
 
-            this.videoDisplays.push(new VideoDisplay(
+            this.displays.push(new VideoDisplay(
               this.scene,
               this.camera,
               new THREE.Vector3( 0, 0, 0 ), // position
-              new THREE.Vector3(0 , 0, 0), // rotation
+              new THREE.Vector3( 0, 0, 0), // rotation
               _element, // the element
               _size, // size in meters
               _frameColor, // color
             ))
-          })
-
         } else if (images.length > 0 && videos.length < 1) {
 
           let _element;
@@ -219,11 +216,12 @@ export class BudsGallery {
 
           // create an element to be converted to a texture
           _element = document.createElement('image')
+          _element.src = _src
           _element.id = proj.artist_name
           _element.style.display = 'none'
           document.body.append(_element)
 
-          this.videoDisplays.push(new ImageDisplay(
+          this.displays.push(new ImageDisplay(
             this.scene,
             this.camera,
             new THREE.Vector3( 0, 0, 0 ), // position
@@ -240,22 +238,23 @@ export class BudsGallery {
 
     placeProjects() {
 
-      for( let i = 0; i < this.videoDisplays.length; i++) {
+      for( let i = 0; i < this.displays.length; i++) {
 
         // spacing the projects
-        let x, y = 2, z, rot
+        let x, y = 1.5, z, rot = 0
         let spacing = ( i % 4 ) * 6
         let frameColor = 0x6bdcff
+        let off = 12
 
         if (i < 4) { // first 4 projects
-          x = 77, z = 10 + spacing, rot = Math.PI/2
+          x = 77 + off, z = 10 + spacing, rot = Math.PI/2
         } else if (i >= 4 && i < 7) { // next 3 projects
-          x = 72 - spacing * 0.8, z = 34, rot = -Math.PI
+          x = 72 + off - spacing * 0.8, z = 34 //, rot = -Math.PI
         } else if (i >= 7 && i < 12) { // last 4 projects
-          spacing = ( i + 1 ) % 4 * 6, x = 59, z = 27 - spacing, rot = -Math.PI*2.5//, frameOffset = -0.1
+          spacing = ( i + 1 ) % 4 * 6, x = 59 + off, z = 27 - spacing, rot = -Math.PI*2.5//, frameOffset = -0.1
         }
 
-        const display = this.videoDisplays[i]
+        const display = this.displays[i]
         display.updatePosition( x, y, z, rot ) // frameOffset )
         // display.updateVolume(volume)
       }
@@ -610,101 +609,18 @@ export class BudsGallery {
         this.activateHighlightedProject()
     }
 
-    addPresentationStage(projectIndex, centerX, centerZ, lookAtX, lookAtZ, scaleFactor = 1, angle) {
-      // The alphabet (for project labels)
-      const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' // now i know by ABCs next time won't you sing with me
-      // pick colors
-      const OUTER_FENCE_COLOR = 0x232323 //0x232378
-      const ENTRANCE_COLOR = 0xf9f910
-      const STAGE_COLOR = 0x232323
-      const DOME_COLOR = 0x232323
-      const PROJECT_NUMBER_COLOR = 0xffffff
-
-      //sky colors -- same as fences
-      const SKY_COLOR_BLUE_ROOM = 0x1250CC;
-      const SKY_COLOR_PINK_ROOM = 0xe49add;
-      const SKY_COLOR_YELLOW_ROOM = 0xfd8f20;
-      const SKY_COLOR_GREEN_ROOM = 0x18DD6C;
-
-      //room colors
-      //all have two colors plus one accent color. all use accen colors that are main colors from other rooms except the greenn room
-      //blue
-      const COL_MAIN_BLUE = 0x4b4ff4
-      const COL_SECOND_BLUE = 0x05c1da
-      //accent: colmainPink = 0xfc3691
-      //COL_MAIN_BLUE, COL_SECOND_BLUE, COL_MAIN_PINK
-
-      //pink rooms
-      const COL_MAIN_PINK = 0xfc3691
-      const COL_SECOND_PINK = 0xfb69b9
-      const COL_MAIN_GREEN = 0x9be210
-      //accent: colmainGreen = 0x9be210
-      // COL_MAIN_PINK, COL_SECOND_PINK, COL_MAIN_GREEN
-
-      //yellow rooms
-      const COL_MAIN_YELLOW = 0xffd810
-      const COL_SECOND_YELLOW = 0xf4d01d
-      // accent: const colmainBlue = 0x4b4ff4
-      //COL_MAIN_YELLOW, COL_SECOND_YELLOW, COL_MAIN_BLUE
-
-
-      //green rooms
-      const COL_ACCENT_BLUE = 0x67D6B5;
-      const COL_SECOND_GREEN = 0x77E424;
-      const COL_ACCENT_YELLOW = 0xF9F912;
-      //
-      // COL_ACCENT_BLUE, COL_SECOND_GREEN, COL_ACCENT_YELLOW
-
-      // other parameters:
-      const NUMBER_OF_PROJECTS = 8
-      const RADIUS = 30
-      const FENCE_RADIUS = RADIUS + 10
-      const FENCE_HEIGHT = 12
-
-        // add the stage itself
-        const cylinderGeometry = new THREE.CylinderBufferGeometry(3 * scaleFactor, 3 * scaleFactor, 1, 32, 1, false)
-        const cylinderMaterial = new THREE.MeshPhongMaterial({ color: STAGE_COLOR, side: THREE.DoubleSide })
-        const cylinder = new THREE.Mesh(cylinderGeometry, cylinderMaterial)
-        cylinder.position.set(centerX, 0, centerZ)
-        this.scene.add(cylinder)
-
-
-        // making a mini dome
-        //https://threejsfundamentals.org/threejs/lessons/threejs-primitives.html
-        //trying sphereGeometryconst radius = 7;
-        const radius = 7
-        const widthSegments = 12
-        const heightSegments = 8
-        const phiStart = Math.PI * 0
-        const phiLength = Math.PI * 1
-        const thetaStart = Math.PI * 0.0
-        const thetaLength = Math.PI * 0.9
-        const domeGeometry = new THREE.SphereBufferGeometry(radius, widthSegments, heightSegments, phiStart, phiLength, thetaStart, thetaLength)
-
-        domeGeometry.scale(0.7, 0.7, 0.7)
-        const domeMaterial = new THREE.MeshPhongMaterial({ color: DOME_COLOR, side: THREE.DoubleSide })
-        const domeMesh = new THREE.Mesh(domeGeometry, domeMaterial)
-        domeMesh.position.set(centerX, 1, centerZ)
-        domeMesh.lookAt(lookAtX, 2, lookAtZ)
-        // domeMesh.translatefZ(-6.5)
-        domeMesh.rotateY(Math.PI)
-        // domeMesh.rotateX(Math.PI/2)
-        // domeMesh.rotateZ(Math.PI/2)
-        this.scene.add(domeMesh)
-
-        /// Font for back walls
-        this.projectionScreenManager.addScreen(centerX, 2, centerZ, lookAtX, 2, lookAtZ, scaleFactor)
-  }
-
-  // updateProjects(projects) {
-  //     // do nothing
-  // }
-  //
-  // _updateProjects() {
-  //   // do nothing
-  // }
-  //
-  // update() {
-  //   // do nothing
-  // }
+    updateDisplays() {
+      // do nothing
+      for( let display of this.displays ) {
+        if (display) {
+          if (display.element.tagName == 'video') {
+            let element = display.element
+            let texture = display.screen.texture
+            if ( element.readyState >= element.HAVE_CURRENT_DATA ) {
+                texture.needsUpdate = true
+            }
+          }
+        }
+      }
+    }
 }

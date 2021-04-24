@@ -67,7 +67,7 @@ export class Yorb {
         // STATS for debugging:
         this.stats = new Stats();
         document.body.appendChild(this.stats.dom);
-        this.stats.dom.style = 'visibility: hidden;';
+        // this.stats.dom.style = 'visibility: hidden;';
 
         //THREE Camera
         this.cameraHeight = 1.75;
@@ -514,6 +514,7 @@ export class Yorb {
             // things to update 50 times per seconds:
             this.controls.update();
             this.projectionScreens.update();
+            this.budsGallery.updateDisplays();
             sceneDraw(this.scene);
 
             // things to update 5 x per second
