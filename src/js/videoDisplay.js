@@ -27,14 +27,44 @@ export class VideoDisplay {
 
     const audioSource = audioCtx.createMediaElementSource( this.element );
 
+    // compensate for volumes between videos
+    const gainNode = audioCtx.createGain();
+
+    var compressor = audioCtx.createDynamicsCompressor();
+    compressor.threshold.setValueAtTime(-10, audioCtx.currentTime);
+    compressor.knee.setValueAtTime(30, audioCtx.currentTime);
+    compressor.ratio.setValueAtTime(12, audioCtx.currentTime);
+    compressor.attack.setValueAtTime(0, audioCtx.currentTime);
+    compressor.release.setValueAtTime(0.25, audioCtx.currentTime);
+
     let videoSound = new THREE.PositionalAudio( listener );
-    videoSound.setNodeSource( audioSource );
+
+    if (this.element.volume > 0.99) {
+
+      console.log("turning the volume up")
+      audioSource.connect( gainNode )
+      gainNode.connect( compressor )
+
+      gainNode.gain.setValueAtTime(5, audioCtx.currentTime)
+
+      videoSound.setNodeSource( compressor )
+
+    } else { // or don't compensate
+
+      videoSound.setNodeSource( audioSource );
+
+    }
+
+
+
+    // let videoSound = new THREE.PositionalAudio( listener );
+
     // videoSound.setDistanceModel( 'linear' )
     // let maxDistance = 100
     // videoSound.setMaxDistance( maxDistance )
     videoSound.setRefDistance( 6 ); // distnace at which sounds starts to rolloff
-    videoSound.setRolloffFactor( 100 ); // higher numbers mean greater rolloff
-    videoSound.setDirectionalCone( 25, 75, 0.05 ) // inner angle, outer angle, ratio outer/inner
+    videoSound.setRolloffFactor( 90 ); // higher numbers mean greater rolloff
+    videoSound.setDirectionalCone( 25, 60, 0.02 ) // inner angle, outer angle, ratio outer/inner
     videoSound.rotation.x = this.rotation.x
     videoSound.rotation.y = this.rotation.y
     videoSound.rotation.z = this.rotation.z

@@ -66,9 +66,8 @@ export class Yorb {
 
         // STATS for debugging:
         this.stats = new Stats();
-        this.stats.dom.id = "stats"
         document.body.appendChild(this.stats.dom);
-        this.stats.dom.style = 'visibility: hidden;';
+        // this.stats.dom.style = 'visibility: hidden;';
 
         //THREE Camera
         this.cameraHeight = 1.75;

@@ -130,6 +130,7 @@ window.onload = async () => {
     });
 
     alert('Allow YORB to access your webcam for the full experience');
+    hitPlay();
     await startCamera();
 
     var startButton = document.getElementById('startButton');
@@ -256,6 +257,13 @@ function updateProjects(_projects) {
         yorbScene.updateProjects(projects);
         yorbScene.createHtmlProjectList(projects);
     }
+}
+
+function hitPlay() {
+  // check and see if we've visited #buds ...
+  if(window.location.hash == '#buds') {
+    yorbScene.budsGallery.addDisplays()
+  }
 }
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//

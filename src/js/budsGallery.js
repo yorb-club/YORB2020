@@ -155,9 +155,9 @@ export class BudsGallery {
           if (data) data.forEach((key, i) => {
             this.projects.push(key)
           });
-          if(this.projects.length == 11) {
-            this.addDisplays()
-          }
+          // if(this.projects.length == 11) {
+          //   this.addDisplays()
+          // }
         }
       }
       req.open("GET", url, true)
@@ -175,26 +175,23 @@ export class BudsGallery {
         const frameColor = 0xcccbcc
 
         if (videos.length > 0) {
-            let _video = videos[0]
-            let _playbackId = _video.mux_playback_id
 
+            let _video = videos[0]
+
+            let _playbackId = _video.mux_playback_id
             let _volume = _video.volume_factor
-            log("volume factor", _volume)
-            let _element;
             let _src = "https://stream.mux.com/"+_playbackId+".m3u8"
             let _size = 3
-            // let _frameColor = 0x6bdcff
-            // log("this project's info: ", playback_id, volume)
 
             // create an element to be converted to a texture
-            _element = document.createElement('video')
+            let _element = document.createElement('video')
             _element.style.width = '1280px'
             _element.style.height = '720px'
             _element.id = _playbackId
             _element.volume = _volume
             _element.loop = true
             _element.style.display = 'none'
-            // _element.autoplay = true
+            _element.autoplay = true
             // Let native HLS support handle it if possible
             if (_element.canPlayType('application/vnd.apple.mpegurl')) {
               _element.src = _src;
@@ -218,7 +215,7 @@ export class BudsGallery {
         } else if (images.length > 0 && videos.length < 1) {
 
           let path = '../assets/images/buds/projects/mary/pomodoro001.jpeg'
-          log(path)
+          // log(path)
           let _size = 3
 
           this.displays.push(new ImageDisplay(
@@ -258,7 +255,7 @@ export class BudsGallery {
         if (i < 4) { // first 4 projects
           x = 77 + off*((4-i)/3) + 10, z = 10 + spacing, rot = Math.PI/3
         } else if (i >= 4 && i < 7) { // next 3 projects
-          x = 72 + off - spacing * 0.8, z = 34 //, rot = -Math.PI
+          x = 72 + off - spacing * 0.95, z = 34 //, rot = -Math.PI
         } else if (i >= 7 && i < 12) { // last 4 projects
           spacing = ( i + 1 ) % 4 * 6, x = 59 +10 + (24-i*4), z = 27 - spacing, rot = -Math.PI/3//, frameOffset = -0.1
         }
