@@ -67,6 +67,10 @@ export class BudsGallery {
 
           log('entering buds gallery')
 
+          // let stats = document.getElementById('stats')
+          // log(stats)
+          // stats.style.visibility = 'visible'
+
           // let spawn = new THREE.Vector3( 60.90 + Math.random()*2, 0.25, 9.88 + Math.random()*-2 )
           let spawn = new THREE.Vector3( 79.31 + Math.random()*2, 0.25, 0.13 + Math.random()*-2 )
           this.camera.position.set(spawn.x, spawn.y, spawn.z)
