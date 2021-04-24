@@ -261,11 +261,7 @@ function updateProjects(_projects) {
 
 function hitPlay() {
   // check and see if we've visited #buds ...
-  if(window.location.hash == '#buds') {
     yorbScene.budsGallery.addDisplays()
-    yorbScene.stats.dom.style = 'visibility: visible;';
-
-  }
 }
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
