@@ -23,23 +23,26 @@ export class VideoDisplay {
   setup() {
 
     const listener = new THREE.AudioListener();
-    const audioCtx = listener.context;//new (window.AudioContext || window.webkitAudioContext)();
+    const audioCtx = listener.context; //new (window.AudioContext || window.webkitAudioContext)();
 
     const audioSource = audioCtx.createMediaElementSource( this.element );
-
-    this.camera.add( listener );
 
     let videoSound = new THREE.PositionalAudio( listener );
     videoSound.setNodeSource( audioSource );
     // videoSound.setDistanceModel( 'linear' )
     // let maxDistance = 100
     // videoSound.setMaxDistance( maxDistance )
-    videoSound.setRefDistance( 0.2 ); // distnace at which sounds starts to rolloff
-    videoSound.setRolloffFactor( 5 ); // higher numbers mean greater rolloff
-    videoSound.setDirectionalCone( 25, 45, 0.1 ) // inner angle, outer angle, ratio outer/inner
+    videoSound.setRefDistance( 6 ); // distnace at which sounds starts to rolloff
+    videoSound.setRolloffFactor( 100 ); // higher numbers mean greater rolloff
+    videoSound.setDirectionalCone( 25, 75, 0.05 ) // inner angle, outer angle, ratio outer/inner
+    videoSound.rotation.x = this.rotation.x
+    videoSound.rotation.y = this.rotation.y
+    videoSound.rotation.z = this.rotation.z
+
+    this.camera.add( listener );
 
     // videoSound.play();
-    // this.element.play();
+    this.element.play();
 
     // Add backing to playSurface
     const frameGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.5, this.HEIGHT*1.5, 8, 15 );

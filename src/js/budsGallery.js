@@ -179,6 +179,7 @@ export class BudsGallery {
             let _playbackId = _video.mux_playback_id
 
             let _volume = _video.volume_factor
+            log("volume factor", _volume)
             let _element;
             let _src = "https://stream.mux.com/"+_playbackId+".m3u8"
             let _size = 3
@@ -193,7 +194,7 @@ export class BudsGallery {
             _element.volume = _volume
             _element.loop = true
             _element.style.display = 'none'
-            _element.autoplay = true
+            // _element.autoplay = true
             // Let native HLS support handle it if possible
             if (_element.canPlayType('application/vnd.apple.mpegurl')) {
               _element.src = _src;
