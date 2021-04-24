@@ -45,7 +45,7 @@ export class VideoDisplay {
       audioSource.connect( gainNode )
       gainNode.connect( compressor )
 
-      gainNode.gain.setValueAtTime(5, audioCtx.currentTime)
+      gainNode.gain.setValueAtTime(7, audioCtx.currentTime)
 
       videoSound.setNodeSource( compressor )
 

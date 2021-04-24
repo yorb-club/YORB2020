@@ -270,7 +270,7 @@ export class BudsGallery {
         if (i < 4) { // first 4 projects
           x = 77 + off*((4-i)/3) + 10, z = 10 + spacing, rot = Math.PI/3
         } else if (i >= 4 && i < 7) { // next 3 projects
-          x = 72 + off - spacing * 0.95, z = 34 //, rot = -Math.PI
+          x = 72 + off - spacing * 1.1, z = 34 //, rot = -Math.PI
         } else if (i >= 7 && i < 12) { // last 4 projects
           spacing = ( i + 1 ) % 4 * 6, x = 59 +10 + (24-i*4), z = 27 - spacing, rot = -Math.PI/3//, frameOffset = -0.1
         }
