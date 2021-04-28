@@ -88,7 +88,7 @@ export class BudsGallery {
           this.getProjectInfo()
 
           //add welcome poster
-          const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_v5.png'));
+          const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_20210427_med.png'));
 
           welcomeTexture.wrapS = THREE.RepeatWrapping
           welcomeTexture.wrapT = THREE.RepeatWrapping
@@ -187,7 +187,8 @@ export class BudsGallery {
         const proj = this.projects[i]
         const videos = proj.videos
         const images = proj.images
-        const frameColor = 0xcccbcc
+        const frameColor = 0xEDF2F6
+        //const frameColor = 0xcccbcc
 
         if (videos.length > 0) {
 

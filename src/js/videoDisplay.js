@@ -17,6 +17,12 @@ export class VideoDisplay {
 
     this.type = 'video'
 
+
+    //adding frame
+    this.border
+    this.borderColor = 0x000000
+
+
     this.setup()
   }
 
@@ -75,11 +81,19 @@ export class VideoDisplay {
     this.element.play();
 
     // Add backing to playSurface
-    const frameGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.5, this.HEIGHT*1.5, 8, 15 );
+    const frameGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.6, this.HEIGHT*1.5, 8, 15 );
     // const frameMaterial = new THREE.MeshBasicMaterial({ color: this.frameColor, opacity: 0.9, transparent: true, side: THREE.DoubleSide } );
     const frameMaterial = new THREE.MeshBasicMaterial({ color: this.frameColor, side: THREE.DoubleSide } );
     this.frame = new THREE.Mesh( frameGeometry, frameMaterial );
-    this.frame.position.set( -this.WIDTH*0.1, 0, 0.08 )
+    this.frame.position.set( -this.WIDTH*0.1, 0, 0.09 )
+
+    //adding border
+    const borderGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.1, this.HEIGHT*1.1, 8, 15 );
+    const borderMaterial = new THREE.MeshBasicMaterial({ color: this.borderColor, side: THREE.DoubleSide } );
+    this.border = new THREE.Mesh( borderGeometry, borderMaterial );
+    this.border.position.set( -this.WIDTH*0.01, 0, 0.08 )
+
+
 
 
     const texture = new THREE.VideoTexture( this.element );
@@ -98,6 +112,7 @@ export class VideoDisplay {
     this.screen.add(videoSound) // Add the sound to the cube
     this.scene.add( this.screen )
     this.screen.add( this.frame )
+    this.screen.add( this.border )
 
     // add card next to display with backing
     const backingGeometry = new THREE.PlaneBufferGeometry( 0.6 * 1.18502824859 , 0.6 , 8 , 15 );
@@ -118,7 +133,8 @@ export class VideoDisplay {
     this.card.add( backing )
     this.card.rotateY( Math.PI * 0.9 )
     // this.card.rotateY( Math.PI )
-    this.card.position.set( -this.WIDTH * 0.65 , 0, -0.12 )
+    this.card.position.set( -this.WIDTH * 0.7 , 0, -0.12 )
+    //this.card.position.set( -this.WIDTH * 0.65 , 0, -0.12 )
     this.screen.add( this.card )
 
 
@@ -127,7 +143,8 @@ export class VideoDisplay {
   updatePosition(x, y, z, rot, frameOffset=0.0) {
     this.screen.position.set( x, y, z )
     this.screen.rotateY( rot )
-    this.frame.translateZ( frameOffset )
+    //this.frame.translateZ( -frameOffset)
+    //this.border.translateZ( -frameOffset )
   }
 
   updateVolume(volume) {
