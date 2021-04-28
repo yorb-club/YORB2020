@@ -95,7 +95,7 @@ export class BudsGallery {
           welcomeTexture.repeat.set(1, 1)
 
           const signGeometry = new THREE.PlaneBufferGeometry(4, 4, 1, 1)
-          const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true})
+          const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true, side: THREE.DoubleSide})
           //const signMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
           const signPlane = new THREE.Mesh(signGeometry, signMaterial)
           signPlane.position.set(78, 2, 7)
