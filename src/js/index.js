@@ -134,9 +134,25 @@ window.onload = async () => {
 
     var startButton = document.getElementById('startButton');
     startButton.addEventListener('click', init);
+
+    var tutorialButton = document.getElementById('tutorialButton');
+    tutorialButton.addEventListener('click', launchTutorial);
 };
 
 async function init() {
+    document.getElementById('overlay').style.visibility = 'hidden';
+
+    // only join room after we user has interacted with DOM (to ensure that media elements play)
+    if (!initialized) {
+        await joinRoom();
+        sendCameraStreams();
+        setupControls();
+        turnGravityOn();
+        initialized = true;
+    }
+}
+
+async function launchTutorial() {
     document.getElementById('overlay').style.visibility = 'hidden';
 
     // only join room after we user has interacted with DOM (to ensure that media elements play)
