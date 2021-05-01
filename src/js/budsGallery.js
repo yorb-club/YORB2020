@@ -103,6 +103,66 @@ export class BudsGallery {
           this.scene.add(signPlane)
 
 
+         //wayfinding
+         const rightArrowTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_wayfinding_right.png'));
+         const leftArrowTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_wayfinding_left.png'));
+
+         //locations
+         //[7.554850300767336, 0.30400000000000005, 0.045147717781014535]
+         //[24.16394109128646, 0.30400000000000005, -2.8441168269538]
+         //[43.23795256932305, 0.25, 5.018814119622774]
+
+
+
+         //left arrow 1
+         leftArrowTexture.wrapS = THREE.RepeatWrapping
+         leftArrowTexture.wrapT = THREE.RepeatWrapping
+         leftArrowTexture.repeat.set(1, 1)
+
+         const leftArrowGeo = new THREE.PlaneBufferGeometry(4, 2, 1, 1)
+         const leftArrowMat = new THREE.MeshBasicMaterial({ map: leftArrowTexture, transparent: true})
+         const leftArrowPlane = new THREE.Mesh(leftArrowGeo, leftArrowMat)
+         //plane.lookAt(0, 1, 0)
+         leftArrowPlane.position.set(7.5, 2, 2.15)
+         leftArrowPlane.rotateY(Math.PI)
+         this.scene.add(leftArrowPlane)
+
+
+         //left arrow 2
+         const leftArrowPlane2 = new THREE.Mesh(leftArrowGeo, leftArrowMat)
+         //plane.lookAt(0, 1, 0)
+         leftArrowPlane2.position.set(43, 2, 6)
+         leftArrowPlane2.rotateY(Math.PI)
+         this.scene.add(leftArrowPlane2)
+
+
+         //left arrow 3
+         const leftArrowPlane3 = new THREE.Mesh(leftArrowGeo, leftArrowMat)
+         //plane.lookAt(0, 1, 0)
+         leftArrowPlane3.position.set(24, 2, 2.15)
+         leftArrowPlane3.rotateY(Math.PI)
+         this.scene.add(leftArrowPlane3)
+
+
+
+
+         //right arrow
+         rightArrowTexture.wrapS = THREE.RepeatWrapping
+         rightArrowTexture.wrapT = THREE.RepeatWrapping
+         rightArrowTexture.repeat.set(1, 1)
+
+         const rightArrowGeo = new THREE.PlaneBufferGeometry(4, 2, 1, 1)
+         const rightArrowMat = new THREE.MeshBasicMaterial({ map: rightArrowTexture, transparent: true})
+         const rightArrowPlane = new THREE.Mesh(rightArrowGeo, rightArrowMat)
+         //plane.lookAt(0, 1, 0)
+         rightArrowPlane.position.set(24, 2, -3.8)
+         //rightArrowPlane.rotateY(Math.PI)
+         this.scene.add(rightArrowPlane)
+
+
+
+
+
 
 
          /// walls ///
