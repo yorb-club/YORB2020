@@ -80,6 +80,7 @@ export class VideoDisplay {
 
     // videoSound.play();
     this.element.play();
+    this.element.muted = false;
 
     // Add large frame to display area
     const frameGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.6, this.HEIGHT*1.5, 1, 1 );

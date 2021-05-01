@@ -291,6 +291,7 @@ export class BudsGallery {
 
             // create an element to be converted to a texture
             let _element = document.createElement('video')
+            _element.muted = true
             _element.style.width = '1280px'
             _element.style.height = '720px'
             _element.id = _playbackId
@@ -298,6 +299,7 @@ export class BudsGallery {
             _element.loop = true
             _element.style.display = 'none'
             _element.autoplay = true
+            _element.load()
             // Let native HLS support handle it if possible
             if (_element.canPlayType('application/vnd.apple.mpegurl')) {
               _element.src = _src;
