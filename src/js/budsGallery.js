@@ -174,7 +174,10 @@ export class BudsGallery {
          this.scene.add(rightArrowPlane)
 
 
-
+         //right arrow 2
+         const rightArrowPlane2 = new THREE.Mesh(rightArrowGeo, rightArrowMat)
+         rightArrowPlane2.position.set(7.5, 2, -3.8)
+         this.scene.add(rightArrowPlane2)
 
 
 
