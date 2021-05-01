@@ -73,20 +73,10 @@ export class BudsGallery {
 
       Object.keys(cards).forEach((key, i, array) =>{
         this.cards[i] = cards[cardsSorted[i]].png
-        log('key:', key, 'i: ', i)
-        log('cardsSorted[i]: ', cardsSorted[i])
-        log('this.cards[i]:', this.cards[i])
+        // log('key:', key, 'i: ', i)
+        // log('cardsSorted[i]: ', cardsSorted[i])
+        // log('this.cards[i]:', this.cards[i])
       })
-
-
-
-
-      // Object.keys(cards).forEach((key, i, array) =>{
-      //   this.cards[i] = cards[key].png
-      //   // log('key:', key)
-      //   // log('i: ', i)
-      //   // log('array[i]: ', array[i])
-      // })
 
 
       // check and see if we've visited #buds ...
