@@ -78,6 +78,7 @@ export class BudsGallery {
           let { x, y, z } = this.position
           let look = new THREE.Vector3( x + 2, 4, z + 6 )
           this.camera.lookAt(look.x, look.y, look.z)
+      }
 
           // font stuffs if we need them
           var loader = new THREE.FontLoader()
@@ -202,7 +203,6 @@ export class BudsGallery {
          floorPlane.rotation.x = (-Math.PI/2)
          //floorPlane.rotation.z = (Math.PI/2)
          this.scene.add( floorPlane );
-        } // end of "if" for window.location.hash, a way to hide parts of YORB!
 
     }
 
@@ -217,11 +217,11 @@ export class BudsGallery {
               this.projects.push(key)
             });
             this.projects.sort(this.sortByProperty("project_id"))
-            log(this.projects)
+            // log(this.projects)
           }
-          // if(this.projects.length == 11) {
-          //   this.addDisplays()
-          // }
+          if(this.projects.length == 11) {
+            this.addDisplays()
+          }
         }
       }
       req.open("GET", url, true)

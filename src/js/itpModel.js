@@ -132,7 +132,7 @@ export class ITPModel {
         // this.loadModel(require('../assets/models/itp/light-diffuser.glb'), "light-diffuser", this.lightDiffuserMaterial, scaleFactor, false, false);
         // this.loadModel(require('../assets/models/itp/light-housing.glb'), "light-housing", this.lightHousingMaterial, scaleFactor, false, false);
         // this.loadModel(require('../assets/models/itp/lighting-grid.glb'), "lighting-grid", this.wallMaterial, scaleFactor, false, false);
-        this.loadModel(require('../assets/models/itp/walls.glb'), "walls", this.wallMaterial, scaleFactor, true, false, true)
+        this.loadModel(require('../assets/models/itp/walls-buds.glb'), "walls", this.wallMaterial, scaleFactor, true, false, true)
         this.loadModel(require('../assets/models/itp/window-shelf.glb'), "window-shelf", this.windowShelfMaterial, scaleFactor, true, false)
         this.loadModel(require('../assets/models/itp/wooden-bar.glb'), "wooden-bar", this.floorMaterial, scaleFactor, true, true, true)
     }
