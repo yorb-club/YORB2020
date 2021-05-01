@@ -90,16 +90,20 @@ export class Flowers {
   addToGroup(th){
     let geometry = new THREE.BufferGeometry();
     geometry.setIndex( this.ind );
-    geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.pos, 3 ) );
-    geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.col, 3));
+    geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( this.pos, 3 ).onUpload( this.disposeArray ) );
+    geometry.setAttribute('color', new THREE.Float32BufferAttribute(this.col, 3).onUpload( this.disposeArray ) );
     geometry.computeVertexNormals();
     if( th != 0 ){
       geometry.rotateZ( -th );
       geometry.translate(this.l1*Math.sin(this.theta), this.l0 + this.l1*Math.cos(this.theta),  0);
     }
     this.group.add( new THREE.Mesh(geometry,
-      new THREE.MeshPhongMaterial({vertexColors: THREE.VertexColors, side: THREE.DoubleSide})) );
+      new THREE.MeshBasicMaterial({vertexColors: THREE.VertexColors, side: THREE.DoubleSide})) );
   }
+
+  disposeArray() {
+			this.array = null;
+	}
 
   violet(age, L0, L1, th){
     this.l0 = L0;  this.l1 = L1;  this.theta = th;
@@ -242,7 +246,7 @@ export class Flowers {
         switch (color){
           case 'leaf':  this.col.push(0, (c+.5)/1.5, 0);  break;
           case 'daisy': this.col.push(d, d, 1);  break;
-          case 'viol':  this.col.push(1, 0, (1-c)*(1-c));
+          case 'viol':  this.col.push(0.9, 0.3, (1-c)*(1-c));
         }
         fi -= dfi;
       }
