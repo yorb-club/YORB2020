@@ -307,7 +307,7 @@ export class BudsGallery {
             _element.volume = _volume
             _element.loop = true
             _element.style.display = 'none'
-            // _element.autoplay = true
+            _element.autoplay = true
             // Let native HLS support handle it if possible
             if (_element.canPlayType('application/vnd.apple.mpegurl')) {
               _element.src = _src;
