@@ -63,9 +63,31 @@ export class BudsGallery {
 
     setup() {
 
-      Object.keys(cards).forEach((key, i, array) =>{
-        this.cards[i] = cards[key].png
+      // we need to sort the artist cards before we can get them all
+      let cardsSorted = cards
+      cardsSorted = Object.keys(cardsSorted).sort(function(a, b) {
+        if (a > b) return 1;
+        if (a < b) return -1;
+        return 0;
       })
+
+      Object.keys(cards).forEach((key, i, array) =>{
+        this.cards[i] = cards[cardsSorted[i]].png
+        log('key:', key, 'i: ', i)
+        log('cardsSorted[i]: ', cardsSorted[i])
+        log('this.cards[i]:', this.cards[i])
+      })
+
+
+
+
+      // Object.keys(cards).forEach((key, i, array) =>{
+      //   this.cards[i] = cards[key].png
+      //   // log('key:', key)
+      //   // log('i: ', i)
+      //   // log('array[i]: ', array[i])
+      // })
+
 
       // check and see if we've visited #buds ...
       if(window.location.hash == '#buds') {
@@ -282,7 +304,7 @@ export class BudsGallery {
             _element.volume = _volume
             _element.loop = true
             _element.style.display = 'none'
-            _element.autoplay = true
+            // _element.autoplay = true
             // Let native HLS support handle it if possible
             if (_element.canPlayType('application/vnd.apple.mpegurl')) {
               _element.src = _src;
