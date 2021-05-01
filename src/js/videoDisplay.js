@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 
 export class VideoDisplay {
-  constructor(scene, camera, position, rotation, videoElement, size, frameColor=0x6bdcff, frameOffset=0.1) {
+  constructor(scene, camera, position, rotation, videoElement, card, size, frameColor=0x6bdcff, frameOffset=0.1) {
     this.scene = scene
     this.camera = camera
     this.screen
-    this.frame, this.card
+    this.frame
+    this.card = card
     this.position = position
     this.rotation = rotation
     this.element = videoElement || document.createElement('video')
@@ -20,7 +21,7 @@ export class VideoDisplay {
 
     //adding frame
     this.border
-    this.borderColor = 0x000000
+    this.borderColor = 0x191919
 
 
     this.setup()
@@ -51,7 +52,7 @@ export class VideoDisplay {
       audioSource.connect( gainNode )
       gainNode.connect( compressor )
 
-      gainNode.gain.setValueAtTime(7, audioCtx.currentTime)
+      gainNode.gain.setValueAtTime(15, audioCtx.currentTime)
 
       videoSound.setNodeSource( compressor )
 
@@ -80,22 +81,20 @@ export class VideoDisplay {
     // videoSound.play();
     this.element.play();
 
-    // Add backing to playSurface
-    const frameGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.6, this.HEIGHT*1.5, 8, 15 );
+    // Add large frame to display area
+    const frameGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.6, this.HEIGHT*1.5, 1, 1 );
     // const frameMaterial = new THREE.MeshBasicMaterial({ color: this.frameColor, opacity: 0.9, transparent: true, side: THREE.DoubleSide } );
     const frameMaterial = new THREE.MeshBasicMaterial({ color: this.frameColor, side: THREE.DoubleSide } );
     this.frame = new THREE.Mesh( frameGeometry, frameMaterial );
     this.frame.position.set( -this.WIDTH*0.1, 0, 0.09 )
 
-    //adding border
-    const borderGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.1, this.HEIGHT*1.1, 8, 15 );
+    // adding border to the screen
+    const borderGeometry = new THREE.PlaneBufferGeometry( this.WIDTH*1.1, this.HEIGHT*1.1, 1, 1 );
     const borderMaterial = new THREE.MeshBasicMaterial({ color: this.borderColor, side: THREE.DoubleSide } );
     this.border = new THREE.Mesh( borderGeometry, borderMaterial );
-    this.border.position.set( -this.WIDTH*0.01, 0, 0.08 )
+    this.border.position.set( 0, 0, 0.089 )
 
-
-
-
+    // the video texture for the screen
     const texture = new THREE.VideoTexture( this.element );
     texture.minFilter = THREE.LinearFilter;
     texture.magFilter = THREE.LinearFilter;
@@ -114,29 +113,30 @@ export class VideoDisplay {
     this.screen.add( this.frame )
     this.screen.add( this.border )
 
+
+    // artist info card
+    let cardTexture = new THREE.TextureLoader().load( this.card );
+    cardTexture.wrapS = THREE.RepeatWrapping
+    cardTexture.wrapT = THREE.RepeatWrapping
+    cardTexture.repeat.set(1, 1)
+
     // add card next to display with backing
-    const backingGeometry = new THREE.PlaneBufferGeometry( 0.6 * 1.18502824859 , 0.6 , 8 , 15 );
+    let cardAspect = 1.6554347826086957
+    let cardGeometry = new THREE.PlaneBufferGeometry(0.4 * cardAspect, 0.4, 1, 1)
+    let cardMaterial = new THREE.MeshBasicMaterial({ map: cardTexture, transparent: true})
+    this.card = new THREE.Mesh(cardGeometry, cardMaterial)
+    this.card.rotateY( Math.PI * 0.9 )
+    this.card.position.set( -this.WIDTH * 0.7 , 0, -0.12 )
+    //this.card.position.set( -this.WIDTH * 0.65 , 0, -0.12 )
+
+    const backingGeometry = new THREE.PlaneBufferGeometry( 0.45 * cardAspect , 0.45 , 1 , 1 );
     // const backingMaterial = new THREE.MeshBasicMaterial({ color: 0xffc0cb, opacity: 0.9, transparent: true, side: THREE.DoubleSide } );
     const backingMaterial = new THREE.MeshBasicMaterial({ color: 0x6bdcff, side: THREE.DoubleSide } ); // pink 0xffc0cb
     const backing = new THREE.Mesh( backingGeometry, backingMaterial );
     backing.position.set( 0, 0, -0.01 )
 
-    let cardTexture = new THREE.TextureLoader().load(require('../assets/images/buds/card.png'));
-    cardTexture.wrapS = THREE.RepeatWrapping
-    cardTexture.wrapT = THREE.RepeatWrapping
-    cardTexture.repeat.set(1, 1)
-
-
-    let cardGeometry = new THREE.PlaneBufferGeometry(0.5 * 1.18502824859, 0.5, 1, 1)
-    let cardMaterial = new THREE.MeshBasicMaterial({ map: cardTexture, transparent: true})
-    this.card = new THREE.Mesh(cardGeometry, cardMaterial)
     this.card.add( backing )
-    this.card.rotateY( Math.PI * 0.9 )
-    // this.card.rotateY( Math.PI )
-    this.card.position.set( -this.WIDTH * 0.7 , 0, -0.12 )
-    //this.card.position.set( -this.WIDTH * 0.65 , 0, -0.12 )
     this.screen.add( this.card )
-
 
   }
 

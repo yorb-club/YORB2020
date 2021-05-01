@@ -6,10 +6,13 @@ import { Flowers } from './flowers'
 import { VideoDisplay } from './videoDisplay'
 import { ImageDisplay } from './imageDisplay'
 
-const proj_thumbnails = require('../assets/images/buds/projects/poster-mock-up-6.png')
+const proj_thumbnails = require('../assets/images/buds/poster-mock-up-6.png')
+const cards = require('../assets/images/buds/cards/*.*')
 
 import debugModule from 'debug'
 const log = debugModule('YORB:Gallery')
+log('cards: ', cards)
+
 
 export class BudsGallery {
     constructor(
@@ -47,8 +50,7 @@ export class BudsGallery {
 
         // for displaying video and screen shares
         this.displays = []
-        // this.hls = document.createElement('script') // doesn't work
-
+        this.cards = new Array(11)
         this.projects = []
         this.hyperlinkedObjects = []
         this.linkMaterials = {}
@@ -62,14 +64,17 @@ export class BudsGallery {
 
     setup() {
 
+      Object.keys(cards).forEach((key, i, array) =>{
+        this.cards[i] = cards[key].png
+      })
+
+
+      log('this.cards', this.cards)
+
       // check and see if we've visited #buds ...
       if(window.location.hash == '#buds') {
 
           log('entering buds gallery')
-
-          // let stats = document.getElementById('stats')
-          // log(stats)
-          // stats.style.visibility = 'visible'
 
           // let spawn = new THREE.Vector3( 60.90 + Math.random()*2, 0.25, 9.88 + Math.random()*-2 )
           let spawn = new THREE.Vector3( 79.31 + Math.random() * 3, 0.25, 0.13 + Math.random() * -2 )
@@ -79,6 +84,8 @@ export class BudsGallery {
           let look = new THREE.Vector3( x + 2, 4, z + 6 )
           this.camera.lookAt(look.x, look.y, look.z)
 
+          // this.controls.lon = 90
+
           // font stuffs if we need them
           var loader = new THREE.FontLoader()
           let fontJSON = require('../assets/fonts/helvetiker_bold.json')
@@ -87,20 +94,30 @@ export class BudsGallery {
           this.setupGallery()
           this.getProjectInfo()
 
-          //add welcome poster
-          const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_20210427_med.png'));
+          // //add welcome poster
+          // const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_20210427_med.png'));
+          //
+          // welcomeTexture.wrapS = THREE.RepeatWrapping
+          // welcomeTexture.wrapT = THREE.RepeatWrapping
+          // welcomeTexture.repeat.set(1, 1)
+          //
+          // const signGeometry = new THREE.PlaneBufferGeometry(4, 4, 1, 1)
+          // const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true, side: THREE.DoubleSide})
+          // //const signMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
+          // const signPlane = new THREE.Mesh(signGeometry, signMaterial)
+          // signPlane.position.set(78, 2, 7)
+          // signPlane.rotateY(Math.PI)
+          // this.scene.add(signPlane)
 
-          welcomeTexture.wrapS = THREE.RepeatWrapping
-          welcomeTexture.wrapT = THREE.RepeatWrapping
-          welcomeTexture.repeat.set(1, 1)
+          //add welcome poster sprite (always facing)
+          const map = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_v5.png'));
+          const material = new THREE.SpriteMaterial( { map: map } );
+          const sprite = new THREE.Sprite( material );
+          sprite.scale.set(4.5, 4.5, 4.5)
+          sprite.position.set(78, 2.3, 7)
+          sprite.rotation.set(Math.PI, 0, 0)
+          this.scene.add(sprite)
 
-          const signGeometry = new THREE.PlaneBufferGeometry(4, 4, 1, 1)
-          const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true, side: THREE.DoubleSide})
-          //const signMaterial = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide})
-          const signPlane = new THREE.Mesh(signGeometry, signMaterial)
-          signPlane.position.set(78, 2, 7)
-          signPlane.rotateY(Math.PI)
-          this.scene.add(signPlane)
 
 
 
@@ -157,7 +174,7 @@ export class BudsGallery {
               this.projects.push(key)
             });
             this.projects.sort(this.sortByProperty("project_id"))
-            log(this.projects)
+            // log(this.projects)
           }
           // if(this.projects.length == 11) {
           //   this.addDisplays()
@@ -188,11 +205,14 @@ export class BudsGallery {
         const videos = proj.videos
         const images = proj.images
         const frameColor = 0xEDF2F6
+        let card = this.cards[i]
+
         //const frameColor = 0xcccbcc
 
         if (videos.length > 0) {
 
             let _video = videos[0]
+            // let _card = cards['card_' + i]['png']
 
             let _playbackId = _video.mux_playback_id
             let _volume = _video.volume_factor
@@ -225,24 +245,29 @@ export class BudsGallery {
               new THREE.Vector3( 0, 0, 0 ), // position
               new THREE.Vector3( 0, 0, 0), // rotation
               _element, // the element
+              card, // the card for displaying the work
               _size, // size in meters
               frameColor, // color
             ))
         } else if (images.length > 0 && videos.length < 1) {
 
-          let path = '../assets/images/buds/projects/mary/pomodoro001.jpeg'
-          // log(path)
-          let _size = 3
+          this.displays.push(undefined)
+          log('should be a blank display at ', i)
 
-          this.displays.push(new ImageDisplay(
-            this.scene,
-            this.camera,
-            new THREE.Vector3( 0, 0, 0 ), // position
-            new THREE.Vector3(0 , 0, 0), // rotation
-            path, // path to images
-            _size, // size in meters
-            frameColor, // color
-          ))
+          // const user = proj.images[0].split('/')[0]
+          // log("artist name", user)
+          //
+          // let _size = 3
+          //
+          // this.displays.push(new ImageDisplay(
+          //   this.scene,
+          //   this.camera,
+          //   new THREE.Vector3( 0, 0, 0 ), // position
+          //   new THREE.Vector3( 0, 0, 0), // rotation
+          //   user, // path to images
+          //   _size, // size in meters
+          //   frameColor, // color
+          // ))
         }
       }
 
@@ -251,14 +276,16 @@ export class BudsGallery {
 
     placeProjects() {
 
+      let loader = new THREE.TextureLoader()
+
       for( let i = 0; i < this.displays.length; i++) {
 
         // spacing the projects
         let x, y = 1.5, z, rot = 0
         let spacing = ( i % 4 ) * 6
-        let frameColor = 0x6bdcff
+        let frameColor = 0xEDF2F6
         let off = 12
-
+        let card = this.cards[i]
         // if (i < 4) { // first 4 projects
         //   x = 77 + off, z = 10 + spacing, rot = Math.PI/2
         // } else if (i >= 4 && i < 7) { // next 3 projects
@@ -276,10 +303,63 @@ export class BudsGallery {
           spacing = ( i + 1 ) % 4 * 6, x = 59 +10 + (24-i*4), z = 27 - spacing, rot = -Math.PI/3//, frameOffset = -0.1
         }
 
+        // hand placing photo artists
+        if ( i == 2 ) { // dalit
+          let path = require('../assets/images/buds/projects/dalit/day 1 - Dalit Steinbrecher small.jpg')
+          let texture = loader.load( path,
+              (tex) => {
+                    tex.wrapS = THREE.RepeatWrapping
+                    tex.wrapT = THREE.RepeatWrapping
+                    tex.repeat.set(1, 1)
 
-        const display = this.displays[i]
-        display.updatePosition( x, y, z, rot ) // frameOffset )
-        // display.updateVolume(volume)
+                    this.displays[i] = new ImageDisplay(
+                      this.scene,
+                      this.camera,
+                      new THREE.Vector3( 0, 0, 0 ), // position
+                      new THREE.Vector3( 0, 0, 0), // rotation
+                      tex, // texture
+                      card,
+                      3, // size in meters
+                      frameColor, // color
+                    )
+                    // console.log('loaded texture', tex, this.displays[i])
+                    this.displays[i].card.translateX(0.2)
+                    this.displays[i].updatePosition( x, y, z, rot ) // frameOffset )
+              })
+
+        } else if ( i == 8 ) {
+          let path = require('../assets/images/buds/projects/reto/EditedWeatherRobot - Reto Chen.jpg')
+          let texture = loader.load( path,
+              (tex) => {
+                    tex.wrapS = THREE.RepeatWrapping
+                    tex.wrapT = THREE.RepeatWrapping
+                    tex.repeat.set(1, 1)
+
+                    this.displays[i] = new ImageDisplay(
+                      this.scene,
+                      this.camera,
+                      new THREE.Vector3( 0, 0, 0 ), // position
+                      new THREE.Vector3( 0, 0, 0), // rotation
+                      tex, // texture
+                      card,
+                      3, // size in meters
+                      frameColor, // color
+                    )
+                    // console.log('loaded texture', tex, this.displays[i])
+                    // this.displays[i].card.translateX(0.09)
+                    this.displays[i].updatePosition( x, y, z, rot ) // frameOffset )
+                }
+            )
+        } else {
+
+          const display = this.displays[i]
+          display.updatePosition( x, y, z, rot ) // frameOffset )
+          // display.updateVolume(volume)
+        }
+
+
+
+
       }
     }
 
@@ -315,7 +395,7 @@ export class BudsGallery {
       let flowers1 = new Flowers(this.scene, position1, NUM_DAISIES, NUM_VIOLETS, true, leftSide);
 
       //back flowers
-      let flowers2 = new Flowers(this.scene, position2, NUM_DAISIES, NUM_VIOLETS, false, 3);
+      let flowers2 = new Flowers(this.scene, position2, Math.floor(NUM_DAISIES * 0.4), Math.floor(NUM_VIOLETS * 0.4), false, 3);
 
     }
 

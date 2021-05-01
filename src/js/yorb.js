@@ -67,11 +67,9 @@ export class Yorb {
         // STATS for debugging:
         this.stats = new Stats();
         document.body.appendChild(this.stats.dom);
-        if ( window.location.hash == '#buds') {
-          this.stats.dom.style = 'visibility: visible;';
-        } else {
-          this.stats.dom.style = 'visibility: hidden;';
-        }
+        this.stats.dom.style = 'visibility: hidden'
+        this.stats.dom.id = 'stats'
+
 
         //THREE Camera
         this.cameraHeight = 1.75;

@@ -28,6 +28,9 @@ export class YorbControls2 {
         this.theta = 0
         this.isUserInteracting = false
         this.camera.target = new THREE.Vector3(0, 0, 0)
+
+        // for toggling the stats
+        this.showStats = false
     }
 
     pause() {
@@ -82,6 +85,9 @@ export class YorbControls2 {
                         if (this.canJump === true) this.velocity.y = jumpSpeed
                         this.canJump = false
                         break
+
+                    case 84: // t
+                        this.toggleStats()
                 }
             },
             false
@@ -110,6 +116,7 @@ export class YorbControls2 {
                     case 68: // d
                         this.moveRight = false
                         break
+
                 }
             },
             false
@@ -151,6 +158,25 @@ export class YorbControls2 {
         this.velocity.z = 0
         this.velocity.y = 0
     }
+
+    toggleStats() {
+
+      this.showStats = !this.showStats
+
+      console.log('toggleStats', this.showStats)
+
+      let stats = document.getElementById('stats')
+
+      console.log('stats el', stats)
+
+
+      if ( this.showStats ) {
+        stats.style = "visibility: visible"
+      } else {
+        stats.style = "visibility: hidden"
+      }
+    }
+
 
     update() {
         this.detectCollisions()
