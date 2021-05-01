@@ -68,9 +68,6 @@ export class BudsGallery {
         this.cards[i] = cards[key].png
       })
 
-
-      log('this.cards', this.cards)
-
       // check and see if we've visited #buds ...
       if(window.location.hash == '#buds') {
 
@@ -92,8 +89,8 @@ export class BudsGallery {
           let fontJSON = require('../assets/fonts/helvetiker_bold.json')
           this.font = loader.parse(fontJSON)
 
-          this.setupGallery()
-          this.getProjectInfo()
+          // this.setupGallery()
+          // this.getProjectInfo()
 
           // //add welcome poster
           // const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/buds/buds_poster_20210427_med.png'));
@@ -220,6 +217,9 @@ export class BudsGallery {
          floorPlane.rotation.x = (-Math.PI/2)
          //floorPlane.rotation.z = (Math.PI/2)
          this.scene.add( floorPlane );
+
+         this.setupGallery()
+         this.getProjectInfo()
 
     }
 

@@ -131,7 +131,6 @@ window.onload = async () => {
 
     alert('Allow YORB to access your webcam for the full experience');
     await startCamera();
-    hitPlay();
 
     var startButton = document.getElementById('startButton');
     startButton.addEventListener('click', init);
@@ -146,7 +145,7 @@ async function init() {
         sendCameraStreams();
         setupControls();
         turnGravityOn();
-        // hitPlay();
+        hitPlay();
         initialized = true;
     }
 }
