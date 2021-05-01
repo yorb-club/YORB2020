@@ -11,7 +11,6 @@ const cards = require('../assets/images/buds/cards/*.*')
 
 import debugModule from 'debug'
 const log = debugModule('YORB:Gallery')
-log('cards: ', cards)
 
 
 export class BudsGallery {
@@ -234,10 +233,6 @@ export class BudsGallery {
               this.projects.push(key)
             });
             this.projects.sort(this.sortByProperty("project_id"))
-            // log(this.projects)
-          }
-          if(this.projects.length == 11) {
-            this.addDisplays()
           }
         }
       }
@@ -312,7 +307,7 @@ export class BudsGallery {
         } else if (images.length > 0 && videos.length < 1) {
 
           this.displays.push(undefined)
-          log('should be a blank display at ', i)
+          // log('should be a blank display at ', i)
 
           // const user = proj.images[0].split('/')[0]
           // log("artist name", user)
