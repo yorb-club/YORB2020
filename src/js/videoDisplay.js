@@ -62,8 +62,6 @@ export class VideoDisplay {
 
     }
 
-
-
     // let videoSound = new THREE.PositionalAudio( listener );
 
     // videoSound.setDistanceModel( 'linear' )
