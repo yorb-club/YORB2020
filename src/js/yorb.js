@@ -19,6 +19,9 @@ import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
 import { Yorbie } from './yorbie';
+import { Tutorial } from './tutorial';
+let tutorialLayer = 2;
+
 
 import {sceneSetup, sceneDraw} from "./sandbox";
 
@@ -150,7 +153,7 @@ export class Yorb {
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
-            this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19));
+            this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 0);
         }
 
         // this.sketches = new Sketches(this.scene)
@@ -669,5 +672,15 @@ export class Yorb {
         return Math.random() * (max - min) + min;
     }
 
+
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    // Tutorial:
+
+    startTutorial(){
+        this.tutorial = new Tutorial(this.scene, this.getPlayerPosition[0], tutorialLayer, this.yorbie)
+    }
+
     //==//==//==//==//==//==//==//==// fin //==//==//==//==//==//==//==//==//==//
+
 }

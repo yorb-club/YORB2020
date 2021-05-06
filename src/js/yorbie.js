@@ -13,14 +13,14 @@ const yorbieModel = require('../assets/models/yorbie.glb');
 
 
 export class Yorbie {
-    constructor (scene, position) {
+    constructor (scene, position, layer) {
 
         this.scene = scene;
         this.model = yorbieModel;
         this.position = position;
         this.modelLoader = new GLTFLoader();
         this.yorbie;
-        this.loadYorbie(this.model);
+        this.loadYorbie(this.model, layer);
     // this code will be called once inside of the 'addYORBParts()' function
     // in the yorb.js file
     
@@ -32,7 +32,7 @@ export class Yorbie {
     // scene.add(myMesh);
     }
 
-    loadYorbie(modelPath) {
+    loadYorbie(modelPath, layer) {
         this.modelLoader.load(
             modelPath,
             (gltf) => {
@@ -45,8 +45,14 @@ export class Yorbie {
                         // child.material = _material
                         child.castShadow = true
                         child.receiveShadow = true
+                        child.layers.set(layer);
                     }
                 })
+                // if (layer > 0){
+                    // this.yorbie.layers.disableAll();
+                    this.yorbie.layers.set(layer);
+                    console.log(this.yorbie.layers)
+                // }
                 this.scene.add(this.yorbie);
             },
             undefined,

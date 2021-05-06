@@ -150,19 +150,26 @@ async function init() {
         turnGravityOn();
         initialized = true;
     }
+    yorbScene.camera.layers.set(0);    
+
 }
 
 async function launchTutorial() {
     document.getElementById('overlay').style.visibility = 'hidden';
-
     // only join room after we user has interacted with DOM (to ensure that media elements play)
     if (!initialized) {
-        await joinRoom();
-        sendCameraStreams();
+        // going to test not doing these until user ready to join public layer
+        // await joinRoom();
+        // sendCameraStreams();
         setupControls();
         turnGravityOn();
         initialized = true;
     }
+
+    // yorbScene.camera.layers.set(1);    
+    yorbScene.camera.layers.enable(2);
+    yorbScene.startTutorial();    
+
 }
 
 export function shareScreen(screenId) {

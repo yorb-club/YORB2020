@@ -30,7 +30,8 @@ body {
 /* https://stackoverflow.com/questions/2941189/how-to-overlay-one-div-over-another-div */
 .main-content-container {
     position: relative;
-    border: 15px inset grey;
+    /* border: 15px inset grey; */
+    border: 15px inset #9588CB;
     box-sizing: border-box; /* Include padding and border in element's width and height */
     overflow: hidden;
     margin-top: 2%;
@@ -167,7 +168,8 @@ body {
 }
 
 .bottom_bar > div {
-    border: 10px inset grey;
+    /* border: 10px inset grey; */
+    border: 10px inset #9588CB;
     background-color: rgb(72, 72, 72);
     color: white;
     font-size: 10px;
@@ -379,4 +381,36 @@ body {
 
 .btn-audio.is-inactive {
     background-position: 0 -40px;
+}
+
+
+/* Tutorial Stuff */
+.tutorial_box {
+    position: absolute;
+    z-index: 3;
+    bottom: 5%;
+    /* left: auto; */
+    margin-left: 60%;
+    margin-right: 5%;
+    /* background-color: rgb(250, 250, 76); */
+    display: flex;
+    flex-direction: row-reverse;
+    /* flex-wrap: nowrap; */
+    /* Then we define how is distributed the remaining space */
+    justify-content: space-around;
+    border: 10px inset #9588CB;
+    background-color: #f4d01d;
+    color: black;
+    /* font-size: 20px; */
+    border-collapse: separate;
+    padding: 0.75%;
+    height: 20%;
+    width: 30%;
+    /* margin: 0%; */
+    font-size: 1.3em;
+    box-sizing: border-box; /* Include padding and border in element's width and height */
+    text-align: center;
+    overflow: hidden;
+    visibility: hidden;
+    /* float: right; */
 }
