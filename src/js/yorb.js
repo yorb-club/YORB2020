@@ -552,6 +552,10 @@ export class Yorb {
                 }
                 this.projectionScreens.checkProjectionScreenCollisions();
 
+                //tutorial loop
+                if (this.tutorial != undefined) {
+                    this.tutorial.run();
+                }
             }
             if (this.frameCount % 50 == 0) {
                 this.selectivelyPauseAndResumeConsumers();
@@ -678,7 +682,7 @@ export class Yorb {
     // Tutorial:
 
     startTutorial(){
-        this.tutorial = new Tutorial(this.scene, this.getPlayerPosition[0], tutorialLayer, this.yorbie)
+        this.tutorial = new Tutorial(this.scene, this.camera, this.mouse, this.getPlayerPosition(), tutorialLayer, this.yorbie)
     }
 
     //==//==//==//==//==//==//==//==// fin //==//==//==//==//==//==//==//==//==//
