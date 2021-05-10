@@ -57,6 +57,7 @@ export class Tutorial {
                 }
                 break;
             case 1: //now look for yorbie
+                this.textBox.style.backgroundColor = "#b6a6f8";
                 let posTarget = new Vector3();
                 let dirTarget = new Vector3(); //no idea why this is needed now
                 this.raycaster.set(this.camera.getWorldPosition(posTarget), this.camera.getWorldDirection(dirTarget));
@@ -66,8 +67,8 @@ export class Tutorial {
                 }
                 break;
             case 2: //shift click on yorbie
+                this.textBox.style.backgroundColor = "#fafa4c";
                 this.raycaster.setFromCamera(this.mouse, this.camera);
-                
                 let mouseRayIntersect = this.raycaster.intersectObject(this.yorbie.yorbie, true);
                 // let thresholdDist = 7;
                 if (mouseRayIntersect.length > 0) {
@@ -79,6 +80,7 @@ export class Tutorial {
                 }
                 break;
             case 3: //walk over to Yorbie
+                this.textBox.style.backgroundColor = "#b6a6f8";
                 let origin = new Vector3(0, 0, 0);
                 let yorbieReady = false;
                 if (this.yorbie.yorbie.position.distanceTo(origin) > .75){
@@ -92,6 +94,9 @@ export class Tutorial {
                 if (yorbieReady && this.yorbie.yorbie.position.distanceTo(this.camera.position) < 2){
                     this.stage++;
                 }
+                break;
+            case 4:
+                this.textBox.style.backgroundColor = "#fafa4c";
                 break;
             default:
                 break;
