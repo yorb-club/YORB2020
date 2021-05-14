@@ -5,6 +5,7 @@
 import * as THREE from "three";
 import { Vector3 } from "three";
 import { Yorbie } from "./yorbie"
+const posterFile = require('../assets/images/showPoster2021.png'); 
 
 let tutorialText = [
     "Welcome to the tutorial!\n\nHere you have a chance to practice the controls of the YORB without anyone else around. Lets start by looking around -- click and drag in the window.",
@@ -38,10 +39,13 @@ export class Tutorial {
         window.addEventListener('keydown', (e) => this.onKeyDown(e), false)
         window.addEventListener('keyup', (e) => this.onKeyUp(e), false)
         this.yorbieCenter = false;
-        console.log('tutorial launched')
-        // console.log(this.camera.rotation);
-        // console.log(this.position);
 
+        //for demo poster
+        let posterTexture = new THREE.TextureLoader().load(posterFile);
+        let posterMaterial = new THREE.MeshBasicMaterial({map: posterTexture});
+        this.poster = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, .2), posterMaterial);
+
+        console.log('tutorial launched')
     }
 
     run(){
@@ -66,7 +70,7 @@ export class Tutorial {
                     this.stage++;
                 }
                 break;
-            case 2: //shift click on yorbie
+            case 2: //shift click on show poster
                 this.textBox.style.backgroundColor = "#fafa4c";
                 this.raycaster.setFromCamera(this.mouse, this.camera);
                 let mouseRayIntersect = this.raycaster.intersectObject(this.yorbie.yorbie, true);
