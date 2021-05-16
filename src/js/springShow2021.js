@@ -382,7 +382,20 @@ export class SpringShow2021 {
     // }
 
     addPortals() {
-        this.portals.push(new Portal(this.scene, new THREE.Vector3(0, 0, -60), 0));
+        const hostname = window.location.hostname
+        
+        if (hostname === 'yorblet1.itp.io') {
+            // if you're at gallery 1, show portal to gallery 2
+            this.portals.push(new Portal(this.scene, new THREE.Vector3(1.5, 0, -60), 2));
+        } else if (hostname === 'yorblet2.itp.io') {
+            // if you're at gallery 2, show portal to gallery 1
+            this.portals.push(new Portal(this.scene, new THREE.Vector3(1.5, 0, -60), 1));
+        } else {
+            // otherwise, assume you're at gallery 1, and show portal to gallery 2
+            this.portals.push(new Portal(this.scene, new THREE.Vector3(1.5, 0, -60), 2));
+        }
+
+        
         //goes through all yorblets except 0 (lobby) and makes portal
         // for (let i = 1; i < yorbletPortalReference.length; i++) {
         //     // log(yorbletPortalReference[i])
@@ -959,7 +972,7 @@ class LazyRiver {
             },
             undefined,
             function (e) {
-                log('trying to load portal');
+                log('trying to load decals');
                 console.error(e)
             }
         )
