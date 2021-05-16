@@ -66,6 +66,10 @@ export class SpringShow2021 {
         // let domElement = document.getElementById('scene-container')
         window.addEventListener('click', (e) => this.onMouseClick(e), false);
 
+        this.shift_down = false;
+        window.addEventListener('keydown', (e) => this.onKeyDown(e), false)
+        window.addEventListener('keyup', (e) => this.onKeyUp(e), false)
+
         this.lazyRiver = new LazyRiver(this.scene, this.camera);
     }
 
@@ -218,8 +222,10 @@ export class SpringShow2021 {
             let projects = this.projects;
 
             for (let i = 0; i < this.hyperlinkedObjects.length; i++) {
+                console.log('removing projects');
                 this.scene.remove(this.hyperlinkedObjects[i]);
             }
+            console.log(this.hyperlinkedObjects);
             this.hyperlinkedObjects = [];
 
             // do a check for duplicates
@@ -428,10 +434,15 @@ export class SpringShow2021 {
 
         let group = new THREE.Group();
 
+        // check whether we've visited the link before and set material accordingly
+        let backgroundMat = this.linkMaterial;
+        if (localStorage.getItem(_project.project_id) == 'visited') {
+            backgroundMat = this.linkVisitedMaterial;
+        } 
+
         // create a background
         let backgroundGeo = new THREE.BoxGeometry(3 * scaleFactor,1.5 * scaleFactor,posterDepth * scaleFactor);
-        // let backgroundMat = new THREE.MeshBasicMaterial({color: 'yellow'});
-        let backgroundMat = this.linkMaterial;
+        
         let projectPoster = new THREE.Mesh(backgroundGeo, backgroundMat);
 
         // add project image
@@ -450,12 +461,7 @@ export class SpringShow2021 {
 
         // let textBoxMat;
 
-        // check whether we've visited the link before and set material accordingly
-        // if (localStorage.getItem(_project.project_id) == 'visited') {
-        //     textBoxMat = this.linkVisitedMaterial;
-        // } else {
-        //     textBoxMat = this.linkMaterial;
-        // }
+        
 
         // let imageMat = this.getProjectImageMat(_project.project_id)
 
@@ -463,9 +469,9 @@ export class SpringShow2021 {
         // var imageSign = new THREE.Mesh(geometry, imageMat);
 
         /////// set up text
-        let titleFontSize = 0.05;
+        let titleFontSize = 0.06;
         let namesFontSize = 0.035;
-        let smallerFontSize = 0.03;
+        let smallerFontSize = 0.035;
 
         // parse text of name and add line breaks if necessary
         var name = this.parseText(_project.project_name);
@@ -475,33 +481,31 @@ export class SpringShow2021 {
 
         let elevator_pitch = this.parseText(_project.elevator_pitch);
         if (elevator_pitch.length > 35) {
-            elevator_pitch = this.addLineBreak(elevator_pitch, 35);
+            elevator_pitch = this.addLineBreak(elevator_pitch, 30);
         }
 
         // names
-        let names = '';
+        let studentNames = '';
         for (let i = 0; i < _project.users.length; i++) {
-            names += _project.users[i].user_name;
+            studentNames += _project.users[i].user_name;
             if (i < _project.users.length - 1) {
-                names += ' & ';
+                studentNames += ' & ';
             }
         }
-
-
 
         // create name text mesh
         let textGroup = new THREE.Group();
         let projectNameTextMesh = createSimpleText(name, fontColor, titleFontSize, this.font);
         let elevatorPitchTextMesh = createSimpleText(elevator_pitch, fontColor, smallerFontSize , this.font);
-        let namesTextMesh = createSimpleText(names, fontColor, namesFontSize, this.font);
+        let studentNamesTextMesh = createSimpleText(studentNames, fontColor, namesFontSize, this.font);
        
 
-        projectNameTextMesh.position.y += 0.3 * scaleFactor;
-        namesTextMesh.position.y += 0.2 * scaleFactor;
+        projectNameTextMesh.position.y += 0.4 * scaleFactor;
+        studentNamesTextMesh.position.y += 0.325 * scaleFactor;
         elevatorPitchTextMesh.position.y += 0 * scaleFactor;
         textGroup.add(projectNameTextMesh);
         textGroup.add(elevatorPitchTextMesh);
-        textGroup.add(namesTextMesh);
+        textGroup.add(studentNamesTextMesh);
 
 
 
@@ -509,23 +513,14 @@ export class SpringShow2021 {
         let alternateSideTextGroup = textGroup.clone();
         alternateSideTextGroup.rotateY(Math.PI);
         alternateSideTextGroup.position.set(0.9 * scaleFactor,0,-posterDepth + 0.01);
-        // projectNameTextMesh.position.x += linkDepth / 2 + 0.01; // offset forward
-        // projectNameTextMesh.rotateY(Math.PI / 2);
 
-        // imageSign.position.set(x, y, z);
-        // textSign.position.set(0, -0.75 / 2 - 0.5 / 2, 0);
-        // textSign.add(projectNameTextMesh);
-        // imageSign.add(textSign);
-        // imageSign.add(projectPoster);
 
         projectPoster.add(imageMesh);
         projectPoster.add(textGroup);
         projectPoster.add(alternateSideTextGroup);
 
         projectPoster.position.set(x,y,z);
-
         projectPoster.name = _project.project_id;
-
 
         // https://stackoverflow.com/questions/24690731/three-js-3d-models-as-hyperlink/24692057
         let now = Date.now();
@@ -533,8 +528,6 @@ export class SpringShow2021 {
             project: _project,
             lastVisitedTime: now,
         };
-
-        // imageSign.name = _project.project_id;
 
         return projectPoster;
     }
@@ -757,10 +750,11 @@ export class SpringShow2021 {
         }
         // log(link);
         link.material = mat;
+        link.scale.set(1.0, 1.0, 1.0);
     }
 
     activateHighlightedProject() {
-        if (this.hightlightedProjectId != -1 && this.activeProjectId === -1) {
+        if (this.hightlightedProjectId != -1 && this.activeProjectId === -1 && this.shift_down) {
             let link = this.scene.getObjectByName(this.hightlightedProjectId);
             if (link != null) {
                 this.generateProjectModal(link.userData.project);
@@ -782,6 +776,18 @@ export class SpringShow2021 {
 
     onMouseClick(e) {
         this.activateHighlightedProject();
+    }
+
+    onKeyDown(e) {
+        if (e.keyCode == 16) {
+            this.shift_down = true
+        }
+    }
+
+    onKeyUp(e) {
+        if (e.keyCode == 16) {
+            this.shift_down = false
+        }
     }
 }
 

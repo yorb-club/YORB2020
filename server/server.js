@@ -202,7 +202,7 @@ async function main() {
     // setInterval(updatePeerStats, 3000);
 
     updateProjects()
-    setInterval(updateProjects, 180000) // update projects every five minutes
+    setInterval(updateProjects, 1800000) // update projects every 50 minutes
 }
 
 main()
