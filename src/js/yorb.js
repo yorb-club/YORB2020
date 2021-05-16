@@ -149,11 +149,11 @@ export class Yorb {
             this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
             //this.projectionScreens.createYorbProjectionScreens()
-	    this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+	        this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
             this.itpModel = new ITPModel(this.scene);
             this.photoGallery = new PhotoGallery(this.scene);
             this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
-            this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 0);
+            this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 1);
         }
 
         // this.sketches = new Sketches(this.scene)
@@ -523,9 +523,15 @@ export class Yorb {
             if (this.frameCount % 10 === 0) {
                 // this.sketches.update()
 
-                if (this.controls.yorbieTarget) {
-                    let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
-                    this.yorbie.updateYorbie(lookPos);
+                //yorbie will follow the player if they press "y" or just look at them if not in the tutorial
+                if(this.yorbie.yorbie != undefined){
+                    if (this.tutorial == undefined && this.controls.yorbieTarget) {
+                        let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                        this.yorbie.updateYorbie(lookPos);
+                    } else if (this.tutorial == undefined) {
+                        let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                        this.yorbie.yorbie.lookAt(lookPos);
+                    }
                 }
             }
 

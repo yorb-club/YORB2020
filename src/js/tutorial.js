@@ -3,16 +3,17 @@
 *
 */
 import * as THREE from "three";
-import { Vector3 } from "three";
-import { Yorbie } from "./yorbie"
+import { MathUtils, Vector3 } from "three";
+import { leaveTutorial } from ".";
+// import { Yorbie } from "./yorbie"
 const posterFile = require('../assets/images/showPoster2021.png'); 
 
 let tutorialText = [
     "Welcome to the tutorial!\n\nHere you have a chance to practice the controls of the YORB without anyone else around. Lets start by looking around -- click and drag in the window.",
     "Great! When you click and drag, think of it like you're directing your virtual eyes to move in that direction. Now lets meet Yorbie! Look around until you see a little yellow puppy in the center of the window.",
-    "Hi Yorbie! Okay, now lets interact with him by holding SHIFT and clicking on him. This is how you can get more info from show posters.",
-    "Now he wants to play! Let's walk over to him. You can use the WASD keys or the arrow keys to move.",
-    "Yayyyyyy"
+    "Hi Yorbie! Okay, he wants to show us this poster -- lets interact with it by holding SHIFT and clicking on it. This is how you can get more info from show posters.",
+    "Now he wants to explore! Let's walk over to him. You can use the WASD keys or the arrow keys to move.",
+    "We're ready to join the public YORB! Make sure your camera and mic are on by checking the icons to the left. Shift+Click Yorbie when you're ready to exit the tutorial!"
 ];
 
 
@@ -24,10 +25,36 @@ export class Tutorial {
         this.mouse = mouse;
         this.position = playerPos; //array with both pos and rot
         this.yorbie = yorbie; // will have to change when its a server-side yorbie
-        this.yorbie.yorbie.position.set(this.position[0][0] + 1, 0, this.position[0][2]);
+        // this.yorbie.yorbie.position.set(this.position[0][0] + 1, 0, this.position[0][2]);
+        // let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+        // this.yorbie.yorbie.lookAt(lookPos);
+
+        //random yorbie pos
+        //this is all very dumb, don't @ me, i'm rushing
+        let userPos = new Vector3(this.camera.position.x, 0.1, this.camera.position.z);
+        // console.log("userPos: ");
+        // console.log(userPos);
+        let yorbiePos = new Vector3(this.camera.position.x + 2, 0.1, this.camera.position.z);
+        let clonePos = userPos.clone();
+        // console.log("yorbPos: ");
+        // console.log(yorbiePos);
+        yorbiePos.sub(userPos);
+        // console.log("yorbPos: ");
+        // console.log(yorbiePos);
+        let randRot = MathUtils.mapLinear(Math.random(), 0, 1, 0, 2 * Math.PI);
+        // console.log("randRot: ");
+        // console.log(randRot);
+        yorbiePos.applyAxisAngle(new Vector3(0, 1, 0), randRot);
+        // console.log("after apply: ");
+        // console.log(yorbiePos);
+        yorbiePos.add(clonePos);
+        // console.log("after add: ");
+        // console.log(yorbiePos);
+        this.yorbie.yorbie.position.set(yorbiePos.x, yorbiePos.y, yorbiePos.z);
         let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
         this.yorbie.yorbie.lookAt(lookPos);
-        // this.yorbieOrigPos = this.yorbie.position;
+        // this.yorbie.yorbie.visible = true;
+        
         // this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 2);
         this.layer = layer;
         this.textBox = document.getElementById("tutorialBox");
@@ -44,6 +71,28 @@ export class Tutorial {
         let posterTexture = new THREE.TextureLoader().load(posterFile);
         let posterMaterial = new THREE.MeshBasicMaterial({map: posterTexture});
         this.poster = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, .2), posterMaterial);
+        let posterPos = yorbiePos.sub(userPos).clone();
+        let posterRot = posterPos.clone();
+        posterRot.applyAxisAngle(new Vector3(0, 1, 0), Math.PI / 2);
+        posterPos.multiplyScalar(2);
+        posterPos.add(clonePos);
+        posterPos.add(posterRot);
+        posterPos.add(new Vector3(0, 1.5, 0));
+        this.poster.position.set(posterPos.x, posterPos.y, posterPos.z);
+        this.poster.lookAt(this.camera.position);
+        this.scene.add(this.poster);
+        this.poster.visible = false;
+
+        let vecToPoster = this.poster.position.clone();
+        vecToPoster.sub(new Vector3(0, 1.3, 0));
+        vecToPoster.sub(this.yorbie.yorbie.position);
+        this.posterPathSegment = vecToPoster.divideScalar(20);
+
+        this.closestArch = new Vector3(0, .2, 0);
+        this.posterBottom = this.poster.position.clone();
+        this.posterBottom.sub(new Vector3(0, 1.3, 0));
+        this.vecToArch = this.closestArch.sub(this.posterBottom);
+        this.vecToArch.divideScalar(20);
 
         console.log('tutorial launched')
     }
@@ -62,6 +111,9 @@ export class Tutorial {
                 break;
             case 1: //now look for yorbie
                 this.textBox.style.backgroundColor = "#b6a6f8";
+                
+                this.yorbie.yorbie.visible = true;
+
                 let posTarget = new Vector3();
                 let dirTarget = new Vector3(); //no idea why this is needed now
                 this.raycaster.set(this.camera.getWorldPosition(posTarget), this.camera.getWorldDirection(dirTarget));
@@ -72,42 +124,65 @@ export class Tutorial {
                 break;
             case 2: //shift click on show poster
                 this.textBox.style.backgroundColor = "#fafa4c";
+                this.poster.visible = true;
+               
+                //move yorbie to the poster
+                if (this.yorbie.yorbie.position.distanceTo(this.posterBottom) > .3){
+                    this.yorbie.yorbie.lookAt(this.posterBottom);
+                    this.yorbie.yorbie.position.add(this.posterPathSegment);
+                } else {
+                    let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                    this.yorbie.yorbie.lookAt(lookPos);
+                    yorbieReady = true;
+                }
                 this.raycaster.setFromCamera(this.mouse, this.camera);
-                let mouseRayIntersect = this.raycaster.intersectObject(this.yorbie.yorbie, true);
-                // let thresholdDist = 7;
+                let mouseRayIntersect = this.raycaster.intersectObject(this.poster, true);
                 if (mouseRayIntersect.length > 0) {
-                    // if (this.)
-                    console.log('asdfasdfd')
-                    this.yorbieCenter = true;
+                    this.yorbieCenter = true; //keeping this name instead of changing to poster because i'm rushing
                 } else {
                     this.yorbieCenter = false;
                 }
                 break;
             case 3: //walk over to Yorbie
                 this.textBox.style.backgroundColor = "#b6a6f8";
-                let origin = new Vector3(0, 0, 0);
+                this.poster.visible = false;
                 let yorbieReady = false;
-                if (this.yorbie.yorbie.position.distanceTo(origin) > .75){
-                    this.yorbie.yorbie.lookAt(origin);
-                    this.yorbie.yorbie.position.lerp(origin, .1);
+                if (this.yorbie.yorbie.position.distanceTo(this.closestArch) > 1.5){
+                    this.yorbie.yorbie.lookAt(this.closestArch);
+                    this.yorbie.yorbie.position.add(this.vecToArch);
                 } else {
-                    let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                    let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z);
                     this.yorbie.yorbie.lookAt(lookPos);
                     yorbieReady = true;
                 }
-                if (yorbieReady && this.yorbie.yorbie.position.distanceTo(this.camera.position) < 2){
+                if (yorbieReady && this.yorbie.yorbie.position.distanceTo(this.camera.position) < 3){
                     this.stage++;
                 }
                 break;
-            case 4:
+            case 4: //ready to join
                 this.textBox.style.backgroundColor = "#fafa4c";
+                let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z);
+                this.yorbie.yorbie.lookAt(lookPos);
+
+                this.raycaster.setFromCamera(this.mouse, this.camera);
+                let mouseRayIntersect2 = this.raycaster.intersectObject(this.yorbie.yorbie, true);
+                if (mouseRayIntersect2.length > 0) {
+                    this.yorbieCenter = true; // keeping this name instead of changing to poster because i'm rushing
+                } else {
+                    this.yorbieCenter = false;
+                }
+                break;
+            case 5: //join
+                this.textBox.style.visibility = "hidden";
+                this.stage++; //just to prevent double calling the leave function
+                leaveTutorial(); //in index.js, self-destructs the tutorial
                 break;
             default:
                 break;
         }
     }
     
-    onMouseClick(e) { //only for 3rd stage
+    onMouseClick(e) { 
         if (this.yorbieCenter && this.shift_down) {
             this.stage++;
             this.yorbieCenter = false;

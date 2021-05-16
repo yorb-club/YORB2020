@@ -79,6 +79,9 @@ export let mySocketID,
 window.clients = {}; // array of connected clients for three.js scene
 window.lastPollSyncData = {};
 
+//for tutorial checks
+let isInTutorial = true;
+
 // adding constraints, VIDEO_CONSTRAINTS is video quality levels
 // localMediaCOnstraints is passed to the getUserMedia object to request a lower video quality than the maximum
 // I believe some webcam settings may override this request
@@ -121,13 +124,14 @@ window.onload = async () => {
         }
     }
 
-    await initSocketConnection();
+    //moved below to init and leaveTutorial
+    // await initSocketConnection(); 
 
     // use sendBeacon to tell the server we're disconnecting when
     // the page unloads
-    window.addEventListener('unload', () => {
-        socket.request('leave', {});
-    });
+    // window.addEventListener('unload', () => {
+    //     socket.request('leave', {});
+    // });
 
     alert('Allow YORB to access your webcam for the full experience');
     await startCamera();
@@ -142,6 +146,14 @@ window.onload = async () => {
 async function init() {
     document.getElementById('overlay').style.visibility = 'hidden';
 
+    await initSocketConnection(); 
+
+    // use sendBeacon to tell the server we're disconnecting when
+    // the page unloads
+    window.addEventListener('unload', () => {
+        socket.request('leave', {});
+    });
+
     // only join room after we user has interacted with DOM (to ensure that media elements play)
     if (!initialized) {
         await joinRoom();
@@ -149,6 +161,7 @@ async function init() {
         setupControls();
         turnGravityOn();
         initialized = true;
+        isInTutorial = false;
     }
     yorbScene.camera.layers.set(0);    
 
@@ -164,11 +177,30 @@ async function launchTutorial() {
         setupControls();
         turnGravityOn();
         initialized = true;
+        isInTutorial = true;
+
     }
 
     // yorbScene.camera.layers.set(1);    
     yorbScene.camera.layers.enable(2);
     yorbScene.startTutorial();    
+
+}
+
+export async function leaveTutorial() {
+    await initSocketConnection(); 
+
+    // use sendBeacon to tell the server we're disconnecting when
+    // the page unloads
+    window.addEventListener('unload', () => {
+        socket.request('leave', {});
+    });
+
+    await joinRoom();
+    sendCameraStreams();
+
+    isInTutorial = false;
+    yorbScene.tutorial = undefined;
 
 }
 
@@ -286,7 +318,9 @@ function updateProjects(_projects) {
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 
 function onPlayerMove() {
-    socket.emit('move', yorbScene.getPlayerPosition());
+    if(!isInTutorial){
+        socket.emit('move', yorbScene.getPlayerPosition());
+    }
 }
 
 export function hackToRemovePlayerTemporarily() {

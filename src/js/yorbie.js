@@ -1,9 +1,9 @@
 /*
-*
+* ask August for any info
 *
 */
 import * as THREE from "three";
-import { Vector3 } from "three";
+import { BoxGeometry, Vector3 } from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 const yorbieModel = require('../assets/models/yorbie.glb');
 
@@ -32,7 +32,7 @@ export class Yorbie {
     // scene.add(myMesh);
     }
 
-    loadYorbie(modelPath, layer) {
+    loadYorbie(modelPath, layer) { //not using layers anymore
         this.modelLoader.load(
             modelPath,
             (gltf) => {
@@ -45,15 +45,22 @@ export class Yorbie {
                         // child.material = _material
                         child.castShadow = true
                         child.receiveShadow = true
-                        child.layers.set(layer);
+                        // child.layers.set(layer);
                     }
                 })
+
+                //add box collider
+                let box = new THREE.Mesh(new THREE.BoxGeometry(250, 250, 250));
+                box.visible = false;
+                this.yorbie.add(box);
+
                 // if (layer > 0){
                     // this.yorbie.layers.disableAll();
-                    this.yorbie.layers.set(layer);
-                    console.log(this.yorbie.layers)
+                    // this.yorbie.layers.set(layer);
+                    // console.log(this.yorbie.layers)
                 // }
                 this.scene.add(this.yorbie);
+                this.yorbie.visible = true;
             },
             undefined,
             function (e) {
