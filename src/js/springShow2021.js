@@ -741,8 +741,8 @@ export class SpringShow2021 {
         link.userData.lastVisitedTime = now;
         link.userData.highlighted = true;
 
-        link.children[0].material = this.highlightMaterial;
-        link.scale.set(1.1, 1.1, 1.1);
+        link.material = this.highlightMaterial;
+        link.scale.set(1.01, 1.01, 1.01);
     }
 
     resetLinkMaterial(link) {
@@ -756,7 +756,7 @@ export class SpringShow2021 {
             mat = this.linkMaterial;
         }
         // log(link);
-        link.children[0].material = mat;
+        link.material = mat;
     }
 
     activateHighlightedProject() {
