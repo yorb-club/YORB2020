@@ -277,7 +277,7 @@ export class SpringShow2021 {
             locX += projectSpacing;
 
             let hyperlink = this.createHyperlinkedMesh(locX, projectHeight, locZ, proj);
-            hyperlink.rotateY(-Math.PI / 2);
+            // hyperlink.rotateY(-Math.PI / 2);
             this.hyperlinkedObjects.push(hyperlink);
             miniGalleryParent.add(hyperlink);
 
@@ -295,7 +295,7 @@ export class SpringShow2021 {
             locX += projectSpacing;
 
             let hyperlink = this.createHyperlinkedMesh(locX, projectHeight, locZ, proj);
-            hyperlink.rotateY(Math.PI / 2);
+            // hyperlink.rotateY(Math.PI / 2);
             this.hyperlinkedObjects.push(hyperlink);
             miniGalleryParent.add(hyperlink);
 
@@ -324,54 +324,54 @@ export class SpringShow2021 {
         this.scene.add(miniGalleryParent);
     }
     // this will update the project posters
-    arrangeProjectsInOval(radius, numProjects, projectOffset) {
-        // set left side offsets
-        let xOffset = 0;
-        let zOffset = radius / 2;
+    // arrangeProjectsInOval(radius, numProjects, projectOffset) {
+    //     // set left side offsets
+    //     let xOffset = 0;
+    //     let zOffset = radius / 2;
 
-        let projectHeight = 1;
+    //     let projectHeight = 1;
 
-        let projectIndex = projectOffset;
-        // make left side projects
-        for (let i = 0; i < numProjects / 2; i++) {
-            let proj = this.projects[projectIndex];
-            if (!proj) return;
+    //     let projectIndex = projectOffset;
+    //     // make left side projects
+    //     for (let i = 0; i < numProjects / 2; i++) {
+    //         let proj = this.projects[projectIndex];
+    //         if (!proj) return;
 
-            let theta = (Math.PI * 2) / (numProjects - 2);
-            let angle = theta * i;
+    //         let theta = (Math.PI * 2) / (numProjects - 2);
+    //         let angle = theta * i;
 
-            let centerX = radius * Math.cos(angle) + xOffset;
-            let centerZ = radius * Math.sin(angle) + zOffset;
+    //         let centerX = radius * Math.cos(angle) + xOffset;
+    //         let centerZ = radius * Math.sin(angle) + zOffset;
 
-            let hyperlink = this.createHyperlinkedMesh(centerX, projectHeight, centerZ, proj);
-            hyperlink.lookAt(centerX, projectHeight, centerZ);
-            this.hyperlinkedObjects.push(hyperlink);
-            this.scene.add(hyperlink);
+    //         let hyperlink = this.createHyperlinkedMesh(centerX, projectHeight, centerZ, proj);
+    //         hyperlink.lookAt(centerX, projectHeight, centerZ);
+    //         this.hyperlinkedObjects.push(hyperlink);
+    //         this.scene.add(hyperlink);
 
-            projectIndex++;
-        }
+    //         projectIndex++;
+    //     }
 
-        xOffset = 0;
-        zOffset = -radius / 2;
+    //     xOffset = 0;
+    //     zOffset = -radius / 2;
 
-        // make right side projects
-        for (let i = numProjects / 2 - 1; i < numProjects - 1; i++) {
-            let proj = this.projects[projectIndex];
-            if (!proj) return;
+    //     // make right side projects
+    //     for (let i = numProjects / 2 - 1; i < numProjects - 1; i++) {
+    //         let proj = this.projects[projectIndex];
+    //         if (!proj) return;
 
-            let theta = (Math.PI * 2) / (numProjects - 2);
-            let angle = theta * i;
+    //         let theta = (Math.PI * 2) / (numProjects - 2);
+    //         let angle = theta * i;
 
-            let centerX = radius * Math.cos(angle) + xOffset;
-            let centerZ = radius * Math.sin(angle) + zOffset;
+    //         let centerX = radius * Math.cos(angle) + xOffset;
+    //         let centerZ = radius * Math.sin(angle) + zOffset;
 
-            let hyperlink = this.createHyperlinkedMesh(centerX, projectHeight, centerZ, proj);
-            this.hyperlinkedObjects.push(hyperlink);
-            this.scene.add(hyperlink);
+    //         let hyperlink = this.createHyperlinkedMesh(centerX, projectHeight, centerZ, proj);
+    //         this.hyperlinkedObjects.push(hyperlink);
+    //         this.scene.add(hyperlink);
 
-            projectIndex++;
-        }
-    }
+    //         projectIndex++;
+    //     }
+    // }
 
     addPortals() {
         this.portals.push(new Portal(this.scene, new THREE.Vector3(0, 0, -60), 0));
@@ -392,20 +392,20 @@ export class SpringShow2021 {
         return decodedString2;
     }
 
-    addLineBreak(longString) {
-        let spaceIndex = longString.indexOf(' ', 10);
+    addLineBreak(longString, maxLineLength = 10) {
+        let spaceIndex = longString.indexOf(' ', maxLineLength);
         if (spaceIndex != -1) {
             let firstHalf = longString.slice(0, spaceIndex);
             let secondHalf = longString.slice(spaceIndex, longString.length);
-            if (secondHalf.length > 15) {
-                secondHalf = this.addLineBreak(secondHalf);
+            if (secondHalf.length > maxLineLength + 5) {
+                secondHalf = this.addLineBreak(secondHalf, maxLineLength);
             }
             return firstHalf.trim() + '\n' + secondHalf.trim();
         } else {
             return longString;
         }
     }
-
+    
     /*
      * createHyperlinkedMesh(x,y,z,_project)
      *
@@ -420,23 +420,129 @@ export class SpringShow2021 {
         let linkDepth = 0.1;
         let fontColor = 0x343434;
         let statusColor = 0xffffff;
-        let fontSize = 0.05;
+        
 
-        var geometry = new THREE.BoxGeometry(linkDepth, 0.75, 0.75);
-        var textBoxGeometry = new THREE.BoxGeometry(linkDepth, 0.5, 0.75);
+        let posterDepth = 0.25;
 
-        let textBoxMat;
+        let scaleFactor = 1;
+
+        let group = new THREE.Group();
+
+        // create a background
+        let backgroundGeo = new THREE.BoxGeometry(3 * scaleFactor,1.5 * scaleFactor,posterDepth * scaleFactor);
+        // let backgroundMat = new THREE.MeshBasicMaterial({color: 'yellow'});
+        let backgroundMat = this.linkMaterial;
+        let projectPoster = new THREE.Mesh(backgroundGeo, backgroundMat);
+
+        // add project image
+        let imageRatio = 1280/720;
+        let imageHeight = 1.25;
+        let imageGeo = new THREE.BoxGeometry(imageHeight * imageRatio * scaleFactor, imageHeight * scaleFactor, (posterDepth + 0.1) * scaleFactor);
+        let imageMat = this.getProjectImageMat(_project.project_id)
+        let imageMesh = new THREE.Mesh(imageGeo, imageMat);
+
+        // offset imageMesh
+        imageMesh.position.set(-0.75 * scaleFactor,0,0);
+
+
+        // var geometry = new THREE.BoxGeometry(linkDepth, 0.75, 0.75);
+        // var textBoxGeometry = new THREE.BoxGeometry(linkDepth, 0.5, 0.75);
+
+        // let textBoxMat;
 
         // check whether we've visited the link before and set material accordingly
-        if (localStorage.getItem(_project.project_id) == 'visited') {
-            textBoxMat = this.linkVisitedMaterial;
-        } else {
-            textBoxMat = this.linkMaterial;
+        // if (localStorage.getItem(_project.project_id) == 'visited') {
+        //     textBoxMat = this.linkVisitedMaterial;
+        // } else {
+        //     textBoxMat = this.linkMaterial;
+        // }
+
+        // let imageMat = this.getProjectImageMat(_project.project_id)
+
+        // var textSign = new THREE.Mesh(textBoxGeometry, textBoxMat);
+        // var imageSign = new THREE.Mesh(geometry, imageMat);
+
+        /////// set up text
+        let titleFontSize = 0.05;
+        let namesFontSize = 0.035;
+        let smallerFontSize = 0.03;
+
+        // parse text of name and add line breaks if necessary
+        var name = this.parseText(_project.project_name);
+        if (name.length > 15) {
+            name = this.addLineBreak(name, 15);
         }
 
+        let elevator_pitch = this.parseText(_project.elevator_pitch);
+        if (elevator_pitch.length > 35) {
+            elevator_pitch = this.addLineBreak(elevator_pitch, 35);
+        }
+
+        // names
+        let names = '';
+        for (let i = 0; i < _project.users.length; i++) {
+            names += _project.users[i].user_name;
+            if (i < _project.users.length - 1) {
+                names += ' & ';
+            }
+        }
+
+
+
+        // create name text mesh
+        let textGroup = new THREE.Group();
+        let projectNameTextMesh = createSimpleText(name, fontColor, titleFontSize, this.font);
+        let elevatorPitchTextMesh = createSimpleText(elevator_pitch, fontColor, smallerFontSize , this.font);
+        let namesTextMesh = createSimpleText(names, fontColor, namesFontSize, this.font);
+       
+
+        projectNameTextMesh.position.y += 0.3 * scaleFactor;
+        namesTextMesh.position.y += 0.2 * scaleFactor;
+        elevatorPitchTextMesh.position.y += 0 * scaleFactor;
+        textGroup.add(projectNameTextMesh);
+        textGroup.add(elevatorPitchTextMesh);
+        textGroup.add(namesTextMesh);
+
+
+
+        textGroup.position.set(0.9 * scaleFactor,0,posterDepth + 0.01);
+        let alternateSideTextGroup = textGroup.clone();
+        alternateSideTextGroup.rotateY(Math.PI);
+        alternateSideTextGroup.position.set(0.9 * scaleFactor,0,-posterDepth + 0.01);
+        // projectNameTextMesh.position.x += linkDepth / 2 + 0.01; // offset forward
+        // projectNameTextMesh.rotateY(Math.PI / 2);
+
+        // imageSign.position.set(x, y, z);
+        // textSign.position.set(0, -0.75 / 2 - 0.5 / 2, 0);
+        // textSign.add(projectNameTextMesh);
+        // imageSign.add(textSign);
+        // imageSign.add(projectPoster);
+
+        projectPoster.add(imageMesh);
+        projectPoster.add(textGroup);
+        projectPoster.add(alternateSideTextGroup);
+
+        projectPoster.position.set(x,y,z);
+
+        projectPoster.name = _project.project_id;
+
+
+        // https://stackoverflow.com/questions/24690731/three-js-3d-models-as-hyperlink/24692057
+        let now = Date.now();
+        projectPoster.userData = {
+            project: _project,
+            lastVisitedTime: now,
+        };
+
+        // imageSign.name = _project.project_id;
+
+        return projectPoster;
+    }
+
+    getProjectImageMat(project_id){
         let tex;
-        if (project_thumbnails[_project.project_id]) {
-            tex = this.textureLoader.load(project_thumbnails[_project.project_id]);
+        if (project_thumbnails[project_id]) {
+            tex = this.textureLoader.load(project_thumbnails[project_id]);
         } else {
             tex = this.textureLoader.load(project_thumbnails['0000']); // default texture
         }
@@ -449,38 +555,9 @@ export class SpringShow2021 {
             map: tex,
         });
 
-        this.linkMaterials[_project.project_id.toString()] = imageMat;
+        this.linkMaterials[project_id.toString()] = imageMat;
 
-        var textSign = new THREE.Mesh(textBoxGeometry, textBoxMat);
-        var imageSign = new THREE.Mesh(geometry, imageMat);
-
-        // parse text of name and add line breaks if necessary
-        var name = this.parseText(_project.project_name);
-        if (name.length > 15) {
-            name = this.addLineBreak(name);
-        }
-
-        // create name text mesh
-        var textMesh = createSimpleText(name, fontColor, fontSize, this.font);
-
-        textMesh.position.x += linkDepth / 2 + 0.01; // offset forward
-        textMesh.rotateY(Math.PI / 2);
-
-        imageSign.position.set(x, y, z);
-        textSign.position.set(0, -0.75 / 2 - 0.5 / 2, 0);
-        textSign.add(textMesh);
-        imageSign.add(textSign);
-
-        // https://stackoverflow.com/questions/24690731/three-js-3d-models-as-hyperlink/24692057
-        let now = Date.now();
-        imageSign.userData = {
-            project: _project,
-            lastVisitedTime: now,
-        };
-
-        imageSign.name = _project.project_id;
-
-        return imageSign;
+        return imageMat;
     }
 
     /*
