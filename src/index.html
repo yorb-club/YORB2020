@@ -20,14 +20,305 @@
             <div class="main-content-container">
                 <div id="scene-container"></div>
                 <div id="overlay">
-                    <div style="padding-top: 5%">
-                        <div>Welcome to the YORB! <br><br> First time visiting or want a refresher on controls? Click here --> </div> 
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <style>
+                    body {font-family: "VCR", Arial, sans-serif}
+                    
+                    /* Full-width input fields */
+                    
+                    /* Set a style for all buttons */
+                    button2 {
+                      background-color: #5BADFF;
+                      color: white;
+                      padding: 14px 20px;
+                      margin: auto;
+                      border: none;
+                      cursor: pointer;
+                      width: auto;
+                      position:absolute;
+                      top: 40%;
+                      left: 16%;           
+                    }
+                    
+                    button2:hover {
+                      opacity: 0.8;
+                    }
+                    /* Set a style for all buttons */
+                    button1 {
+                      background-color: #5BADFF;
+                      color: white;
+                      padding: 14px 20px;
+                      margin: auto;
+                      border: none;
+                      cursor: pointer;
+                      width: auto;
+                      position:absolute;
+                      top: 40%;
+                      left: 27%;
+                      
+            
+                    }
+                    
+                    button1:hover {
+                      opacity: 0.8;
+                    }
+                    
+                    button3 {
+                      background-color: #5BADFF;
+                      color: white;
+                      padding: 14px 20px;
+                      margin: 20px;
+                      border: none;
+                      cursor: pointer;
+                      width: auto;
+                      position:absolute;
+                      top: 300px;
+                      left: 250px;
+                      
+                  
+            
+                    }
+                    
+                    button3:hover {
+                      opacity: 0.8;
+                    }
+
+                    /* Extra styles for the cancel button */
+                    .cancelbtn {
+                      width: auto;
+                      padding: 10px 18px;
+                      background-color:#F8F7E1
+                      
+                    }
+                    
+                    /* Center the image and position the close button */
+                    .imgcontainer {
+                      text-align: center;
+                      margin: 24px 0 12px 0;
+                      position: relative;
+                       
+                    }
+                    
+                    img.avatar {
+                      width: 60%;
+                      
+                    }
+                                      
+                    .container {
+                      padding: 16px;
+                      /* margin-top: 20%; */
+                    }
+                    
+                    span.psw {
+                      float: right;
+                      padding-top: 16px;
+                    }
+
+                    /* image2 */
+
+                    .imgcontainer {
+                      text-align: center;
+                      margin: 24px 0 12px 0;
+                      position: relative;
+                      top:30px;
+                      left:10px;
+                    }
+                    img.avatar2 {
+                      width: 30%;
+                      
+                    }
+
+                    .welcome {
+                      position: absolute;
+                      top: 16%;
+                      left: 16%;
+                      color:#000;
+                    }
+
+
+                    .event {
+                      position: absolute;
+                      top: 16%;
+                      left: 43%;
+                      color:#000;
+                    }
+
+
+                    .gallery370 {
+                      position: absolute;
+                      top: 28%;
+                      left: 20%;
+                      color:#000;
+                    }
+                  
+
+                    .gallery721 {
+                      position: absolute;
+                      top: 32%;
+                      left: 20%;
+                      color:#000;
+                    }
+
+
+
+                    .ellennotes1 {
+                      position: absolute;
+                      top: 28%;
+                      left: 41%;
+                      color:#000;
+                      
+                    }
+
+
+                    .ellennotes2 {
+                      position: absolute;
+                      top: 45%;
+                      left: 43%;
+                      color:#000;
+                      text-align:left;
+                    }
+
+
+                    /* The Modal (background) */
+                    .modal {
+                      display: none; /* Hidden by default */
+                      position: relative; /* Stay in place */
+                      z-index: 1; /* Sit on top */
+                      left: 0;
+                      top: 0;
+                      width: 100%; /* Full width */
+                      height: 100%; /* Full z */
+                      overflow: auto; /* Enable scroll if needed */
+                      background-color: rgb(0,0,0); /* Fallback color */
+                      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+                      padding-top: 60px;
+                    }
+                    
+                    /* Modal Content/Box */
+                    .modal-content {
+                      background-color: #F8F7E1;
+                      margin: 15% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+                      border: 1px solid #F8F7E1;
+                      width: 90%; /* Could be more or less, depending on screen size */
+                    }
+                    
+                    /* The Close X Button (x) */
+                    .close {
+                      position: absolute;
+                      right: 25px;
+                      top: 0;
+                      color: rgb(247, 239, 239);
+                      font-size: 35px;
+                      font-weight: bold;
+                    }
+                    
+                    .close:hover,
+                    .close:focus {
+                      color:#F8F7E1;
+                      cursor: pointer;
+                    }
+                    
+                    /* Add Zoom Animation */
+                    .animate {
+                      -webkit-animation: animatezoom 0.6s;
+                      animation: animatezoom 0.6s
+                    }
+                    
+                    @-webkit-keyframes animatezoom {
+                      from {-webkit-transform: scale(0)} 
+                      to {-webkit-transform: scale(1)}
+                    }
+                      
+                    @keyframes animatezoom {
+                      from {transform: scale(0)} 
+                      to {transform: scale(1)}
+                    }
+                    
+                    /* Change styles for span and cancel button on extra small screens */
+                    @media screen and (max-width: 300px) {
+                      span.psw {
+                         display: block;
+                         float: none;
+                      }
+                      .cancelbtn {
+                         width: 100%;
+                      }
+                    }
+                    </style>
+                    </head>
+                    <body>
+                    
+                    <h2></h2>
+                    
+                    <!-- <button onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Click to Enter</button> -->
+                    
+                    <div id="id01" class="modal">
+                      
+                      <form class="modal-content animate" action="/action_page.php" method="post">
+                        <div class="imgcontainer">
+                          <!-- <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span> -->
+                          <img src=./assets/images/popupBackground1.png alt="Avatar" class="avatar">
+                          <img src=./assets/images/springshowsquare.png alt="Avatar2" class="avatar2">
+                        </div>
+                    
+                        <div class="container">
+                          <button2 id="enterButton" type="enter">Enter</button2>
+                          <button1 id="tutorialButton" type="tutorial">See Tutorial</button1>
+
+                          <div class="welcome"><h1>Welcome to Yorb!</h1></div>
+
+                          <div class="event"><h1>Today's Event</h1></div>
+
+                          <div class="gallery370"><a href="http://google.com"><p1>Visit Gallery 370</p1></a></div>
+
+                          <div class="gallery721"><a href="http://google.com"><p2>Visit Gallery 721</p2></a></div>
+
+                          <div class="ellennotes1"><p2><small>The [ITP/IMA/Low Res] Spring Show 2021<br>
+                            A Festival of the Recently Possible<br> From May 17 - 18<br>
+                            
+                            YORB Gallery Opening<br>
+                            Monday May 17 10am - 12pm ET<br>
+                            </small></p2></div>
+
+                            <div class="ellennotes2"><p2><small>Celebrate our students and<br> their incredible work<br> from this semester!<br>
+                            
+                              The YORB Gallery open <br>throughout the festival<br> as an experimental and <br>playful archive of students’<br> projects and social space.<br>
+                              
+                              More events and festival info:<br> https://itp.nyu.edu/show
+                               </small></p2></div>
+                        </div>
+                    
+                        <!-- <div class="container" style="background-color:#F8F7E1">
+                          <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancel</button>
+                           
+                        </div> -->
+                      </form>
+                    </div>
+                    
+                    <!-- <script>
+                    // Get the modal
+                    // var modal = document.getElementById('id01');
+                    
+                    // When the user clicks anywhere outside of the modal, close it
+                    // window.onclick = function(event) {
+                    //     if (event.target == modal) {
+                    //         modal.style.display = "none";
+                    //     }
+                    // }
+                     // </script> -->
+
+                    <!-- <script>  var button2 = document.getElementById('button2')
+                      button2.addEventListener('click', init)
+                    </script> -->
+                    
+                    <!-- <div style="padding-top: 5%">
+                        <div>Welcome to the YORB! <br><br> First time visiting or want a refresher on controls? Click here -> </div> 
                         <button id="tutorialButton"><img src="./assets/images/enter.png" /></button>
                     </div>
                     <div style="padding-top: 5%">
-                        <div>Ready to jump right into the YORB?  Click here --></div>
+                        <div>Ready to jump right into the YORB?  Click here -></div>
                         <button id="startButton"><img src="./assets/images/enter.png" /></button>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="webcam-status-overlay">

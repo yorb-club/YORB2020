@@ -136,7 +136,7 @@ window.onload = async () => {
     alert('Allow YORB to access your webcam for the full experience');
     await startCamera();
 
-    var startButton = document.getElementById('startButton');
+    var startButton = document.getElementById('enterButton');
     startButton.addEventListener('click', init);
 
     var tutorialButton = document.getElementById('tutorialButton');
