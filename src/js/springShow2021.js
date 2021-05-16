@@ -222,10 +222,10 @@ export class SpringShow2021 {
             let projects = this.projects;
 
             for (let i = 0; i < this.hyperlinkedObjects.length; i++) {
-                console.log('removing projects');
+                // console.log('removing projects');
                 this.scene.remove(this.hyperlinkedObjects[i]);
             }
-            console.log(this.hyperlinkedObjects);
+            // console.log(this.hyperlinkedObjects);
             this.hyperlinkedObjects = [];
 
             // do a check for duplicates
@@ -255,10 +255,12 @@ export class SpringShow2021 {
                 let gallerySpacingX = 20;
                 let gallerySpacingZ = 20;
 
-                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, 0, Math.PI, 0xff00ff);
-                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, 0, 0, 0xffffff);
-                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, 0, Math.PI, 0x0000ff);
-                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, 0, 0, 0x00ffff);
+                let startOffset = 0;
+
+                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, 0xff00ff);
+                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, 0xffffff);
+                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, 0x0000ff);
+                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, 0, startOffset + 30, 0x00ffff);
 
                 // console.log("We've placed ", endIndex, ' projects so far.')
             }
@@ -735,11 +737,11 @@ export class SpringShow2021 {
         link.userData.highlighted = true;
 
         link.material = this.highlightMaterial;
-        link.scale.set(1.01, 1.01, 1.01);
+        // link.scale.set(1.01, 1.01, 1.01);
     }
 
     resetLinkMaterial(link) {
-        link.scale.set(1, 1, 1);
+        // link.scale.set(1, 1, 1);
         // reset according to whether we have visited it or not yet
         let mat;
         // check whether we've visited the link before and set material accordingly
@@ -750,7 +752,7 @@ export class SpringShow2021 {
         }
         // log(link);
         link.material = mat;
-        link.scale.set(1.0, 1.0, 1.0);
+        // link.scale.set(1.0, 1.0, 1.0);
     }
 
     activateHighlightedProject() {
