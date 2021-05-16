@@ -87,11 +87,30 @@ export class Tutorial {
         vecToPoster.sub(new Vector3(0, 1.3, 0));
         vecToPoster.sub(this.yorbie.yorbie.position);
         this.posterPathSegment = vecToPoster.divideScalar(20);
-
-        this.closestArch = new Vector3(0, .2, 0);
+        //redundant
         this.posterBottom = this.poster.position.clone();
         this.posterBottom.sub(new Vector3(0, 1.3, 0));
-        this.vecToArch = this.closestArch.sub(this.posterBottom);
+
+        //finds nearest arch (all just 20,20) -- laborious but w/e
+        let arch1Pos = new Vector3(20, 0.1, 20);
+        let arch2Pos = new Vector3(20, 0.1, -20);
+        let arch3Pos = new Vector3(-20, 0.1, 20);
+        let arch4Pos = new Vector3(-20, 0.1, -20);
+        let arch1Dist = this.posterBottom.distanceTo(arch1Pos);
+        let arch2Dist = this.posterBottom.distanceTo(arch2Pos);
+        let arch3Dist = this.posterBottom.distanceTo(arch3Pos);
+        let arch4Dist = this.posterBottom.distanceTo(arch4Pos);
+        if (arch1Dist < arch2Dist && arch1Dist < arch3Dist && arch1Dist < arch4Dist){
+            this.closestArch = arch1Pos;
+        } else if (arch2Dist < arch1Dist && arch2Dist < arch3Dist && arch2Dist < arch4Dist){
+            this.closestArch = arch2Pos;
+        } else if (arch3Dist < arch2Dist && arch3Dist < arch1Dist && arch3Dist < arch4Dist){
+            this.closestArch = arch3Pos;
+        } else {
+            this.closestArch = arch4Pos;
+        }
+        let archPath = this.closestArch.clone();
+        this.vecToArch = archPath.sub(this.posterBottom);
         this.vecToArch.divideScalar(20);
 
         console.log('tutorial launched')
@@ -147,7 +166,7 @@ export class Tutorial {
                 this.textBox.style.backgroundColor = "#b6a6f8";
                 this.poster.visible = false;
                 let yorbieReady = false;
-                if (this.yorbie.yorbie.position.distanceTo(this.closestArch) > 1.5){
+                if (this.yorbie.yorbie.position.distanceTo(this.closestArch) > 4){
                     this.yorbie.yorbie.lookAt(this.closestArch);
                     this.yorbie.yorbie.position.add(this.vecToArch);
                 } else {
