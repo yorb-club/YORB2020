@@ -7,7 +7,7 @@ import { Portal } from './portals';
 import { Signage } from './signage';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
-const project_thumbnails = require('../assets/images/project_thumbnails/winterShow2020/*.png');
+const project_thumbnails = require('../assets/images/project_thumbnails/springShow2021/*.jpg');
 
 const waterTextureFile = require('../assets/images/TexturesCom_WaterPlain0012_1_seamless_S.jpg');
 const grassTextureFile = require('../assets/images/Grass004_1K_Color.jpg');
