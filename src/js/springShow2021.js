@@ -5,9 +5,11 @@ import { hackToRemovePlayerTemporarily } from './index.js';
 import { Vector3 } from 'three';
 import { Portal } from './portals';
 import { Signage } from './signage';
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+const signModel = require('../assets/models/furniture/ITPSpringShow2021.glb');
 
 const project_thumbnails = require('../assets/images/project_thumbnails/winterShow2020/*.png');
-
 const waterTextureFile = require('../assets/images/TexturesCom_WaterPlain0012_1_seamless_S.jpg');
 const grassTextureFile = require('../assets/images/Grass004_1K_Color.jpg');
 
@@ -31,6 +33,21 @@ const yorbletPortalReference = [
     // { position: new Vector3(-23, 0, -45) },
     // { position: new Vector3(-23, 0, -47.5) }
 ];
+
+
+//YORBLET INDEX
+
+
+// set which YORBLET we're in based on hostname
+const hostname = window.location.hostname
+
+let YORBLET_INDEX = 1
+if (hostname === 'yorblet1.itp.io') {
+    YORBLET_INDEX = 1
+} else if (hostname === 'yorblet2.itp.io') {
+    YORBLET_INDEX = 2
+}
+
 
 export class SpringShow2021 {
     constructor(scene, camera, controls, mouse) {
@@ -60,6 +77,9 @@ export class SpringShow2021 {
 
         this.portals = [];
 
+        //loading gltf
+        this.signloader = new GLTFLoader();
+
         // let domElement = document.getElementById('scene-container')
         window.addEventListener('click', (e) => this.onMouseClick(e), false);
 
@@ -78,6 +98,8 @@ export class SpringShow2021 {
 
         this.addGround();
         this.addPortals();
+
+        this.add3dPoster(signModel);
         // this.addDecals();
         // var signage = new Signage(this.scene);
         // this.addArrowSigns();
@@ -93,6 +115,40 @@ export class SpringShow2021 {
         groundPlane.rotateX(-Math.PI / 2);
         this.scene.add(groundPlane);
     }
+
+
+    add3dPoster(signModel){
+
+      this.signloader.load(signModel , ( gltf ) => {
+
+      let signScene = gltf.scene;
+      //side
+      //signScene.position.set(27, 12, 39);
+
+      //positioning by portal
+      signScene.position.set(0, 12, -68);
+      signScene.scale.set(8, 8, 8);
+      //signScene.rotateY(Math.PI);
+
+      this.scene.add( signScene );
+      console.log("success");
+
+    }, undefined, function ( e ) {
+
+      	//console.error( error );
+        log('trying to load portal');
+        console.error(e);
+
+      } );
+
+    }
+
+    addInfoSigns(){
+
+      //-23.414260246741083, 0.25, 38.92540156709661
+
+    }
+
 
     // addDecals() {
     //     //add welcome sign
@@ -246,10 +302,25 @@ export class SpringShow2021 {
                 let gallerySpacingX = 20;
                 let gallerySpacingZ = 20;
 
-                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, 0, Math.PI, 0xff00ff);
-                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, 0, 0, 0xffffff);
-                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, 0, Math.PI, 0x0000ff);
-                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, 0, 0, 0x00ffff);
+
+                //LYDIA
+                //set arch colors the same in each gallery
+                let archColA = 0xffffff;
+                let archColB = 0x3C9EFC;
+                let archColC = 0xFEE83D;
+                let archColD = 0x42D4A3;
+
+                //floor colors
+                //yellow
+                let floorA = 0xFEE83D
+                //red
+                let floorB = 0xF44848
+
+
+                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, 0, Math.PI, archColA);
+                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, 0, 0, archColB);
+                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, 0, Math.PI, archColC);
+                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, 0, 0, archColD);
 
                 // console.log("We've placed ", endIndex, ' projects so far.')
             }
@@ -306,11 +377,18 @@ export class SpringShow2021 {
         torus.rotateY(Math.PI / 2);
         miniGalleryParent.add(torus);
 
+
+        //LYDIA
+        //add an arrow next to the entrance
+
+
+
+
         // then a floor
         let floorWidth = projectSpacing * 1.5;
         let floorLength = projectSpacing * (numProjects / 2 + 1);
         let geo = new THREE.BoxGeometry(floorLength, 0.1, floorWidth);
-        let mat = new THREE.MeshLambertMaterial({ color: 'hotpink' });
+        let mat = new THREE.MeshLambertMaterial({ color: 0xF44848 });
         let mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(projectSpacing * (numProjects / 4), 0, 0);
         miniGalleryParent.add(mesh);
