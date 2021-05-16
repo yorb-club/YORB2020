@@ -4,9 +4,12 @@
 *
 */
 
-let VENUE_ID = 165;
+let VENUE_ID = 166;
 
 let url = `https://itp.nyu.edu/projects/public/projectsJSON_ALL.php?venue_id=${VENUE_ID}`
+
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0
 
 var https = require('https');
 var Stream = require('stream').Transform;
@@ -83,8 +86,11 @@ function downloadAndProcessImage(url, filename) {
             //         console.log(info);
             //     });
             sharp(data.read())
-                .resize(256,256)
-                .toFile('project_thumbnails/' + filename + '.png', (err, info) => {
+                .resize(1280,720)
+                .jpeg({
+                    quality:75
+                })
+                .toFile('projectThumbnails/' + filename + '.jpg', (err, info) => {
                     console.log(err);
                     console.log(info);
                 });
