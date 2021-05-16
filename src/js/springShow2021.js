@@ -383,7 +383,7 @@ export class SpringShow2021 {
 
     addPortals() {
         const hostname = window.location.hostname
-        
+
         if (hostname === 'yorblet1.itp.io') {
             // if you're at gallery 1, show portal to gallery 2
             this.portals.push(new Portal(this.scene, new THREE.Vector3(1.5, 0, -60), 2));
