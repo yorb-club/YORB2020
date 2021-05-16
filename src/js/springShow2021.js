@@ -260,7 +260,7 @@ export class SpringShow2021 {
                 this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, 0xff00ff);
                 this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, 0xffffff);
                 this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, 0x0000ff);
-                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, 0, startOffset + 30, 0x00ffff);
+                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, startOffset + 30, 0, 0x00ffff);
 
                 // console.log("We've placed ", endIndex, ' projects so far.')
             }
