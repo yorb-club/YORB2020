@@ -11,10 +11,11 @@ import { redrawVideoCanvas, makeVideoTextureAndMaterial } from './utils';
 
 import { SpringShow2020 } from './springShow2020';
 import { WinterShow2020 } from './winterShow2020';
+import { SpringShow2021 } from './springShow2021';
 import { ITPModel } from './itpModel';
 import { Sketches } from './p5Sketches';
 import { ProjectionScreens } from './projectionScreens';
-import { YorbControls2 } from './yorbControls2.js';
+import { Controls } from './controls.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
@@ -23,8 +24,7 @@ import { Tutorial } from './tutorial';
 let tutorialLayer = 2;
 
 
-import {sceneSetup, sceneDraw} from "./sandbox";
-
+import { sceneSetup, sceneDraw } from './sandbox';
 
 import * as THREE from 'three';
 
@@ -133,26 +133,27 @@ export class Yorb {
     addYORBParts() {
         sceneSetup(this.scene);
 
-        this.controls = new YorbControls2(this.scene, this.camera, this.renderer);
+        this.controls = new Controls(this.scene, this.camera, this.renderer);
 
-        //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+        this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
-        
-	this.show = false;
+
+        this.show = false;
         this.yorblet = false;
 
-        if (MODE === 'YORBLET') {
-            this.yorblet = new Yorblet(this.scene, this.projectionScreens, this.mouse, this.camera, this.controls);
-        }
+        // if (MODE === 'YORBLET') {
+        //     this.yorblet = new Yorblet(this.scene, this.projectionScreens, this.mouse, this.camera, this.controls);
+        // }
 
         if (MODE === 'YORB') {
-            this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
+            this.show = new SpringShow2021(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
-            //this.projectionScreens.createYorbProjectionScreens()
-	        this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
-            this.itpModel = new ITPModel(this.scene);
-            this.photoGallery = new PhotoGallery(this.scene);
-            this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
+
+            // this.projectionScreens.createYorbProjectionScreens()
+            // this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+            // this.itpModel = new ITPModel(this.scene);
+            // this.photoGallery = new PhotoGallery(this.scene);
+            // this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
             this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 1);
         }
 
@@ -203,7 +204,7 @@ export class Yorb {
     // update projects:
     updateProjects(projects) {
         if (this.show) {
-            // log('yorb received', projects.length, 'show projects');
+            log('yorb received', projects.length, 'show projects');
             this.show.updateProjects(projects);
         }
         if (this.yorblet) {
@@ -482,8 +483,8 @@ export class Yorb {
      */
     getStartingPosition() {
         // Elevator bank range: x: 3 to 28, z: -2.5 to 1.5
-        let startX = this.randomRange(6, 20);
-        let startZ = this.randomRange(-2.5, -1.5);
+        let startX = this.randomRange(-5, 5);
+        let startZ = this.randomRange(-5, -5);
 
         // In front of Red Square / ER range: x: -7.4 to - 13.05, z: -16.8 to -8.3
         // let randX = this.randomRange(-7, -16)
@@ -491,8 +492,8 @@ export class Yorb {
 
         // any query params in the URL?
         let params = new URLSearchParams(window.location.search);
-        let xParam = params.get("x");
-        let zParam = params.get("z");
+        let xParam = params.get('x');
+        let zParam = params.get('z');
 
         if (xParam) startX = parseFloat(xParam);
         if (zParam) startZ = parseFloat(zParam);
@@ -513,6 +514,7 @@ export class Yorb {
 
         if (!this.controls.paused) {
             this.frameCount++;
+            this.show.update();
 
             // things to update 50 times per seconds:
             this.controls.update();
@@ -540,7 +542,7 @@ export class Yorb {
                 this.projectionScreens.updatePositionalAudio();
                 this.movementCallback();
                 if (this.show) {
-                    this.show.update();
+                    // this.show.update();
                     for (let portal of this.show.portals) {
                         //originally had this in framecount % 50, might want to move there if too slow
                         if (portal.teleportCheck(this.getPlayerPosition()[0])) {
