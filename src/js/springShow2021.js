@@ -5,11 +5,14 @@ import { hackToRemovePlayerTemporarily } from './index.js';
 import { Vector3 } from 'three';
 import { Portal } from './portals';
 import { Signage } from './signage';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 
 const project_thumbnails = require('../assets/images/project_thumbnails/winterShow2020/*.png');
 
 const waterTextureFile = require('../assets/images/TexturesCom_WaterPlain0012_1_seamless_S.jpg');
 const grassTextureFile = require('../assets/images/Grass004_1K_Color.jpg');
+
+const flowerModels = require('../assets/models/riverDecals/flower.glb');
 
 import debugModule from 'debug';
 
@@ -730,6 +733,19 @@ class LazyRiver {
         this.lookAt = new THREE.Vector3();
 
         this.addSpline();
+
+
+        //add river decals: floating flowers
+        this.clock = new THREE.Clock();
+        this.clock.start();
+        this.riverDecals = [];
+        this.riverDecalsLoader = new GLTFLoader();
+        this.loadRiverDecals(flowerModels, {x:-17.52911685177447, y:-0.25, z:-6.858704475933721});
+        this.loadRiverDecals(flowerModels, {x:19.0849347853045, y:-0.25, z:-0.845524866568901});
+        this.loadRiverDecals(flowerModels, {x:20.13282642491018, y:-0.25, z:27.78063153216663});
+        this.loadRiverDecals(flowerModels, {x:-9.89357092667647, y:-0.25, z:-43.94454546474782});
+        this.loadRiverDecals(flowerModels, {x:18.118351880883242, y:-0.25, z:-30.57204928570804});
+        this.loadRiverDecals(flowerModels, {x:-19.036655824047, y:-0.25, z:28.516400226731044});
     }
 
     addSpline() {
@@ -820,13 +836,16 @@ class LazyRiver {
         this.findClosestPointAlongLazyRiver();
     }
 
-    findClosestPointAlongLazyRiver() {
+    //updated this function to support finding closest point for a given position of an object
+    findClosestPointAlongLazyRiver(currentPos) {
         let closestIndex = -1;
         let closest = null;
         let closestDistance = Infinity;
         for (let i = 0; i < this.pointsAlongLazyRiver.length; i++) {
             let pt = this.pointsAlongLazyRiver[i];
-            let distSquared = this.camera.position.distanceToSquared(pt);
+            let distSquared = currentPos == undefined ?
+                this.camera.position.distanceToSquared(pt) :
+                currentPos.distanceToSquared(pt);
             if (distSquared < closestDistance) {
                 closestDistance = distSquared;
                 closest = pt;
@@ -834,6 +853,31 @@ class LazyRiver {
             }
         }
         return closestIndex / this.pointsResolution;
+    }
+
+    loadRiverDecals(modelPath, position) {
+        this.riverDecalsLoader.load(
+            modelPath,
+            (gltf) => {
+                let decalScene = gltf.scene
+                decalScene.position.set(position.x, position.y, position.z)
+                decalScene.scale.set(.1, .1, .1)
+                decalScene.traverse((child) => {
+                    if (child.isMesh) {
+                        // child.material = _material
+                        child.castShadow = true
+                        child.receiveShadow = true
+                    }
+                })
+                this.scene.add(decalScene)
+                this.riverDecals.push(decalScene)
+            },
+            undefined,
+            function (e) {
+                log('trying to load portal');
+                console.error(e)
+            }
+        )
     }
 
     update() {
@@ -846,5 +890,16 @@ class LazyRiver {
             this.tubeGeometry.parameters.path.getTangent(this.positionAlongCurve, this.direction);
             this.camera.position.add(this.direction.multiplyScalar(this.speedFactor));
         }
+
+        //animate all river decals with a sin wave Y position & Y rotation
+        let delta = this.clock.getDelta();
+        this.riverDecals.forEach((d, idx) => {
+            let decalPositionAlongCurve = this.findClosestPointAlongLazyRiver(d.position);
+            let decalNewPos = new THREE.Vector3();
+            this.tubeGeometry.parameters.path.getTangent(decalPositionAlongCurve, decalNewPos);
+            d.position.add(decalNewPos.multiplyScalar(0.01));
+            d.position.setY(Math.sin(this.clock.getElapsedTime() + idx)*0.5 - 0.5);
+            d.rotation.y += delta * 0.25;
+        })
     }
 }
