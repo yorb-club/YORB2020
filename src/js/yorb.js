@@ -19,6 +19,10 @@ import { Controls } from './controls.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
+import { Yorbie } from './yorbie';
+import { Tutorial } from './tutorial';
+let tutorialLayer = 2;
+
 
 import { sceneSetup, sceneDraw } from './sandbox';
 
@@ -34,6 +38,7 @@ if (hostname === 'yorb.itp.io') {
 }
 
 import debugModule from 'debug';
+import { Vector3 } from 'three';
 
 const log = debugModule('YORB:YorbScene');
 
@@ -144,11 +149,12 @@ export class Yorb {
             this.show = new SpringShow2021(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
 
-            //this.projectionScreens.createYorbProjectionScreens()
+            // this.projectionScreens.createYorbProjectionScreens()
             // this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
             // this.itpModel = new ITPModel(this.scene);
             // this.photoGallery = new PhotoGallery(this.scene);
             // this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
+            this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 1);
         }
 
         // this.sketches = new Sketches(this.scene)
@@ -531,6 +537,17 @@ export class Yorb {
             // things to update 5 x per second
             if (this.frameCount % 10 === 0) {
                 // this.sketches.update()
+
+                //yorbie will follow the player if they press "y" or just look at them if not in the tutorial
+                if(this.yorbie.yorbie != undefined){
+                    if (this.tutorial == undefined && this.controls.yorbieTarget) {
+                        let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                        this.yorbie.updateYorbie(lookPos);
+                    } else if (this.tutorial == undefined) {
+                        let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                        this.yorbie.yorbie.lookAt(lookPos);
+                    }
+                }
             }
 
             if (this.frameCount % 20 == 0) {
@@ -555,6 +572,11 @@ export class Yorb {
                     }
                 }
                 this.projectionScreens.checkProjectionScreenCollisions();
+
+                //tutorial loop
+                if (this.tutorial != undefined) {
+                    this.tutorial.run();
+                }
             }
             if (this.frameCount % 50 == 0) {
                 this.selectivelyPauseAndResumeConsumers();
@@ -675,5 +697,15 @@ export class Yorb {
         return Math.random() * (max - min) + min;
     }
 
+
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    // Tutorial:
+
+    startTutorial(){
+        this.tutorial = new Tutorial(this.scene, this.camera, this.mouse, this.getPlayerPosition(), tutorialLayer, this.yorbie)
+    }
+
     //==//==//==//==//==//==//==//==// fin //==//==//==//==//==//==//==//==//==//
+
 }

@@ -150,7 +150,7 @@ export function makeVideoTextureAndMaterial(_id, dims = null) {
     // make material from texture
     var movieMaterial = new THREE.MeshBasicMaterial({
         map: videoTexture,
-        overdraw: true,
+        // overdraw: true,
         side: THREE.DoubleSide,
     })
 
