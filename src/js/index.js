@@ -384,10 +384,17 @@ function setupControls() {
                 console.log('Have your friends meet you here: ', url);
                 makePositionLinkModal(position);
             }
+            if (e.keyCode == 72) {
+                // 'h'
+                let position = yorbScene.getPlayerPosition()[0];
+                treePositions.push(position);
+                console.log(treePositions);
+            }
         },
         false
     );
 }
+let treePositions = [];
 
 function makePositionLinkModal(position) {
     // parse project descriptions to render without &amp; etc.
