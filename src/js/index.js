@@ -32,8 +32,8 @@ let WEB_SOCKET_SERVER = false;
 let INSTANCE_PATH = false;
 
 // For running against local server
-// WEB_SOCKET_SERVER = 'localhost:3000'
-// INSTANCE_PATH = '/socket.io'
+// WEB_SOCKET_SERVER = 'localhost:3000';
+// INSTANCE_PATH = '/socket.io';
 
 // For running against ITP server
 WEB_SOCKET_SERVER = 'https://yorb.itp.io';
@@ -361,17 +361,16 @@ function makePositionLinkModal(position) {
         });
         closeButton.innerHTML = 'X';
 
-
         let spacerDiv = document.createElement('div');
-        spacerDiv.innerHTML += "<br><br>"
+        spacerDiv.innerHTML += '<br><br>';
 
         let spacerDiv2 = document.createElement('div');
-        spacerDiv2.innerHTML += "<br><br>"
+        spacerDiv2.innerHTML += '<br><br>';
 
         contentEl.appendChild(closeButton);
-        contentEl.appendChild(spacerDiv)
+        contentEl.appendChild(spacerDiv);
         contentEl.appendChild(linkEl);
-        contentEl.appendChild(spacerDiv2)
+        contentEl.appendChild(spacerDiv2);
 
         modalEl.appendChild(contentEl);
         document.body.appendChild(modalEl);
@@ -948,13 +947,16 @@ export async function pauseAllConsumersForPeer(_id) {
     if (lastPollSyncData[_id]) {
         if (!(_id === mySocketID)) {
             for (let [mediaTag, info] of Object.entries(lastPollSyncData[_id].media)) {
-                let consumer = findConsumerForTrack(_id, mediaTag);
-                if (consumer) {
-                    if (!consumer.paused) {
-                        log('Pausing', mediaTag, 'consumer for peer with ID: ' + _id);
-                        await pauseConsumer(consumer);
+                if (mediaTag == 'screen-video' || mediaTag == 'screen-audio') continue;
+                    let consumer = findConsumerForTrack(_id, mediaTag);
+                    if (consumer) {
+                        if (!consumer.paused) {
+                            log('Pausing', mediaTag, 'consumer for peer with ID: ' + _id);
+                            console.log('Pausing', mediaTag, 'consumer for peer with ID: ' + _id)
+                            await pauseConsumer(consumer);
+                        }
                     }
-                }
+                
             }
         }
     }
@@ -1172,6 +1174,18 @@ async function pollAndUpdate() {
                         // that we don't already have consumers for...
 
                         log(`auto subscribing to track that ${id} has added`);
+                        await subscribeToTrack(id, mediaTag);
+                    }
+                }
+            }
+
+            // separate update for screen share so we can see people's screens from wherever:
+            for (let [mediaTag, info] of Object.entries(peers[id].media)) {
+                if (mediaTag == 'screen-video' || mediaTag == 'screen-audio') {
+                    // for each of the peer's producers...
+                    if (!findConsumerForTrack(id, mediaTag)) {
+                        // that we don't already have consumers for...
+                        log(`auto subscribing to screenshare that ${id} has added`);
                         await subscribeToTrack(id, mediaTag);
                     }
                 }

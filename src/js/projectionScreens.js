@@ -20,6 +20,7 @@ export class ProjectionScreens {
 
         this.projectionScreens = {} // object to store projection screens
         this.shift_down = false
+        this.g_down = false;
         this.createBlankScreenVideo()
         this.createYorbProjectionScreens() // turn on for YORB, but not YORBLETS
 
@@ -186,7 +187,7 @@ export class ProjectionScreens {
             if (audioEl) {
                 let distSquared = this.camera.position.distanceToSquared(screen.position)
 //		console.log(distSquared);
-                if (distSquared > this.distanceThresholdSquared) {
+                if (distSquared > this.distanceThresholdSquared+ 20000) {
                     // TODO pause consumer here, rather than setting volume to zero
                     audioEl.volume = 0
                 } else {
@@ -232,7 +233,7 @@ export class ProjectionScreens {
         var intersects = this.raycaster.intersectObjects(Object.values(this.projectionScreens))
 
         // if we have intersections, highlight them
-        let thresholdDist = 7
+        let thresholdDist = 18
         if (intersects.length > 0) {
             if (intersects[0].distance < thresholdDist) {
                 // this.screenHoverImage.style = "visiblity: visible;"
@@ -247,9 +248,10 @@ export class ProjectionScreens {
     }
 
     onMouseClick(e) {
-        if (this.hightlightedScreen && this.shift_down) {
+        if (this.hightlightedScreen && this.shift_down && this.g_down) {
             this.projectToScreen(this.hightlightedScreen.userData.screenId)
-            this.shift_down = false // reset this because the displayMedia dialog means we lose the onKeyUp event
+            this.shift_down = false; 
+            this.g_down = false;// reset this because the displayMedia dialog means we lose the onKeyUp event
         }
     }
 
@@ -257,11 +259,17 @@ export class ProjectionScreens {
         if (e.keyCode == 16) {
             this.shift_down = true
         }
+        if (e.keyCode == 71) {
+            this.g_down = true
+        }
     }
 
     onKeyUp(e) {
         if (e.keyCode == 16) {
             this.shift_down = false
+        }
+        if (e.keyCode == 71) {
+            this.g_down = false
         }
     }
 }
