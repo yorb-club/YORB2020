@@ -67,6 +67,8 @@ export class Tutorial {
         window.addEventListener('keyup', (e) => this.onKeyUp(e), false)
         this.yorbieCenter = false;
 
+        this.origRot = new Vector3(this.camera.rotation.x, this.camera.rotation.y, this.camera.rotation.z);
+
         //for demo poster
         let posterTexture = new THREE.TextureLoader().load(posterFile);
         let posterMaterial = new THREE.MeshBasicMaterial({map: posterTexture});
@@ -122,9 +124,8 @@ export class Tutorial {
         switch (this.stage){
             case 0: //during first stage, check to see if they look around at all
                 let camRot = new Vector3(this.camera.rotation.x, this.camera.rotation.y, this.camera.rotation.z);
-                let origRot = new Vector3(this.position[1][0], this.position[1][1], this.position[1][2]);
                 // console.log(camRot.distanceTo(origRot));
-                if(camRot.distanceTo(origRot) > 0) {
+                if(camRot.distanceTo(this.origRot) > 0) {
                     this.stage++;
                 }
                 break;
@@ -174,7 +175,7 @@ export class Tutorial {
                     this.yorbie.yorbie.lookAt(lookPos);
                     yorbieReady = true;
                 }
-                if (yorbieReady && this.yorbie.yorbie.position.distanceTo(this.camera.position) < 3){
+                if (yorbieReady && this.yorbie.yorbie.position.distanceTo(this.camera.position) < 4){
                     this.stage++;
                 }
                 break;
