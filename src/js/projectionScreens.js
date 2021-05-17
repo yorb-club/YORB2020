@@ -187,7 +187,7 @@ export class ProjectionScreens {
             if (audioEl) {
                 let distSquared = this.camera.position.distanceToSquared(screen.position)
 //		console.log(distSquared);
-                if (distSquared > this.distanceThresholdSquared) {
+                if (distSquared > this.distanceThresholdSquared+ 20000) {
                     // TODO pause consumer here, rather than setting volume to zero
                     audioEl.volume = 0
                 } else {
@@ -233,7 +233,7 @@ export class ProjectionScreens {
         var intersects = this.raycaster.intersectObjects(Object.values(this.projectionScreens))
 
         // if we have intersections, highlight them
-        let thresholdDist = 7
+        let thresholdDist = 18
         if (intersects.length > 0) {
             if (intersects[0].distance < thresholdDist) {
                 // this.screenHoverImage.style = "visiblity: visible;"
