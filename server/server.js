@@ -202,7 +202,7 @@ async function main() {
     // setInterval(updatePeerStats, 3000);
 
     updateProjects()
-    setInterval(updateProjects, 180000) // update projects every five minutes
+    setInterval(updateProjects, 1800000) // update projects every 50 minutes
 }
 
 main()
@@ -253,12 +253,12 @@ async function runSocketServer() {
     setInterval(() => {
         let now = Date.now()
         for (let id in clients) {
-            if (now - clients[id].lastSeenTs > 60000) {
+            if (now - clients[id].lastSeenTs > 120000) {
                 log('Culling inactive user with id', id)
-                clients[id].position = [1000, 1000, 1000]
+                clients[id].position[1] = -5; // send them underground
             }
         }
-    }, 5000)
+    }, 10000)
 
     io.on('connection', (socket) => {
         log('User ' + socket.id + ' connected, there are ' + io.engine.clientsCount + ' clients connected')
