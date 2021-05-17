@@ -13,6 +13,8 @@ const waterTextureFile = require('../assets/images/water.jpg');
 const grassTextureFile = require('../assets/images/grass.jpg');
 
 const flowerModels = require('../assets/models/riverDecals/flower.glb');
+const treeModel = require('../assets/models/sycamore-tree-no-material.glb');
+
 
 import debugModule from 'debug';
 
@@ -89,6 +91,7 @@ export class SpringShow2021 {
         window.addEventListener('keyup', (e) => this.onKeyUp(e), false)
 
         this.lazyRiver = new LazyRiver(this.scene, this.camera);
+        this.forest = new Forest(this.scene);
     }
 
     //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -1043,5 +1046,123 @@ class LazyRiver {
             d.position.setY(Math.sin(this.clock.getElapsedTime() + idx)*0.5 - 0.5);
             d.rotation.y += delta * 0.25;
         })
+    }
+}
+
+
+
+class Forest {
+    constructor(scene) {
+        this.scene = scene;
+
+        this.modelLoader = new GLTFLoader();
+        this.loadModel(treeModel);
+    }
+
+    loadModel(modelPath) {
+        // const geometry = new THREE.IcosahedronGeometry(0.5, 3);
+        // const material = new THREE.MeshPhongMaterial();
+
+        // mesh = new THREE.InstancedMesh(geometry, material, count);
+
+        // let i = 0;
+        // const offset = (amount - 1) / 2;
+
+        // const matrix = new THREE.Matrix4();
+
+        // for (let x = 0; x < amount; x++) {
+        //     for (let y = 0; y < amount; y++) {
+        //         for (let z = 0; z < amount; z++) {
+        //             matrix.setPosition(offset - x, offset - y, offset - z);
+
+        //             mesh.setMatrixAt(i, matrix);
+        //             mesh.setColorAt(i, color);
+
+        //             i++;
+        //         }
+        //     }
+        // }
+        this.modelLoader.load(modelPath, (gltf) => {
+            let tree = gltf.scene;
+            let mesh;
+
+            tree.traverse(function (child) {
+                if (child.geometry !== undefined) {
+                    // let treePositions = [
+                    //     [-41.80502739655212, 0.25, 0.9050014822916808],
+                    //     [-60.22938568341768, 0.25, 21.365141653787664],
+                    //     [-46.83569511564057, 0.25, 42.92003673172964],
+                    //     [-46.12791281268416, 0.25, 65.35509355421226],
+                    //     [-29.77230096845921, 0.25, 76.13088824860273],
+                    //     [-21.626362372186644, 0.25, 94.03595359641862],
+                    //     [2.014145676752229, 0.25, 91.95648210778918],
+                    //     [16.467486455479403, 0.25, 82.35178185338086],
+                    //     [26.236235313923217, 0.25, 70.05800356446096],
+                    //     [33.85149876490692, 0.25, 50.03141880472053],
+                    //     [50.15291418472052, 0.25, 41.1243456414818],
+                    //     [55.864019973577136, 0.25, 21.378623506511776],
+                    //     [47.85807182827959, 0.25, -0.8604240277597427],
+                    //     [58.870220925898494, 0.25, -19.90099023261997],
+                    //     [40.49435249739234, 0.25, -53.802672160644754],
+                    //     [-22.36881476934588, 0.25, -82.63414740096961],
+                    //     [-40.93123874623877, 0.25, -47.96591154122878],
+                    // ];
+                    let treePositions = [
+                        [48.154969583211106, 0.25, 42.26099860789299],
+                        [55.4832533802054, 0.25, 66.33663694620691],
+                        [20.554087541616468, 0.25, 93.20179827828923],
+                        [-16.644608084055495, 0.25, 95.14420609424455],
+                        [-62.54807989788408, 0.25, 81.61236075234477],
+                        [-51.830234875173254, 0.25, 44.11887270501372],
+                        [-72.65879576357358, 0.25, 24.38754094083904],
+                        [-56.352844121521684, 0.25, 0.6624226541746008],
+                        [-51.246690114452974, 0.25, -49.82453529320749],
+                        [-59.797777853341024, 0.25, -76.70147429063918],
+                        [-39.54883662794229, 0.25, -74.76927722945358],
+                        [54.709580806506175, 0.25, -63.53899679458416],
+                        [84.05728838299054, 0.25, -53.74239853411677],
+                        [73.9303852933223, 0.25, -24.697192020726664],
+                        [96.18331082278613, 0.25, -9.17168451554123],
+                        [69.84392513088181, 0.25, 4.074623646583492],
+                        [83.33064504034178, 0.25, 27.65752025321697],
+                    ];
+                    let geometry = child.geometry;
+
+                    // color according to YORBLEt
+                    let treeCol = 0xffffff;
+                    if (YORBLET_INDEX == 1) {
+                        //yellow
+                        treeCol = 0xfee83d;
+                    } else if (YORBLET_INDEX == 2) {
+                        //red
+                        treeCol = 0xf44848;
+                    }
+
+                    const material = new THREE.MeshPhongMaterial({ color: treeCol });
+
+                    mesh = new THREE.InstancedMesh(geometry, material, treePositions.length);
+
+                    const matrix = new THREE.Matrix4();
+
+                    for (let i = 0; i < treePositions.length; i++) {
+                        let pos = treePositions[i];
+                        matrix.setPosition(pos[0], 0, pos[2]);
+
+                        mesh.setMatrixAt(i, matrix);
+                    }
+                }
+            });
+
+            this.scene.add(mesh);
+
+            // tree.traverse((child) => {
+            //     if (child.isMesh) {
+            //         child.castShadow = true
+            //         child.receiveShadow = true
+            //     }
+            // })
+
+            // this.scene.add(tree);
+        });
     }
 }
