@@ -5,7 +5,7 @@
 import * as THREE from "three";
 import { BoxGeometry, Vector3 } from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-const yorbieModel = require('../assets/models/yorbie.glb');
+const yorbieModel = require('../assets/models/yorbie-small.glb');
 
 
 
