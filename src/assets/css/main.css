@@ -406,7 +406,7 @@ body {
     height: 20%;
     width: 40%;
     /* margin: 0%; */
-    font-size: 1.3em;
+    font-size: 1.0em;
     box-sizing: border-box; /* Include padding and border in element's width and height */
     text-align: center;
     overflow: hidden;
