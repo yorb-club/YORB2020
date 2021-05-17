@@ -149,7 +149,7 @@ export class SpringShow2021 {
                 let gallerySpacingX = 20;
                 let gallerySpacingZ = 20;
 
-                let startOffset = 40;
+                let startOffset = 0;
 
                 this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, 0xff00ff);
                 this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, 0xffffff);
