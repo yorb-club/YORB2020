@@ -474,24 +474,20 @@ body {
     border: none;
     cursor: pointer;
     width: auto;
+    display: inline-block
 }
 
 .button2:hover {
     opacity: 0.8;
 }
-/* Set a style for all buttons */
-.button1 {
-    background-color: #5badff;
-    color: white;
-    padding: 14px 20px;
-    margin: auto;
-    border: none;
-    cursor: pointer;
-    width: auto;
-}
 
-.button1:hover {
-    opacity: 0.8;
+#enterButton {
+    background: none;
+    border: 0px;
+    display: inline-block
+}
+#enterButton > img{
+    max-width: 100px;
 }
 
 
