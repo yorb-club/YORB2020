@@ -6,7 +6,7 @@ import { Vector3 } from 'three';
 import { Portal } from './portals';
 import { Signage } from './signage';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-
+const signModel = require('../assets/models/furniture/ITPSpringShow2021.glb');
 const project_thumbnails = require('../assets/images/project_thumbnails/springShow2021/*.jpg');
 
 const waterTextureFile = require('../assets/images/TexturesCom_WaterPlain0012_1_seamless_S.jpg');
@@ -34,6 +34,21 @@ const yorbletPortalReference = [
     // { position: new Vector3(-23, 0, -45) },
     // { position: new Vector3(-23, 0, -47.5) }
 ];
+
+
+//YORBLET INDEX
+
+
+// set which YORBLET we're in based on hostname
+const hostname = window.location.hostname
+
+let YORBLET_INDEX = 1
+if (hostname === 'yorblet1.itp.io') {
+    YORBLET_INDEX = 1
+} else if (hostname === 'yorblet2.itp.io') {
+    YORBLET_INDEX = 2
+}
+
 
 export class SpringShow2021 {
     constructor(scene, camera, controls, mouse) {
@@ -63,6 +78,9 @@ export class SpringShow2021 {
 
         this.portals = [];
 
+        //loading gltf
+        this.signloader = new GLTFLoader();
+
         // let domElement = document.getElementById('scene-container')
         window.addEventListener('click', (e) => this.onMouseClick(e), false);
 
@@ -85,6 +103,11 @@ export class SpringShow2021 {
 
         this.addGround();
         this.addPortals();
+
+        this.add3dPoster(signModel);
+        // this.addDecals();
+        // var signage = new Signage(this.scene);
+        // this.addArrowSigns();
     }
 
     addGround() {
@@ -97,6 +120,140 @@ export class SpringShow2021 {
         groundPlane.rotateX(-Math.PI / 2);
         this.scene.add(groundPlane);
     }
+
+
+    add3dPoster(signModel){
+
+      this.signloader.load(signModel , ( gltf ) => {
+
+      let signScene = gltf.scene;
+      //side
+      //signScene.position.set(27, 12, 39);
+
+      //positioning by portal
+      signScene.position.set(0, 12, -68);
+      signScene.scale.set(8, 8, 8);
+      //signScene.rotateY(Math.PI);
+
+      this.scene.add( signScene );
+      console.log("success");
+
+    }, undefined, function ( e ) {
+
+      	//console.error( error );
+        log('trying to load portal');
+        console.error(e);
+
+      } );
+
+    }
+
+    addInfoSigns(){
+
+      //-23.414260246741083, 0.25, 38.92540156709661
+
+    }
+
+
+    // addDecals() {
+    //     //add welcome sign
+    //     const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/decals/welcome_sign_export_4x.png'));
+    //     const tipsTexture = new THREE.TextureLoader().load(require('../assets/images/decals/tips_export_4x.png'));
+    //     const mapTexture = new THREE.TextureLoader().load(require('../assets/images/decals/full_map_export_1x_new.png'));
+
+    //     //add welcome poster
+    //     let posterX = -6.5;
+    //     let posterY = 1.6;
+    //     let posterZ = -7.25;
+
+    //     let posterRotation = 1.5708 * 2;
+
+    //     welcomeTexture.wrapS = THREE.RepeatWrapping;
+    //     welcomeTexture.wrapT = THREE.RepeatWrapping;
+    //     welcomeTexture.repeat.set(1, 1);
+
+    //     const signGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1);
+    //     const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true });
+    //     const signPlane = new THREE.Mesh(signGeometry, signMaterial);
+    //     //plane.lookAt(0, 1, 0)
+    //     signPlane.position.set(posterX, posterY, posterZ);
+    //     signPlane.rotateY(posterRotation);
+    //     this.scene.add(signPlane);
+
+    //     //add tips poster
+    //     posterX = -9.5;
+    //     posterY = 1.65;
+    //     posterZ = -7.25;
+
+    //     posterRotation = 1.5708 * 2;
+
+    //     tipsTexture.wrapS = THREE.RepeatWrapping;
+    //     tipsTexture.wrapT = THREE.RepeatWrapping;
+    //     tipsTexture.repeat.set(1, 1);
+
+    //     const tipsGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1);
+    //     const tipsMaterial = new THREE.MeshBasicMaterial({ map: tipsTexture, transparent: true });
+    //     const tipsPlane = new THREE.Mesh(tipsGeometry, tipsMaterial);
+    //     //plane.lookAt(0, 1, 0)
+    //     tipsPlane.position.set(posterX, posterY, posterZ);
+    //     tipsPlane.rotateY(posterRotation);
+    //     this.scene.add(tipsPlane);
+
+    //     //add map
+    //     posterX = -3.5;
+    //     posterY = 1.65;
+    //     posterZ = -10.25;
+
+    //     posterRotation = 1.5708 * 3;
+
+    //     mapTexture.wrapS = THREE.RepeatWrapping;
+    //     mapTexture.wrapT = THREE.RepeatWrapping;
+    //     mapTexture.repeat.set(1, 1);
+
+    //     const mapGeometry = new THREE.PlaneBufferGeometry(5, 2.5, 1, 1);
+    //     const mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture, transparent: true });
+    //     const mapPlane = new THREE.Mesh(mapGeometry, mapMaterial);
+    //     //plane.lookAt(0, 1, 0)
+    //     mapPlane.position.set(posterX, posterY, posterZ);
+    //     mapPlane.rotateY(posterRotation);
+    //     this.scene.add(mapPlane);
+
+    //     const mapPlane2 = new THREE.Mesh(mapGeometry, mapMaterial);
+    //     mapPlane2.position.set(15, 1.75, 2.15);
+    //     mapPlane2.rotateY(Math.PI);
+    //     this.scene.add(mapPlane2);
+    // }
+
+    // addArrowSigns() {
+    //     const ArrowImages = require('../assets/images/arrow_signs/*.png');
+    //     const arrowImageObjects = [
+    //         { file: ArrowImages['MainProjArea_Forward'], w: 4, h: 2.5, x: -9, y: 0.01, z: -12, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
+    //         { file: ArrowImages['MainProjArea_Forward'], w: 4, h: 2.5, x: -1, y: 0.01, z: -12, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
+    //         { file: ArrowImages['Yorblet1-6_Left'], w: 4, h: 2, x: -18, y: 0.01, z: -5, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
+    //         { file: ArrowImages['Yorblet6-12_Right'], w: 4.5, h: 2, x: -18, y: 0.01, z: -23, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
+    //         { file: ArrowImages['ZoomProjects'], w: 4, h: 2, x: -18, y: 0.01, z: -14, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
+    //     ];
+
+    //     arrowImageObjects.forEach((img) => {
+    //         const imgTxture = new THREE.TextureLoader().load(img.file);
+
+    //         imgTxture.wrapS = THREE.RepeatWrapping;
+    //         imgTxture.wrapT = THREE.RepeatWrapping;
+    //         imgTxture.repeat.set(1, 1);
+
+    //         const imgGeometry = new THREE.PlaneBufferGeometry(img.w, img.h, 1, 1);
+    //         const imgMaterial = new THREE.MeshBasicMaterial({ map: imgTxture, transparent: true, side: THREE.DoubleSide });
+    //         const imgPlane = new THREE.Mesh(imgGeometry, imgMaterial);
+
+    //         imgPlane.position.set(img.x, img.y, img.z);
+
+    //         imgPlane.rotateY(img.rotateY);
+    //         imgPlane.rotateX(img.rotateX);
+    //         // if (rotateZ) {imgPlane.rotateZ(rotateZ)}
+
+    //         this.scene.add(imgPlane);
+    //     });
+    // }
 
     /*
      * updateProjects(projects)
@@ -149,12 +306,29 @@ export class SpringShow2021 {
                 let gallerySpacingX = 20;
                 let gallerySpacingZ = 20;
 
+
+
+                //LYDIA
+                //set arch colors the same in each gallery
+                let archColA = 0xffffff;
+                let archColB = 0x3C9EFC;
+                let archColC = 0xFEE83D;
+                let archColD = 0x42D4A3;
+
+                //floor colors
+                //yellow
+                let floorA = 0xFEE83D
+                //red
+                let floorB = 0xF44848
+
+
                 let startOffset = 0;
 
-                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, 0xff00ff);
-                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, 0xffffff);
-                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, 0x0000ff);
-                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, startOffset + 30, 0, 0x00ffff);
+                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, archColA);
+                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, archColB);
+                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, archColC);
+                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, startOffset + 30, 0, archColD);
+
 
             }
         }
@@ -210,11 +384,18 @@ export class SpringShow2021 {
         torus.rotateY(Math.PI / 2);
         miniGalleryParent.add(torus);
 
+
+        //LYDIA
+        //add an arrow next to the entrance
+
+
+
+
         // then a floor
         let floorWidth = projectSpacing * 1.5;
         let floorLength = projectSpacing * (numProjects / 2 + 1);
         let geo = new THREE.BoxGeometry(floorLength, 0.1, floorWidth);
-        let mat = new THREE.MeshLambertMaterial({ color: 'hotpink' });
+        let mat = new THREE.MeshLambertMaterial({ color: 0xF44848 });
         let mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(projectSpacing * (numProjects / 4), 0, 0);
         miniGalleryParent.add(mesh);
