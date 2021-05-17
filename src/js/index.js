@@ -139,8 +139,7 @@ window.onload = async () => {
     var startButton = document.getElementById('enterButton');
     startButton.addEventListener('click', init);
 
-    var tutorialButton = document.getElementById('tutorialButton');
-    tutorialButton.addEventListener('click', launchTutorial);
+    
 };
 
 async function init() {
@@ -167,7 +166,7 @@ async function init() {
 
 }
 
-async function launchTutorial() {
+export async function launchTutorial() {
     document.getElementById('overlay').style.visibility = 'hidden';
     // only join room after we user has interacted with DOM (to ensure that media elements play)
     if (!initialized) {

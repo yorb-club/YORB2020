@@ -7,6 +7,8 @@ import { BoxGeometry, Vector3 } from "three";
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 const yorbieModel = require('../assets/models/yorbie-small.glb');
 
+import {launchTutorial} from "./index";
+
 
 
 
@@ -61,6 +63,10 @@ export class Yorbie {
                 // }
                 this.scene.add(this.yorbie);
                 this.yorbie.visible = true;
+
+                // activate tutorial button once yorbie is loaded
+                var tutorialButton = document.getElementById('tutorialButton');
+    tutorialButton.addEventListener('click', launchTutorial);
             },
             undefined,
             function (e) {
