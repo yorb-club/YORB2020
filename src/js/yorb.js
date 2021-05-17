@@ -198,6 +198,19 @@ export class Yorb {
         dirLight2.position.set(1, 0.5, -1);
         dirLight2.position.multiplyScalar(200);
         this.scene.add(dirLight2);
+
+
+        //another directional light for poster
+        let dirLight3 = new THREE.DirectionalLight(0xffffe6, 0.3);
+        dirLight3.color.setHSL(0.1, 1, 0.95);
+        dirLight3.position.set(-1, .5, 1);
+        dirLight3.position.multiplyScalar(200);
+        this.scene.add(dirLight3);
+
+        //trying to add target but not working
+        // dirLight3.target.position.setTimeout = (14, 14, -68);
+        // this.scene.add(dirLight3.target)
+
     }
 
     //

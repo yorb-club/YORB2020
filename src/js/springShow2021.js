@@ -105,6 +105,7 @@ export class SpringShow2021 {
         this.addPortals();
 
         this.add3dPoster(signModel);
+        this.addInfoSigns();
         // this.addDecals();
         // var signage = new Signage(this.scene);
         // this.addArrowSigns();
@@ -131,9 +132,9 @@ export class SpringShow2021 {
       //signScene.position.set(27, 12, 39);
 
       //positioning by portal
-      signScene.position.set(0, 12, -68);
+      signScene.position.set(14, 14, -68);
       signScene.scale.set(8, 8, 8);
-      //signScene.rotateY(Math.PI);
+      signScene.rotateY(-Math.PI/4);
 
       this.scene.add( signScene );
       console.log("success");
@@ -150,7 +151,36 @@ export class SpringShow2021 {
 
     addInfoSigns(){
 
-      //-23.414260246741083, 0.25, 38.92540156709661
+      const mainMapTexture = new THREE.TextureLoader().load(require('../assets/images/springshow/MainMap_v2.png'));
+      const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/springshow/WelcomeSign_v2.png'));
+
+
+      //welcometexture
+      welcomeTexture.wrapS = THREE.RepeatWrapping;
+      welcomeTexture.wrapT = THREE.RepeatWrapping;
+      welcomeTexture.repeat.set(1, 1);
+
+      const signGeometry = new THREE.PlaneBufferGeometry(12, 9.36, 1, 1);
+      const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true, side: THREE.DoubleSide });
+      const welcomePlane = new THREE.Mesh(signGeometry, signMaterial);
+      //plane.lookAt(0, 1, 0)
+      welcomePlane.position.set(-24, 5, 43);
+      welcomePlane.rotateY(Math.PI/2);
+      this.scene.add(welcomePlane);
+
+      //map texture
+      mainMapTexture.wrapS = THREE.RepeatWrapping;
+      mainMapTexture.wrapT = THREE.RepeatWrapping;
+      mainMapTexture.repeat.set(1, 1);
+
+      const mapGeometry = new THREE.PlaneBufferGeometry(14, 7, 1, 1);
+      const mapMaterial = new THREE.MeshBasicMaterial({ map: mainMapTexture, transparent: true, side: THREE.DoubleSide });
+      const mainMapPlane = new THREE.Mesh(mapGeometry, mapMaterial);
+      //plane.lookAt(0, 1, 0)
+      mainMapPlane.position.set(24, 4, 43);
+      mainMapPlane.rotateY(-Math.PI/2);
+      this.scene.add(mainMapPlane);
+
 
     }
 
@@ -306,20 +336,27 @@ export class SpringShow2021 {
                 let gallerySpacingX = 20;
                 let gallerySpacingZ = 20;
 
-
-
-                //LYDIA
                 //set arch colors the same in each gallery
                 let archColA = 0xffffff;
-                let archColB = 0x3C9EFC;
-                let archColC = 0xFEE83D;
-                let archColD = 0x42D4A3;
+                let archColB = 0x42D4A3;
+                let archColC = 0x3C9EFC;
+                let archColD = 0xFEE83D;
 
-                //floor colors
-                //yellow
-                let floorA = 0xFEE83D
-                //red
-                let floorB = 0xF44848
+
+                //blue 0x3C9EFC 0x42D4A3
+
+                let floorColor;
+
+                //select floor color based on yorblet
+                if (YORBLET_INDEX == 1){
+                  //yellow
+                  floorColor = 0xFEE83D;
+
+                }
+                else if (YORBLET_INDEX == 2){
+                  //red
+                  floorColor = 0xF44848;
+                }
 
 
                 let startOffset = 0;
@@ -327,17 +364,17 @@ export class SpringShow2021 {
                     startOffset = 39;
                 }
 
-                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, archColA);
-                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, archColB);
-                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, archColC);
-                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, startOffset + 30, 0, archColD);
+                this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, archColA, floorColor);
+                this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, archColB, floorColor);
+                this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, archColC, floorColor);
+                this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, startOffset + 30, 0, archColD, floorColor);
 
 
             }
         }
     }
 
-    arrangeMiniGallery(centerX, centerZ, numProjects, projectOffset, yRotation = 0, archCol) {
+    arrangeMiniGallery(centerX, centerZ, numProjects, projectOffset, yRotation = 0, archCol, floorColor) {
         let miniGalleryParent = new THREE.Group();
 
         let projectIndex = projectOffset;
@@ -398,7 +435,7 @@ export class SpringShow2021 {
         let floorWidth = projectSpacing * 1.5;
         let floorLength = projectSpacing * (numProjects / 2 + 1);
         let geo = new THREE.BoxGeometry(floorLength, 0.1, floorWidth);
-        let mat = new THREE.MeshLambertMaterial({ color: 0xF44848 });
+        let mat = new THREE.MeshLambertMaterial({ color: floorColor });
         let mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(projectSpacing * (numProjects / 4), 0, 0);
         miniGalleryParent.add(mesh);
@@ -423,7 +460,7 @@ export class SpringShow2021 {
             this.portals.push(new Portal(this.scene, new THREE.Vector3(1.5, 0, -60), 2));
         }
 
-        
+
         //goes through all yorblets except 0 (lobby) and makes portal
         // for (let i = 1; i < yorbletPortalReference.length; i++) {
         //     // log(yorbletPortalReference[i])
@@ -454,7 +491,7 @@ export class SpringShow2021 {
             return longString;
         }
     }
-    
+
     /*
      * createHyperlinkedMesh(x,y,z,_project)
      *
@@ -469,7 +506,7 @@ export class SpringShow2021 {
         let linkDepth = 0.1;
         let fontColor = 0x343434;
         let statusColor = 0xffffff;
-        
+
 
         let posterDepth = 0.25;
 
@@ -481,11 +518,11 @@ export class SpringShow2021 {
         let backgroundMat = this.linkMaterial;
         if (localStorage.getItem(_project.project_id) == 'visited') {
             backgroundMat = this.linkVisitedMaterial;
-        } 
+        }
 
         // create a background
         let backgroundGeo = new THREE.BoxGeometry(3 * scaleFactor,1.5 * scaleFactor,posterDepth * scaleFactor);
-        
+
         let projectPoster = new THREE.Mesh(backgroundGeo, backgroundMat);
 
         // add project image
@@ -528,7 +565,7 @@ export class SpringShow2021 {
         let projectNameTextMesh = createSimpleText(name, fontColor, titleFontSize, this.font);
         let elevatorPitchTextMesh = createSimpleText(elevator_pitch, fontColor, smallerFontSize , this.font);
         let studentNamesTextMesh = createSimpleText(studentNames, fontColor, namesFontSize, this.font);
-       
+
 
         projectNameTextMesh.position.y += 0.4 * scaleFactor;
         studentNamesTextMesh.position.y += 0.325 * scaleFactor;
