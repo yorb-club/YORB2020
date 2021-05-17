@@ -324,7 +324,7 @@ export class SpringShow2021 {
 
                 let startOffset = 0;
                 if (YORBLET_INDEX == 2){
-                    startIndex = 39;
+                    startOffset = 39;
                 }
 
                 this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, archColA);
