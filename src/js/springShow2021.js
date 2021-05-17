@@ -85,9 +85,6 @@ export class SpringShow2021 {
 
         this.addGround();
         this.addPortals();
-        // this.addDecals();
-        // var signage = new Signage(this.scene);
-        // this.addArrowSigns();
     }
 
     addGround() {
@@ -100,106 +97,6 @@ export class SpringShow2021 {
         groundPlane.rotateX(-Math.PI / 2);
         this.scene.add(groundPlane);
     }
-
-    // addDecals() {
-    //     //add welcome sign
-    //     const welcomeTexture = new THREE.TextureLoader().load(require('../assets/images/decals/welcome_sign_export_4x.png'));
-    //     const tipsTexture = new THREE.TextureLoader().load(require('../assets/images/decals/tips_export_4x.png'));
-    //     const mapTexture = new THREE.TextureLoader().load(require('../assets/images/decals/full_map_export_1x_new.png'));
-
-    //     //add welcome poster
-    //     let posterX = -6.5;
-    //     let posterY = 1.6;
-    //     let posterZ = -7.25;
-
-    //     let posterRotation = 1.5708 * 2;
-
-    //     welcomeTexture.wrapS = THREE.RepeatWrapping;
-    //     welcomeTexture.wrapT = THREE.RepeatWrapping;
-    //     welcomeTexture.repeat.set(1, 1);
-
-    //     const signGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1);
-    //     const signMaterial = new THREE.MeshBasicMaterial({ map: welcomeTexture, transparent: true });
-    //     const signPlane = new THREE.Mesh(signGeometry, signMaterial);
-    //     //plane.lookAt(0, 1, 0)
-    //     signPlane.position.set(posterX, posterY, posterZ);
-    //     signPlane.rotateY(posterRotation);
-    //     this.scene.add(signPlane);
-
-    //     //add tips poster
-    //     posterX = -9.5;
-    //     posterY = 1.65;
-    //     posterZ = -7.25;
-
-    //     posterRotation = 1.5708 * 2;
-
-    //     tipsTexture.wrapS = THREE.RepeatWrapping;
-    //     tipsTexture.wrapT = THREE.RepeatWrapping;
-    //     tipsTexture.repeat.set(1, 1);
-
-    //     const tipsGeometry = new THREE.PlaneBufferGeometry(2.7, 2, 1, 1);
-    //     const tipsMaterial = new THREE.MeshBasicMaterial({ map: tipsTexture, transparent: true });
-    //     const tipsPlane = new THREE.Mesh(tipsGeometry, tipsMaterial);
-    //     //plane.lookAt(0, 1, 0)
-    //     tipsPlane.position.set(posterX, posterY, posterZ);
-    //     tipsPlane.rotateY(posterRotation);
-    //     this.scene.add(tipsPlane);
-
-    //     //add map
-    //     posterX = -3.5;
-    //     posterY = 1.65;
-    //     posterZ = -10.25;
-
-    //     posterRotation = 1.5708 * 3;
-
-    //     mapTexture.wrapS = THREE.RepeatWrapping;
-    //     mapTexture.wrapT = THREE.RepeatWrapping;
-    //     mapTexture.repeat.set(1, 1);
-
-    //     const mapGeometry = new THREE.PlaneBufferGeometry(5, 2.5, 1, 1);
-    //     const mapMaterial = new THREE.MeshBasicMaterial({ map: mapTexture, transparent: true });
-    //     const mapPlane = new THREE.Mesh(mapGeometry, mapMaterial);
-    //     //plane.lookAt(0, 1, 0)
-    //     mapPlane.position.set(posterX, posterY, posterZ);
-    //     mapPlane.rotateY(posterRotation);
-    //     this.scene.add(mapPlane);
-
-    //     const mapPlane2 = new THREE.Mesh(mapGeometry, mapMaterial);
-    //     mapPlane2.position.set(15, 1.75, 2.15);
-    //     mapPlane2.rotateY(Math.PI);
-    //     this.scene.add(mapPlane2);
-    // }
-
-    // addArrowSigns() {
-    //     const ArrowImages = require('../assets/images/arrow_signs/*.png');
-    //     const arrowImageObjects = [
-    //         { file: ArrowImages['MainProjArea_Forward'], w: 4, h: 2.5, x: -9, y: 0.01, z: -12, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
-    //         { file: ArrowImages['MainProjArea_Forward'], w: 4, h: 2.5, x: -1, y: 0.01, z: -12, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
-    //         { file: ArrowImages['Yorblet1-6_Left'], w: 4, h: 2, x: -18, y: 0.01, z: -5, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
-    //         { file: ArrowImages['Yorblet6-12_Right'], w: 4.5, h: 2, x: -18, y: 0.01, z: -23, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
-    //         { file: ArrowImages['ZoomProjects'], w: 4, h: 2, x: -18, y: 0.01, z: -14, rotateX: -Math.PI / 2, rotateY: Math.PI / 2 },
-    //     ];
-
-    //     arrowImageObjects.forEach((img) => {
-    //         const imgTxture = new THREE.TextureLoader().load(img.file);
-
-    //         imgTxture.wrapS = THREE.RepeatWrapping;
-    //         imgTxture.wrapT = THREE.RepeatWrapping;
-    //         imgTxture.repeat.set(1, 1);
-
-    //         const imgGeometry = new THREE.PlaneBufferGeometry(img.w, img.h, 1, 1);
-    //         const imgMaterial = new THREE.MeshBasicMaterial({ map: imgTxture, transparent: true, side: THREE.DoubleSide });
-    //         const imgPlane = new THREE.Mesh(imgGeometry, imgMaterial);
-
-    //         imgPlane.position.set(img.x, img.y, img.z);
-
-    //         imgPlane.rotateY(img.rotateY);
-    //         imgPlane.rotateX(img.rotateX);
-    //         // if (rotateZ) {imgPlane.rotateZ(rotateZ)}
-
-    //         this.scene.add(imgPlane);
-    //     });
-    // }
 
     /*
      * updateProjects(projects)
@@ -217,15 +114,12 @@ export class SpringShow2021 {
     }
 
     _updateProjects() {
-        console.log('updating ', this.projects);
         if (this.font) {
             let projects = this.projects;
 
             for (let i = 0; i < this.hyperlinkedObjects.length; i++) {
-                // console.log('removing projects');
                 this.scene.remove(this.hyperlinkedObjects[i]);
             }
-            // console.log(this.hyperlinkedObjects);
             this.hyperlinkedObjects = [];
 
             // do a check for duplicates
@@ -255,14 +149,13 @@ export class SpringShow2021 {
                 let gallerySpacingX = 20;
                 let gallerySpacingZ = 20;
 
-                let startOffset = 0;
+                let startOffset = 40;
 
                 this.arrangeMiniGallery(-gallerySpacingX, -gallerySpacingZ, 10, startOffset + 0, Math.PI, 0xff00ff);
                 this.arrangeMiniGallery(gallerySpacingX, -gallerySpacingZ, 10, startOffset + 10, 0, 0xffffff);
                 this.arrangeMiniGallery(-gallerySpacingX, gallerySpacingZ, 10, startOffset + 20, Math.PI, 0x0000ff);
                 this.arrangeMiniGallery(gallerySpacingX, gallerySpacingZ, 10, startOffset + 30, 0, 0x00ffff);
 
-                // console.log("We've placed ", endIndex, ' projects so far.')
             }
         }
     }
@@ -280,7 +173,7 @@ export class SpringShow2021 {
         // arrange one row
         for (let i = 0; i < numProjects / 2; i++) {
             let proj = this.projects[projectIndex];
-            if (!proj) return;
+            if (!proj) continue;
 
             locX += projectSpacing;
 
@@ -298,7 +191,7 @@ export class SpringShow2021 {
         // then the other
         for (let i = 0; i < numProjects / 2; i++) {
             let proj = this.projects[projectIndex];
-            if (!proj) return;
+            if (!proj) continue;
 
             locX += projectSpacing;
 
@@ -331,55 +224,6 @@ export class SpringShow2021 {
 
         this.scene.add(miniGalleryParent);
     }
-    // this will update the project posters
-    // arrangeProjectsInOval(radius, numProjects, projectOffset) {
-    //     // set left side offsets
-    //     let xOffset = 0;
-    //     let zOffset = radius / 2;
-
-    //     let projectHeight = 1;
-
-    //     let projectIndex = projectOffset;
-    //     // make left side projects
-    //     for (let i = 0; i < numProjects / 2; i++) {
-    //         let proj = this.projects[projectIndex];
-    //         if (!proj) return;
-
-    //         let theta = (Math.PI * 2) / (numProjects - 2);
-    //         let angle = theta * i;
-
-    //         let centerX = radius * Math.cos(angle) + xOffset;
-    //         let centerZ = radius * Math.sin(angle) + zOffset;
-
-    //         let hyperlink = this.createHyperlinkedMesh(centerX, projectHeight, centerZ, proj);
-    //         hyperlink.lookAt(centerX, projectHeight, centerZ);
-    //         this.hyperlinkedObjects.push(hyperlink);
-    //         this.scene.add(hyperlink);
-
-    //         projectIndex++;
-    //     }
-
-    //     xOffset = 0;
-    //     zOffset = -radius / 2;
-
-    //     // make right side projects
-    //     for (let i = numProjects / 2 - 1; i < numProjects - 1; i++) {
-    //         let proj = this.projects[projectIndex];
-    //         if (!proj) return;
-
-    //         let theta = (Math.PI * 2) / (numProjects - 2);
-    //         let angle = theta * i;
-
-    //         let centerX = radius * Math.cos(angle) + xOffset;
-    //         let centerZ = radius * Math.sin(angle) + zOffset;
-
-    //         let hyperlink = this.createHyperlinkedMesh(centerX, projectHeight, centerZ, proj);
-    //         this.hyperlinkedObjects.push(hyperlink);
-    //         this.scene.add(hyperlink);
-
-    //         projectIndex++;
-    //     }
-    // }
 
     addPortals() {
         const hostname = window.location.hostname
@@ -437,7 +281,7 @@ export class SpringShow2021 {
      */
 
     createHyperlinkedMesh(x, y, z, _project) {
-        console.log(_project);
+        // console.log(_project);
         let linkDepth = 0.1;
         let fontColor = 0x343434;
         let statusColor = 0xffffff;
@@ -469,19 +313,6 @@ export class SpringShow2021 {
 
         // offset imageMesh
         imageMesh.position.set(-0.75 * scaleFactor,0,0);
-
-
-        // var geometry = new THREE.BoxGeometry(linkDepth, 0.75, 0.75);
-        // var textBoxGeometry = new THREE.BoxGeometry(linkDepth, 0.5, 0.75);
-
-        // let textBoxMat;
-
-        
-
-        // let imageMat = this.getProjectImageMat(_project.project_id)
-
-        // var textSign = new THREE.Mesh(textBoxGeometry, textBoxMat);
-        // var imageSign = new THREE.Mesh(geometry, imageMat);
 
         /////// set up text
         let titleFontSize = 0.06;
@@ -517,7 +348,7 @@ export class SpringShow2021 {
 
         projectNameTextMesh.position.y += 0.4 * scaleFactor;
         studentNamesTextMesh.position.y += 0.325 * scaleFactor;
-        elevatorPitchTextMesh.position.y += 0 * scaleFactor;
+        elevatorPitchTextMesh.position.y += -0.15 * scaleFactor;
         textGroup.add(projectNameTextMesh);
         textGroup.add(elevatorPitchTextMesh);
         textGroup.add(studentNamesTextMesh);
@@ -880,17 +711,9 @@ class LazyRiver {
         let vectors = [];
         for (let i = 0; i < points.length; i++) {
             let pt = points[i];
-            console.log(pt);
             vectors.push(new THREE.Vector3(pt[0], pt[1], pt[2]));
         }
-        // this.lazyRiverPath = new THREE.CatmullRomCurve3([
-        //     new THREE.Vector3(0, 0, -5),
-        //     new THREE.Vector3(20, 0, -20),
-        //     new THREE.Vector3(80, 0, -20),
-        //     new THREE.Vector3(20, 0, 20),
-        //     new THREE.Vector3(-20, 0, 20),
-        // ]);
-        console.log(vectors);
+
         this.lazyRiverPath = new THREE.CatmullRomCurve3(vectors);
 
         this.lazyRiverPath.curveType = 'catmullrom';
