@@ -6,7 +6,7 @@ import * as THREE from "three";
 import { MathUtils, Vector3 } from "three";
 import { leaveTutorial } from ".";
 // import { Yorbie } from "./yorbie"
-const posterFile = require('../assets/images/showPoster2021.png'); 
+const posterFile = require('../assets/images/showPoster2021.jpg'); 
 
 let tutorialText = [
     "Welcome to the tutorial!\n\nHere you have a chance to practice the controls of the YORB without anyone else around. Lets start by looking around -- click and drag in the window.",
