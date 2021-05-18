@@ -11,16 +11,20 @@ import { redrawVideoCanvas, makeVideoTextureAndMaterial } from './utils';
 
 import { SpringShow2020 } from './springShow2020';
 import { WinterShow2020 } from './winterShow2020';
+import { SpringShow2021 } from './springShow2021';
 import { ITPModel } from './itpModel';
 import { Sketches } from './p5Sketches';
 import { ProjectionScreens } from './projectionScreens';
-import { YorbControls2 } from './yorbControls2.js';
+import { Controls } from './controls.js';
 import { Yorblet } from './yorblet.js';
 import { PhotoGallery } from './photoGallery';
 import { DaysGallery } from './daysGallery';
+import { Yorbie } from './yorbie';
+import { Tutorial } from './tutorial';
+let tutorialLayer = 2;
 
-import {sceneSetup, sceneDraw} from "./sandbox";
 
+import { sceneSetup, sceneDraw } from './sandbox';
 
 import * as THREE from 'three';
 
@@ -34,6 +38,7 @@ if (hostname === 'yorb.itp.io') {
 }
 
 import debugModule from 'debug';
+import { Vector3 } from 'three';
 
 const log = debugModule('YORB:YorbScene');
 
@@ -128,26 +133,28 @@ export class Yorb {
     addYORBParts() {
         sceneSetup(this.scene);
 
-        this.controls = new YorbControls2(this.scene, this.camera, this.renderer);
+        this.controls = new Controls(this.scene, this.camera, this.renderer);
 
-        //this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+        this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
         //console.log("testing logging");
-        
-	this.show = false;
+
+        this.show = false;
         this.yorblet = false;
 
-        if (MODE === 'YORBLET') {
-            this.yorblet = new Yorblet(this.scene, this.projectionScreens, this.mouse, this.camera, this.controls);
-        }
+        // if (MODE === 'YORBLET') {
+        //     this.yorblet = new Yorblet(this.scene, this.projectionScreens, this.mouse, this.camera, this.controls);
+        // }
 
         if (MODE === 'YORB') {
-            this.show = new WinterShow2020(this.scene, this.camera, this.controls, this.mouse);
+            this.show = new SpringShow2021(this.scene, this.camera, this.controls, this.mouse);
             this.show.setup();
-            //this.projectionScreens.createYorbProjectionScreens()
-	    this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
-            this.itpModel = new ITPModel(this.scene);
-            this.photoGallery = new PhotoGallery(this.scene);
-            this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
+
+            // this.projectionScreens.createYorbProjectionScreens()
+            // this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
+            // this.itpModel = new ITPModel(this.scene);
+            // this.photoGallery = new PhotoGallery(this.scene);
+            // this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
+            this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 1);
         }
 
         // this.sketches = new Sketches(this.scene)
@@ -191,13 +198,26 @@ export class Yorb {
         dirLight2.position.set(1, 0.5, -1);
         dirLight2.position.multiplyScalar(200);
         this.scene.add(dirLight2);
+
+
+        //another directional light for poster
+        let dirLight3 = new THREE.DirectionalLight(0xffffe6, 0.3);
+        dirLight3.color.setHSL(0.1, 1, 0.95);
+        dirLight3.position.set(-1, .5, 1);
+        dirLight3.position.multiplyScalar(200);
+        this.scene.add(dirLight3);
+
+        //trying to add target but not working
+        // dirLight3.target.position.setTimeout = (14, 14, -68);
+        // this.scene.add(dirLight3.target)
+
     }
 
     //
     // update projects:
     updateProjects(projects) {
         if (this.show) {
-            // log('yorb received', projects.length, 'show projects');
+            log('yorb received', projects.length, 'show projects');
             this.show.updateProjects(projects);
         }
         if (this.yorblet) {
@@ -385,14 +405,21 @@ export class Yorb {
 
         let _head = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), videoMaterial);
 
+        const ringGeo = new THREE.RingGeometry(0.75, 0.85, 4);
+        const ringMat = new THREE.MeshBasicMaterial({ color: 0xffff00, side: THREE.DoubleSide });
+        const _ring = new THREE.Mesh(ringGeo, ringMat);
+        _ring.rotateOnAxis(new THREE.Vector3(0,0,1),Math.PI/4);
+
         // set position of head before adding to parent object
         _body.position.set(0, 0, 0);
         _head.position.set(0, 1, 0);
+        _ring.position.set(0,1,0.51);
 
         // https://threejs.org/docs/index.html#api/en/objects/Group
         var group = new THREE.Group();
         group.add(_body);
         group.add(_head);
+        group.add(_ring);
 
         // add group to scene
         this.scene.add(group);
@@ -403,6 +430,7 @@ export class Yorb {
         this.clients[_id].texture = videoTexture;
         this.clients[_id].desiredPosition = new THREE.Vector3();
         // this.clients[_id].desiredRotation = new THREE.Quaternion();
+        this.clients[_id].desiredLookAt = new THREE.Vector3();
         this.clients[_id].projectionScreenId = -1;
     }
 
@@ -421,8 +449,7 @@ export class Yorb {
                     // update position
                     this.clients[_id].desiredPosition = new THREE.Vector3(_clientProps[_id].position[0], _clientProps[_id].position[1], _clientProps[_id].position[2]);
                     // update rotation
-                    let euler = new THREE.Euler(0, _clientProps[_id].rotation[1], 0, 'XYZ');
-                    this.clients[_id].group.setRotationFromEuler(euler);
+                    this.clients[_id].desiredLookAt = new THREE.Vector3(_clientProps[_id].rotation[0],this.clients[_id].desiredPosition.y,_clientProps[_id].rotation[2])
                 }
             }
         }
@@ -455,6 +482,8 @@ export class Yorb {
                 if (this.clients[_id].group.position.distanceTo(this.clients[_id].desiredPosition) < snapDistance) {
                     this.clients[_id].group.position.set(this.clients[_id].desiredPosition.x, this.clients[_id].desiredPosition.y, this.clients[_id].desiredPosition.z);
                 }
+
+                this.clients[_id].group.lookAt(this.clients[_id].desiredLookAt);
             }
         }
     }
@@ -464,10 +493,14 @@ export class Yorb {
     // Position Update for Socket
 
     getPlayerPosition() {
+        var lookAtVector = new THREE.Vector3(0,0, -1);
+        lookAtVector.applyQuaternion(this.camera.quaternion);
+        lookAtVector.normalize();
+        lookAtVector.add(this.camera.position);
         // TODO: use quaternion or are euler angles fine here?
         return [
             [this.camera.position.x, this.camera.position.y - (this.cameraHeight - 0.5), this.camera.position.z],
-            [this.camera.rotation.x, this.camera.rotation.y, this.camera.rotation.z],
+            [lookAtVector.x, lookAtVector.y, lookAtVector.z],
         ];
     }
 
@@ -476,8 +509,8 @@ export class Yorb {
      */
     getStartingPosition() {
         // Elevator bank range: x: 3 to 28, z: -2.5 to 1.5
-        let startX = this.randomRange(6, 20);
-        let startZ = this.randomRange(-2.5, -1.5);
+        let startX = this.randomRange(-5, 5);
+        let startZ = this.randomRange(-5, -5);
 
         // In front of Red Square / ER range: x: -7.4 to - 13.05, z: -16.8 to -8.3
         // let randX = this.randomRange(-7, -16)
@@ -485,8 +518,8 @@ export class Yorb {
 
         // any query params in the URL?
         let params = new URLSearchParams(window.location.search);
-        let xParam = params.get("x");
-        let zParam = params.get("z");
+        let xParam = params.get('x');
+        let zParam = params.get('z');
 
         if (xParam) startX = parseFloat(xParam);
         if (zParam) startZ = parseFloat(zParam);
@@ -507,6 +540,7 @@ export class Yorb {
 
         if (!this.controls.paused) {
             this.frameCount++;
+            this.show.update();
 
             // things to update 50 times per seconds:
             this.controls.update();
@@ -516,6 +550,17 @@ export class Yorb {
             // things to update 5 x per second
             if (this.frameCount % 10 === 0) {
                 // this.sketches.update()
+
+                //yorbie will follow the player if they press "y" or just look at them if not in the tutorial
+                if(this.yorbie.yorbie != undefined){
+                    if (this.tutorial == undefined && this.controls.yorbieTarget) {
+                        let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                        this.yorbie.updateYorbie(lookPos);
+                    } else if (this.tutorial == undefined) {
+                        let lookPos = new Vector3(this.camera.position.x, 0.2, this.camera.position.z)
+                        this.yorbie.yorbie.lookAt(lookPos);
+                    }
+                }
             }
 
             if (this.frameCount % 20 == 0) {
@@ -523,7 +568,7 @@ export class Yorb {
                 this.projectionScreens.updatePositionalAudio();
                 this.movementCallback();
                 if (this.show) {
-                    this.show.update();
+                    // this.show.update();
                     for (let portal of this.show.portals) {
                         //originally had this in framecount % 50, might want to move there if too slow
                         if (portal.teleportCheck(this.getPlayerPosition()[0])) {
@@ -540,6 +585,11 @@ export class Yorb {
                     }
                 }
                 this.projectionScreens.checkProjectionScreenCollisions();
+
+                //tutorial loop
+                if (this.tutorial != undefined) {
+                    this.tutorial.run();
+                }
             }
             if (this.frameCount % 50 == 0) {
                 this.selectivelyPauseAndResumeConsumers();
@@ -660,5 +710,15 @@ export class Yorb {
         return Math.random() * (max - min) + min;
     }
 
+
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
+    // Tutorial:
+
+    startTutorial(){
+        this.tutorial = new Tutorial(this.scene, this.camera, this.mouse, this.getPlayerPosition(), tutorialLayer, this.yorbie)
+    }
+
     //==//==//==//==//==//==//==//==// fin //==//==//==//==//==//==//==//==//==//
+
 }

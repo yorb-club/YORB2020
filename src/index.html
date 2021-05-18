@@ -7,7 +7,9 @@
 
         <script>
             // window.localStorage.setItem('debug', 'YORB*')
-            console.log("██╗    ██╗███████╗██╗      ██████╗ ██████╗ ███╗   ███╗███████╗    ████████╗ ██████╗     ██╗   ██╗ ██████╗ ██████╗ ██████╗ \n██║    ██║██╔════╝██║     ██╔════╝██╔═══██╗████╗ ████║██╔════╝    ╚══██╔══╝██╔═══██╗    ╚██╗ ██╔╝██╔═══██╗██╔══██╗██╔══██╗\n██║ █╗ ██║█████╗  ██║     ██║     ██║   ██║██╔████╔██║█████╗         ██║   ██║   ██║     ╚████╔╝ ██║   ██║██████╔╝██████╔╝\n██║███╗██║██╔══╝  ██║     ██║     ██║   ██║██║╚██╔╝██║██╔══╝         ██║   ██║   ██║      ╚██╔╝  ██║   ██║██╔══██╗██╔══██╗\n╚███╔███╔╝███████╗███████╗╚██████╗╚██████╔╝██║ ╚═╝ ██║███████╗       ██║   ╚██████╔╝       ██║   ╚██████╔╝██║  ██║██████╔╝\n ╚══╝╚══╝ ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝       ╚═╝    ╚═════╝        ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═════╝ \n");
+            console.log(
+                '██╗    ██╗███████╗██╗      ██████╗ ██████╗ ███╗   ███╗███████╗    ████████╗ ██████╗     ██╗   ██╗ ██████╗ ██████╗ ██████╗ \n██║    ██║██╔════╝██║     ██╔════╝██╔═══██╗████╗ ████║██╔════╝    ╚══██╔══╝██╔═══██╗    ╚██╗ ██╔╝██╔═══██╗██╔══██╗██╔══██╗\n██║ █╗ ██║█████╗  ██║     ██║     ██║   ██║██╔████╔██║█████╗         ██║   ██║   ██║     ╚████╔╝ ██║   ██║██████╔╝██████╔╝\n██║███╗██║██╔══╝  ██║     ██║     ██║   ██║██║╚██╔╝██║██╔══╝         ██║   ██║   ██║      ╚██╔╝  ██║   ██║██╔══██╗██╔══██╗\n╚███╔███╔╝███████╗███████╗╚██████╗╚██████╔╝██║ ╚═╝ ██║███████╗       ██║   ╚██████╔╝       ██║   ╚██████╔╝██║  ██║██████╔╝\n ╚══╝╚══╝ ╚══════╝╚══════╝ ╚═════╝ ╚═════╝ ╚═╝     ╚═╝╚══════╝       ╚═╝    ╚═════╝        ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═════╝ \n'
+            );
         </script>
 
         <link rel="stylesheet" type="text/css" href="./assets/css/main.css" />
@@ -20,8 +22,53 @@
             <div class="main-content-container">
                 <div id="scene-container"></div>
                 <div id="overlay">
-                    <div style="padding-top: 5%">
-                        <button id="startButton"><img src="./assets/images/enter.png" /></button>
+                    <div id="welcome-screen-modal">
+                        <div id="welcome-screen-container" class="animate">
+                            <div id="image-container">
+                                <!-- <img src=./assets/images/popupBackground1.png alt="Avatar" class="avatar"> -->
+                                <img src=./assets/images/showPoster2021.jpg alt="Poster depicting a happy character and cartoonish computer for spring show 2021" class="avatar2">
+                            </div>
+
+                            <div id="text-container">
+                                <div class="welcome"><h1>Welcome to Yorb!</h1></div>
+
+                                <div class="event"><h1>Today's Event</h1></div>
+
+                                <div>
+                                    <p>
+                                        <small
+                                            >The [ITP/IMA/Low Res] Spring Show 2021<br />
+                                            A Festival of the Recently Possible<br />
+                                            From May 17 - 18<br />
+
+                                            YORB Gallery Opening<br />
+                                            Monday May 17 10am - 12pm ET<br />
+                                        </small>
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p>
+                                        <small
+                                            >Celebrate our students and their incredible work from this semester! The YORB Gallery open throughout the festival as an experimental and playful archive
+                                            of students’ projects and social space. More events and festival info: https://itp.nyu.edu/show
+                                        </small>
+                                    </p>
+                                </div>
+                                <div id="controls-explanation">
+                                    <img src="./assets/images/explanation.png" alt="use arrow keys or WASD keys to move, use mouse to rotate camera view" />
+                                </div>
+
+                                <div id="enter-buttons">
+                                    <div>
+                                        <button class="button1" id="enterButton" type="enter"><img src="./assets/images/enter.png" /></button>
+                                    </div>
+                                    <div>
+                                        <button class="button2" id="tutorialButton" type="tutorial">See Tutorial</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -33,31 +80,29 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="tutorialBox" class="tutorial_box">Test text for tutorial!</div>
             </div>
 
             <div class="bottom_bar_container">
                 <div class="bottom_bar">
                     <div id="project-details">
-                        <div class="box-title">ITP Winter Show 2020</div>
-                        <div class="box-content">
-                            Wed Dec 16th, 8-10 p.m. ET <br />
-                            Thu Dec 17th, 8-10 p.m. ET <br /><br />
-                        </div>
-                        <div class="box-content" id="html-project-list">
-                        </div>
+                        <div class="box-title">ITP Spring Show 2021 Gallery</div>
+                        <div class="box-content">Remarks – Thurs May 16th, 10 am - 12 pm ET <br /><br /></div>
+                        <div class="box-content" id="html-project-list"></div>
                     </div>
 
                     <div>
                         <div class="box-title">CONTROLS:</div>
                         <div class="box-content">
-                            ESCAPE........exit<br />
                             WASD..........move<br />
                             SPACEBAR......jump<br />
-                            MOUSE.........look<br />
+                            MOUSE+DRAG....look<br />
                             SHIFT+CLICK...interact<br />
                             C.............webcam<br />
                             M.............mic<br />
-                            1.............paint
+                            1.............paint<br />
+                            Y.............Yorbie!
                         </div>
                         <br />
                     </div>
@@ -85,6 +130,8 @@
                             <br />
                             <a target="_blank" rel="noopener noreferrer" href="http://alden.website/">Alden Rivendale Jones</a>
                             <br />
+                            <a target="_blank" rel="noopener noreferrer" href="https://www.danioved.com/">Dan Oved</a>
+                            <br />
                             <a target="_blank" rel="noopener noreferrer" href="https://billybennett.tv/">Billy Bennett</a>
                             <br />
                             <a target="_blank" rel="noopener noreferrer" href="https://www.lydiajessup.me/">Lydia Jessup</a>
@@ -92,6 +139,8 @@
                             <a target="_blank" rel="noopener noreferrer" href="https://augustluhrs.art/portfolio">August Luhrs</a>
                             <br />
                             <a target="_blank" rel="noopener noreferrer" href="https://www.ygzhang.com/">Yuguang Zhang</a>
+                            <br />
+                            <a target="_blank" rel="noopener noreferrer" href="https://yorb.itp.io/">Zara Khosravi</a>
                             <br />
                             <br />
                             <br />

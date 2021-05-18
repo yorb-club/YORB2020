@@ -1,6 +1,6 @@
 import * as THREE from 'three'
 
-export class YorbControls2 {
+export class Controls {
     constructor(scene, camera, renderer) {
         this.scene = scene
         this.camera = camera
@@ -53,6 +53,7 @@ export class YorbControls2 {
         this.vertex = new THREE.Vector3()
         this.color = new THREE.Color()
 
+        this.yorbieTarget = false; //for toggling lookat test
 
         document.addEventListener(
             'keydown',
@@ -81,6 +82,10 @@ export class YorbControls2 {
                     case 32: // space
                         if (this.canJump === true) this.velocity.y = jumpSpeed
                         this.canJump = false
+                        break
+
+                    case 89: //y
+                        this.yorbieTarget = !this.yorbieTarget;
                         break
                 }
             },

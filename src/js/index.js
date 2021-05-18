@@ -32,11 +32,11 @@ let WEB_SOCKET_SERVER = false;
 let INSTANCE_PATH = false;
 
 // For running against local server
-// WEB_SOCKET_SERVER = 'localhost:3000'
-// INSTANCE_PATH = '/socket.io'
+// WEB_SOCKET_SERVER = 'localhost:3000';
+// INSTANCE_PATH = '/socket.io';
 
 // For running against ITP server
-WEB_SOCKET_SERVER = 'https://yorb.itp.io';
+WEB_SOCKET_SERVER = 'https://yorblet1.itp.io';
 INSTANCE_PATH = '/socket.io';
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
@@ -78,6 +78,9 @@ export let mySocketID,
 
 window.clients = {}; // array of connected clients for three.js scene
 window.lastPollSyncData = {};
+
+//for tutorial checks
+let isInTutorial = true;
 
 // adding constraints, VIDEO_CONSTRAINTS is video quality levels
 // localMediaCOnstraints is passed to the getUserMedia object to request a lower video quality than the maximum
@@ -121,23 +124,34 @@ window.onload = async () => {
         }
     }
 
-    await initSocketConnection();
+    //moved below to init and leaveTutorial
+    // await initSocketConnection(); 
+
+    // use sendBeacon to tell the server we're disconnecting when
+    // the page unloads
+    // window.addEventListener('unload', () => {
+    //     socket.request('leave', {});
+    // });
+
+    alert('Allow YORB to access your webcam for the full experience');
+    await startCamera();
+
+    var startButton = document.getElementById('enterButton');
+    startButton.addEventListener('click', init);
+
+    
+};
+
+async function init() {
+    document.getElementById('overlay').style.visibility = 'hidden';
+
+    await initSocketConnection(); 
 
     // use sendBeacon to tell the server we're disconnecting when
     // the page unloads
     window.addEventListener('unload', () => {
         socket.request('leave', {});
     });
-
-    alert('Allow YORB to access your webcam for the full experience');
-    await startCamera();
-
-    var startButton = document.getElementById('startButton');
-    startButton.addEventListener('click', init);
-};
-
-async function init() {
-    document.getElementById('overlay').style.visibility = 'hidden';
 
     // only join room after we user has interacted with DOM (to ensure that media elements play)
     if (!initialized) {
@@ -146,7 +160,47 @@ async function init() {
         setupControls();
         turnGravityOn();
         initialized = true;
+        isInTutorial = false;
     }
+    yorbScene.camera.layers.set(0);    
+
+}
+
+export async function launchTutorial() {
+    document.getElementById('overlay').style.visibility = 'hidden';
+    // only join room after we user has interacted with DOM (to ensure that media elements play)
+    if (!initialized) {
+        // going to test not doing these until user ready to join public layer
+        // await joinRoom();
+        // sendCameraStreams();
+        setupControls();
+        turnGravityOn();
+        initialized = true;
+        isInTutorial = true;
+
+    }
+
+    // yorbScene.camera.layers.set(1);    
+    yorbScene.camera.layers.enable(2);
+    yorbScene.startTutorial();    
+
+}
+
+export async function leaveTutorial() {
+    await initSocketConnection(); 
+
+    // use sendBeacon to tell the server we're disconnecting when
+    // the page unloads
+    window.addEventListener('unload', () => {
+        socket.request('leave', {});
+    });
+
+    await joinRoom();
+    sendCameraStreams();
+
+    isInTutorial = false;
+    yorbScene.tutorial = undefined;
+
 }
 
 export function shareScreen(screenId) {
@@ -263,7 +317,9 @@ function updateProjects(_projects) {
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 
 function onPlayerMove() {
-    socket.emit('move', yorbScene.getPlayerPosition());
+    if(!isInTutorial){
+        socket.emit('move', yorbScene.getPlayerPosition());
+    }
 }
 
 export function hackToRemovePlayerTemporarily() {
@@ -361,17 +417,16 @@ function makePositionLinkModal(position) {
         });
         closeButton.innerHTML = 'X';
 
-
         let spacerDiv = document.createElement('div');
-        spacerDiv.innerHTML += "<br><br>"
+        spacerDiv.innerHTML += '<br><br>';
 
         let spacerDiv2 = document.createElement('div');
-        spacerDiv2.innerHTML += "<br><br>"
+        spacerDiv2.innerHTML += '<br><br>';
 
         contentEl.appendChild(closeButton);
-        contentEl.appendChild(spacerDiv)
+        contentEl.appendChild(spacerDiv);
         contentEl.appendChild(linkEl);
-        contentEl.appendChild(spacerDiv2)
+        contentEl.appendChild(spacerDiv2);
 
         modalEl.appendChild(contentEl);
         document.body.appendChild(modalEl);
@@ -948,13 +1003,16 @@ export async function pauseAllConsumersForPeer(_id) {
     if (lastPollSyncData[_id]) {
         if (!(_id === mySocketID)) {
             for (let [mediaTag, info] of Object.entries(lastPollSyncData[_id].media)) {
-                let consumer = findConsumerForTrack(_id, mediaTag);
-                if (consumer) {
-                    if (!consumer.paused) {
-                        log('Pausing', mediaTag, 'consumer for peer with ID: ' + _id);
-                        await pauseConsumer(consumer);
+                if (mediaTag == 'screen-video' || mediaTag == 'screen-audio') continue;
+                    let consumer = findConsumerForTrack(_id, mediaTag);
+                    if (consumer) {
+                        if (!consumer.paused) {
+                            log('Pausing', mediaTag, 'consumer for peer with ID: ' + _id);
+                            console.log('Pausing', mediaTag, 'consumer for peer with ID: ' + _id)
+                            await pauseConsumer(consumer);
+                        }
                     }
-                }
+                
             }
         }
     }
@@ -1172,6 +1230,18 @@ async function pollAndUpdate() {
                         // that we don't already have consumers for...
 
                         log(`auto subscribing to track that ${id} has added`);
+                        await subscribeToTrack(id, mediaTag);
+                    }
+                }
+            }
+
+            // separate update for screen share so we can see people's screens from wherever:
+            for (let [mediaTag, info] of Object.entries(peers[id].media)) {
+                if (mediaTag == 'screen-video' || mediaTag == 'screen-audio') {
+                    // for each of the peer's producers...
+                    if (!findConsumerForTrack(id, mediaTag)) {
+                        // that we don't already have consumers for...
+                        log(`auto subscribing to screenshare that ${id} has added`);
                         await subscribeToTrack(id, mediaTag);
                     }
                 }
