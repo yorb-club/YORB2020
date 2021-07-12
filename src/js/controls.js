@@ -8,6 +8,8 @@ export class Controls {
 
         this.paused = false
 
+        this.smallPosition = new THREE.Vector3(0,0,30);
+
         this.cameraHeight = 1.5
         this.playerSize = 1;
 
@@ -178,14 +180,35 @@ export class Controls {
     }
 
     getSpeedBasedOnLocation(){
-        let pos = this.camera.position.x;
+        // let pos = this.camera.position.x;
         // return Math.max(0.5, 50/(50-pos));
-        return 50;
+        // return 50;
+
+        let highThreshold = 10;
+        let lowThreshold = 5;
+        let dist = this.camera.position.distanceTo(this.smallPosition);
+        if (dist > highThreshold){
+            return 50;
+        } else if (dist > lowThreshold){
+            return scale(dist, lowThreshold, highThreshold, 5, 50);
+        } else {
+            return 5;
+        }
     }
 
     updateCameraHeightBasedOnLocation(){
+        let highThreshold = 10;
+        let lowThreshold = 5;
         let pos = this.camera.position.x;
-        this.playerSize = Math.min(1.0,Math.max(0.1, 1.0 - pos/50))
+        let dist = this.camera.position.distanceTo(this.smallPosition);
+        if (dist > highThreshold){
+            this.playerSize = 1;
+        } else if (dist > lowThreshold){
+            this.playerSize = scale(dist, lowThreshold, highThreshold, 0.05, 1);
+        } else {
+            this.playerSize = 0.05;
+        }
+        // this.playerSize = Math.min(1.0,Math.max(0.1, 1.0 - pos/50))
         this.cameraHeight = 1.5 * this.playerSize;        
     }
 
@@ -405,4 +428,10 @@ export class Controls {
         this.camera.target.z = 500 * Math.sin(this.phi) * Math.sin(this.theta)
         this.camera.lookAt(this.camera.target)
     }
+}
+
+
+// https://stackoverflow.com/questions/10756313/javascript-jquery-map-a-range-of-numbers-to-another-range-of-numbers
+function scale (number, inMin, inMax, outMin, outMax) {
+    return (number - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
 }

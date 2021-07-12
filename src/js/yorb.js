@@ -151,7 +151,7 @@ export class Yorb {
 
             // this.projectionScreens.createYorbProjectionScreens()
             // this.projectionScreens = new ProjectionScreens(this.scene, this.camera, this.mouse);
-            // this.itpModel = new ITPModel(this.scene);
+            this.itpModel = new ITPModel(this.scene);
             // this.photoGallery = new PhotoGallery(this.scene);
             // this.daysGallery = new DaysGallery(this.scene, this.camera, this.mouse);
             this.yorbie = new Yorbie(this.scene, new Vector3(2.86, 0, 1.19), 1);
@@ -411,9 +411,9 @@ export class Yorb {
         _ring.rotateOnAxis(new THREE.Vector3(0,0,1),Math.PI/4);
 
         // set position of head before adding to parent object
-        _body.position.set(0, 0, 0);
-        _head.position.set(0, 1, 0);
-        _ring.position.set(0,1,0.51);
+        _body.position.set(0, 0.5, 0);
+        _head.position.set(0, 1.5, 0);
+        _ring.position.set(0,1.5,0.51);
 
         // https://threejs.org/docs/index.html#api/en/objects/Group
         var group = new THREE.Group();
@@ -501,7 +501,7 @@ export class Yorb {
         lookAtVector.add(this.camera.position);
         // TODO: use quaternion or are euler angles fine here?
         return [
-            [this.camera.position.x, this.camera.position.y - (this.controls.cameraHeight - 0.5), this.camera.position.z],
+            [this.camera.position.x, 0, this.camera.position.z],
             [lookAtVector.x, lookAtVector.y, lookAtVector.z],
         ];
     }

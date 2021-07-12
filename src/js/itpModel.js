@@ -79,7 +79,7 @@ export class ITPModel {
             _file,
             (gltf) => {
                 let scene = gltf.scene
-                scene.position.set(0, 0, 0)
+                scene.position.set(0, 0.01, 30)
                 scene.scale.set(_scale, _scale, _scale)
                 scene.traverse((child) => {
                     if (child.isMesh) {
@@ -87,7 +87,7 @@ export class ITPModel {
                         child.castShadow = _castShadow
                         child.receiveShadow = _receiveShadow
                         if (_collidable) {
-                            child.layers.enable(3)
+                            // child.layers.enable(3)
 
                             this.collidableMeshList.push(child)
                         }
@@ -106,21 +106,21 @@ export class ITPModel {
     }
 
     coverElevatorBankArea() {
-        let boxGeo = new THREE.BoxBufferGeometry(24.75,5,0.1);
-        let leftSideCover = new THREE.Mesh(boxGeo, this.wallMaterial);
-        leftSideCover.position.set(16,2,-4.1);
+        // let boxGeo = new THREE.BoxBufferGeometry(24.75,5,0.1);
+        // let leftSideCover = new THREE.Mesh(boxGeo, this.wallMaterial);
+        // leftSideCover.position.set(16,2,-4.1);
 
-        let rightSideCover = new THREE.Mesh(boxGeo, this.wallMaterial);
-        rightSideCover.position.set(14.65,2,2.25);
-        this.scene.add(leftSideCover)
-        this.scene.add(rightSideCover);
+        // let rightSideCover = new THREE.Mesh(boxGeo, this.wallMaterial);
+        // rightSideCover.position.set(14.65,2,2.25);
+        // this.scene.add(leftSideCover)
+        // this.scene.add(rightSideCover);
 
-        leftSideCover.layers.enable(3)
-        rightSideCover.layers.enable(3)
+        // leftSideCover.layers.enable(3)
+        // rightSideCover.layers.enable(3)
     }
 
     loadFloorModel() {
-        let scaleFactor = 1.25
+        let scaleFactor = 0.05
         this.matMode = 0
 
         this.loadModel(require('../assets/models/itp/ceiling.glb'), "ceiling", this.ceilingMaterial, scaleFactor, true, false)
