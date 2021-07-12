@@ -208,8 +208,20 @@ export class Controls {
         } else {
             this.playerSize = 0.05;
         }
-        // this.playerSize = Math.min(1.0,Math.max(0.1, 1.0 - pos/50))
         this.cameraHeight = 1.5 * this.playerSize;        
+    }
+
+    getCollisionDetectionThresholdBasedOnLocation(){
+        let highThreshold = 10;
+        let lowThreshold = 5;
+        let dist = this.camera.position.distanceTo(this.smallPosition);
+        if (dist > highThreshold){
+            return 1;
+        } else if (dist > lowThreshold){
+            return scale(dist, lowThreshold, highThreshold, 0.75, 1);
+        } else {
+            return 0.075;
+        }
     }
 
     // update for these controls, which are unfortunately not included in the controls directly...
@@ -383,7 +395,7 @@ export class Controls {
 
     checkCollisions(pts, dir) {
         // distance at which a collision will be detected and movement stopped (this should be greater than the movement speed per frame...)
-        var detectCollisionDistance = 1
+        var detectCollisionDistance = this.getCollisionDetectionThresholdBasedOnLocation();
 
         for (var i = 0; i < pts.length; i++) {
             var pt = pts[i].clone()

@@ -75,7 +75,7 @@ export class Yorb {
 
         //THREE Camera
         this.cameraHeight = 1.75;
-        this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.1, 5000);
+        this.camera = new THREE.PerspectiveCamera(50, this.width / this.height, 0.025, 5000);
 
         this.mouse = new THREE.Vector2();
 
