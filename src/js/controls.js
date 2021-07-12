@@ -9,6 +9,7 @@ export class Controls {
         this.paused = false
 
         this.cameraHeight = 1.5
+        this.playerSize = 1;
 
         this.raycaster = new THREE.Raycaster()
 
@@ -176,10 +177,23 @@ export class Controls {
       this.gravity = true;
     }
 
+    getSpeedBasedOnLocation(){
+        let pos = this.camera.position.x;
+        // return Math.max(0.5, 50/(50-pos));
+        return 50;
+    }
+
+    updateCameraHeightBasedOnLocation(){
+        let pos = this.camera.position.x;
+        this.playerSize = Math.min(1.0,Math.max(0.1, 1.0 - pos/50))
+        this.cameraHeight = 1.5 * this.playerSize;        
+    }
+
     // update for these controls, which are unfortunately not included in the controls directly...
     // see: https://github.com/mrdoob/three.js/issues/5566
     updateControls() {
-        let speed = 50
+        let speed = this.getSpeedBasedOnLocation();
+        this.updateCameraHeightBasedOnLocation();
 
         var time = performance.now()
         var rawDelta = (time - this.prevTime) / 1000

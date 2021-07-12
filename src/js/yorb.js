@@ -5,7 +5,7 @@
  *
  */
 
-import { hackToRemovePlayerTemporarily, pauseAllConsumersForPeer, resumeAllConsumersForPeer } from './index.js';
+import { hackToRemovePlayerTemporarily, pauseAllConsumersForPeer, resumeAllConsumersForPeer, updatePlayerSize } from './index.js';
 
 import { redrawVideoCanvas, makeVideoTextureAndMaterial } from './utils';
 
@@ -450,6 +450,8 @@ export class Yorb {
                     this.clients[_id].desiredPosition = new THREE.Vector3(_clientProps[_id].position[0], _clientProps[_id].position[1], _clientProps[_id].position[2]);
                     // update rotation
                     this.clients[_id].desiredLookAt = new THREE.Vector3(_clientProps[_id].rotation[0],this.clients[_id].desiredPosition.y,_clientProps[_id].rotation[2])
+                    console.log('setting scale',_clientProps[_id].size)
+                    this.clients[_id].group.scale.set(_clientProps[_id].size, _clientProps[_id].size, _clientProps[_id].size);
                 }
             }
         }
@@ -469,10 +471,10 @@ export class Yorb {
     updatePositions() {
         // PARACHUTE IS BACK...
         // While landing, let's look at the middle of the area
-        if (this.camera.position.y > 8) {
-            let lookMiddle = new THREE.Vector3(0, this.cameraHeight, 0);
-            this.camera.lookAt(lookMiddle);
-        }
+        // if (this.camera.position.y > 8) {
+        //     let lookMiddle = new THREE.Vector3(0, this.cameraHeight, 0);
+        //     this.camera.lookAt(lookMiddle);
+        // }
 
         let snapDistance = 0.5;
         // let snapAngle = 0.2; // radians
@@ -499,7 +501,7 @@ export class Yorb {
         lookAtVector.add(this.camera.position);
         // TODO: use quaternion or are euler angles fine here?
         return [
-            [this.camera.position.x, this.camera.position.y - (this.cameraHeight - 0.5), this.camera.position.z],
+            [this.camera.position.x, this.camera.position.y - (this.controls.cameraHeight - 0.5), this.camera.position.z],
             [lookAtVector.x, lookAtVector.y, lookAtVector.z],
         ];
     }
@@ -564,6 +566,7 @@ export class Yorb {
             }
 
             if (this.frameCount % 20 == 0) {
+                updatePlayerSize(this.controls.playerSize);
                 this.updateClientVolumes();
                 this.projectionScreens.updatePositionalAudio();
                 this.movementCallback();

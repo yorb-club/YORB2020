@@ -270,6 +270,7 @@ async function runSocketServer() {
             // rotation: [0, 0, 0, 1] // stored as XYZW values of Quaternion
             rotation: [0, 0, 0],
             projectionScreenId: -1,
+            size: 1,
         }
 
         socket.emit('introduction', socket.id, Object.keys(clients))
@@ -289,6 +290,12 @@ async function runSocketServer() {
                 clients[socket.id].position = data[0]
                 clients[socket.id].rotation = data[1]
                 clients[socket.id].lastSeenTs = now
+            }
+        })
+
+        socket.on('updatePlayerSize', (data) => {
+            if (clients[socket.id]) {
+                clients[socket.id].size = data;
             }
         })
 

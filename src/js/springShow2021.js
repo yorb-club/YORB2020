@@ -45,9 +45,9 @@ const yorbletPortalReference = [
 const hostname = window.location.hostname
 
 let YORBLET_INDEX = 1
-if (hostname === 'yorblet1.itp.io') {
+if (hostname === 'yorb.itp.io/spring-show-a') {
     YORBLET_INDEX = 1
-} else if (hostname === 'yorblet2.itp.io') {
+} else if (hostname === 'yorb.itp.io/spring-show-b') {
     YORBLET_INDEX = 2
 }
 

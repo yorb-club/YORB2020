@@ -32,12 +32,12 @@ let WEB_SOCKET_SERVER = false;
 let INSTANCE_PATH = false;
 
 // For running against local server
-// WEB_SOCKET_SERVER = 'localhost:3000';
-// INSTANCE_PATH = '/socket.io';
+WEB_SOCKET_SERVER = 'localhost:3000';
+INSTANCE_PATH = '/socket.io';
 
 // For running against ITP server
-WEB_SOCKET_SERVER = 'https://yorblet1.itp.io';
-INSTANCE_PATH = '/socket.io';
+// WEB_SOCKET_SERVER = 'https://yorb.itp.io';
+// INSTANCE_PATH = '/spring-show-a/socket.io';
 
 //==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//==//
 // Setup Global Variables:
@@ -331,6 +331,10 @@ export function hackToRemovePlayerTemporarily() {
     for (let _id in clients) {
         pauseAllConsumersForPeer(_id);
     }
+}
+
+export function updatePlayerSize(size){
+    socket.emit('updatePlayerSize', size);
 }
 
 function createScene() {
